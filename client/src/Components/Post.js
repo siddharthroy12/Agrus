@@ -1,0 +1,145 @@
+import styled from 'styled-components'
+
+import {
+	Card, CardHeader, CardMedia, CardContent,
+	Avatar, IconButton, Typography, CardActions
+} from '@material-ui/core'
+
+import {
+	ArrowUpward as ArrowUpwardIcon,
+	ArrowDownward as ArrowDownwardIcon,
+	Bookmark as BookmarkIcon,
+	MoreVert as MoreVertIcon,
+	Message as MessageIcon
+} from '@material-ui/icons'
+
+const HeaderText = styled.div`
+	display: flex;
+	align-items: center;
+
+	& > * {
+		margin-right: 10px;
+	}
+`
+
+const BoardName = styled(Typography)`
+	font-weight: 500;
+`
+
+const PostContent = styled(CardContent)`
+	padding-top: 0;
+	padding-bottom: 1rem;
+	font-weight: 300;
+	padding-bottom: 0;
+`
+
+const MediaContainer = styled.div`
+	display:flex;
+	justify-content: center;
+	background-color: black;
+`
+
+const PostTitle = styled(Typography)`
+	font-weight: 500;
+	margin-bottom: 0.5rem;
+`
+
+const PostBody = styled(Typography)`
+	color: #505050;
+	//background-color: rgba(0, 0, 0, 0.1);
+`
+
+const PostActions = styled(CardActions)`
+	display: flex;
+
+	& > * {
+		margin-right: 1rem;
+		margin-left: 0 !important;
+	}
+`
+
+export default function Post() {
+	const post = {
+		type: 'media', // media | text
+		title: 'The council has spoken',
+		media: 'https://preview.redd.it/wuxlazynzdu41.png?width=640&height=699&crop=smart&auto=webp&s=0cb5df500dbf89092f616eabf9a5acb7b34184a1',
+		body: 'Title is pretty self-explanatory. Feel feel to share your own advice/experiences as well. \n\nEdit: Got some downvotes, unfortunately, but I want to clarify: Im doing this to cope and to...',
+		board: 'uso',
+		author: 'siddharthroy',
+		score: 250,
+		comments: 25
+	}
+
+	return (
+		<Card elevation={3}>
+			<CardHeader
+				avatar={
+					<IconButton size="small">
+						<Avatar style={{width: '40xp', height: '40px'}}>H</Avatar>
+					</IconButton>
+				}
+				action={
+          <IconButton aria-label="settings">
+            <MoreVertIcon />
+          </IconButton>
+        }
+        title={
+					<HeaderText	>
+						<BoardName>
+							{ post.board }
+						</BoardName>
+						<Typography>
+							•
+						</Typography>
+						<Typography>
+							Posted by { post.author }
+						</Typography>
+					</HeaderText>
+				}
+        subheader="September 14, 2016"
+			/>
+			<PostContent>
+					<PostTitle>
+						{ post.title }
+					</PostTitle>
+					{ post.type === 'text' && (
+						<PostBody>
+							{ post.body }
+						</PostBody>
+					)}
+			</PostContent>
+			{ post.type === 'media' && (
+				<MediaContainer>
+					<CardMedia
+						component="img"
+						alt="Contemplative Reptile"
+						style={{height: '25rem', width: 'auto'}}
+						image={post.media}
+						title="Paella dish"
+					/>
+				</MediaContainer>
+			)}
+			
+			<PostActions>
+				<IconButton size="small">
+					<ArrowUpwardIcon />
+				</IconButton>
+				<Typography>
+					{ post.score }
+				</Typography>
+				<IconButton size="small">
+					<ArrowDownwardIcon />
+				</IconButton>
+				<IconButton size="small">
+					<MessageIcon />
+				</IconButton>
+				<Typography>
+					{ post.comments }
+				</Typography>
+				<IconButton size="small">
+					<BookmarkIcon />
+				</IconButton>
+			</PostActions>
+		</Card>
+	)
+}
