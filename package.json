@@ -1,7 +1,15 @@
 {
-  "name": "Agrus",
+  "name": "agrus",
   "version": "1.0.0",
   "main": "server.js",
+  "scripts": {
+    "start": "node  backend/server",
+    "server": "nodemon backend/server",
+    "client": "yarn --cwd client start",
+    "dev": "concurrently \"yarn run server\" \"yarn run client\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false yarn --cwd client install && yarn --cwd client build",
+    "install-all": "yarn install && yarn --cwd client install"
+  },
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -11,6 +19,7 @@
     "express-async-handler": "^1.1.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "validator": "^13.6.0"
   }
 }

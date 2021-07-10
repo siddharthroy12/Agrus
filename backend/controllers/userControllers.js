@@ -1,12 +1,17 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/User')
-const generateToken = require('../utils/generateToken')
+const generateToken = require('../utils/genToken')
 
 // @desc Register user & send token back
 // @route POST /api/user/register
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
-	const { username, password, avatar } = req.body
+	let { username, password } = req.body
+
+  if (username === undefined || password === undefined) {
+    res.status(400)
+    throw new Error('Provide all feilds')
+  }
 
 	// Username and password must not be empty
 	if (username.trim() === '' || password.trim() === '') {
@@ -46,13 +51,10 @@ const registerUser = asyncHandler(async (req, res) => {
   try {
     const newUser = await User.create({
       username,
-      password,
-			avatar: avatar === undefined ? '' : avatar 
+      password
     })
 
     res.status(201).json({
-      _id: newUser._id,
-			username: newUser.username,
       token: generateToken(newUser._id),
     })
 
@@ -67,6 +69,12 @@ const registerUser = asyncHandler(async (req, res) => {
 // @access Public
 const loginUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body
+    
+    if (username === undefined || password === undefined) {
+      res.status(400)
+      throw new Error('Provide all feilds')
+    }
+
     const user = await User.findOne({ username })
 
     if (!user) {
@@ -96,7 +104,6 @@ const authenticateUser = asyncHandler(async (req, res) => {
     res.status(200)
     res.json(req.user)
 })
-
 
 // @desc Get User
 // @route GET /api/user/:username

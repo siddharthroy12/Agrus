@@ -5,6 +5,7 @@ const morgan = require('morgan')
 const connectDB = require('./utils/connectDB')
 const { notFound, errorHandler } = require('./middlewares/errorMiddlewares')
 const userRoutes = require('./routes/userRoutes')
+const boardRoutes = require('./routes/boardRoutes')
 
 // Load environment variables from .env
 require('dotenv').config()
@@ -25,6 +26,7 @@ app.use(express.json())
 // app.use('/api/label', labelRoutes)
 // app.use('/api/notes', noteRoutes)
 app.use('/api/user', userRoutes)
+app.use('/api/board', boardRoutes)
 
 // Serve client in production mode
 if (process.env.NODE_ENV === 'production') {

@@ -10,13 +10,16 @@ const boardSchema = mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	logo: {
+		type:String,
+		default: '',
+	},
 	description: {
 		type: String,
 		required: true,
 	},
 	members: {
 		type: Number,
-		required: true,
 		default: 0
 	},
 	posts: [{

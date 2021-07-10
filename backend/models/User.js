@@ -11,7 +11,8 @@ const userSchema = mongoose.Schema({
 		require: true
 	},
 	avatar: {
-		type: String
+		type: String,
+		default: ''
 	},
 	posts: [{
 		type: mongoose.Schema.ObjectId,

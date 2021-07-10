@@ -7,9 +7,8 @@ const postSchema = mongoose.Schema({
 		required: true
 	},
 	board: {
-		type: mongoose.Schema.ObjectId,
-		ref: 'User',
-		required: true
+		type: String,
+		default: ''
 	},
 	title: {
 		type: String,
@@ -21,33 +20,28 @@ const postSchema = mongoose.Schema({
 	},
 	media: {
 		type: String,
+		default: ''
 	},
 	mediaType: {
 		type: String,
+		default: ''
 	},
 	body: {
 		type: String,
+		default: ''
 	},
 	score: {
 		type: Number,
-		required: true,
 		default: 0
 	},
 	commentCount: {
 		type: Number,
-		required: true,
 		default: 0 
 	},
-	comments: {
+	comments: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Comment',
-		required: true
-	},
-	deleted: {
-		type: Boolean,
-		required: true,
-		default: false
-	}
+	}],
 }, {
     timestamp: true
 })
