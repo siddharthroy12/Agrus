@@ -110,8 +110,72 @@ const deleteBoard = asyncHandler(async (req, res) => {
 	res.json({message: 'Board deleted successfully'})
 })
 
+// @desc Join and Leave Board
+// @route POST /api/board/:boardName/join
+// @access Private
+const joinBoard = asyncHandler(async (req, res) => {
+	const board = await Board.findOne({boardName: req.params.boardName})
+
+	if (!board) {
+		res.status(404)
+		throw new Error('Board Not found')
+	}
+
+	const hasAlreadyJoined = req.user.joinedBoards.filter((boardId) => {
+		return (boardId.toString() === board._id.toString())
+	}).length
+
+	// If already joined then leave
+	if (hasAlreadyJoined) {
+		// Remove the joined board
+		req.user.joinedBoards = req.user.joinedBoards.filter((boardId) => {
+			return (boardId.toString() !== board._id.toString())
+		})
+
+		await Board.updateOne({boardName: req.params.boardName}, {
+			$inc: {
+				members: -1
+			}
+		})
+
+		await req.user.save()
+
+		res.status(200)
+		res.json({message: 'Board left successfully'})
+		return
+	}
+
+	req.user.joinedBoards.push(board._id)
+	await req.user.save()
+	
+	await Board.updateOne({boardName: req.params.boardName}, {
+		$inc: {
+			members: 1
+		}
+	})
+
+	res.status(200)
+	res.json({message: 'Board joined successfully'})
+})
+
+
+// @desc Get All Boards
+// @route GET /api/board/all
+// @access Public/Development
+const getAllBoards = asyncHandler(async (req, res) => {
+	if (process.env.NODE_ENV === 'development') {
+		const boards = await Board.find({})
+		res.json(boards)
+	} else {
+		res.status(400)
+		throw new Error('Not permitted')
+	}
+})
+
 module.exports = {
 	createBoard,
 	updateBoard,
 	deleteBoard,
+	getAllBoards,
+	joinBoard,
 }

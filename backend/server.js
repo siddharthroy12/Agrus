@@ -1,3 +1,6 @@
+// Load environment variables from .env (This line should be at toop!)
+require('dotenv').config()
+
 const path = require('path')
 const express = require('express')
 const cors = require('cors')
@@ -6,9 +9,6 @@ const connectDB = require('./utils/connectDB')
 const { notFound, errorHandler } = require('./middlewares/errorMiddlewares')
 const userRoutes = require('./routes/userRoutes')
 const boardRoutes = require('./routes/boardRoutes')
-
-// Load environment variables from .env
-require('dotenv').config()
 
 // Connect to database
 connectDB()

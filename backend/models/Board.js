@@ -22,10 +22,6 @@ const boardSchema = mongoose.Schema({
 		type: Number,
 		default: 0
 	},
-	posts: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'Post'
-	}]
 }, {
     timestamp: true
 })

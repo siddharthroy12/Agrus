@@ -22,10 +22,6 @@ const postSchema = mongoose.Schema({
 		type: String,
 		default: ''
 	},
-	mediaType: {
-		type: String,
-		default: ''
-	},
 	body: {
 		type: String,
 		default: ''
@@ -38,10 +34,10 @@ const postSchema = mongoose.Schema({
 		type: Number,
 		default: 0 
 	},
-	comments: [{
-		type: mongoose.Schema.ObjectId,
-		ref: 'Comment',
-	}],
+	edited: {
+		type: Boolean
+		default: false
+	}
 }, {
     timestamp: true
 })

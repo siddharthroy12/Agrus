@@ -14,6 +14,14 @@ const userSchema = mongoose.Schema({
 		type: String,
 		default: ''
 	},
+	joinedBoards: [{
+		type: mongoose.Schema.ObjectId,
+		ref: 'Board'
+	}],
+	savedPosts: [{
+		type: mongoose.Schema.ObjectId,
+		ref: 'Post'
+	}],
 	posts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Post'
