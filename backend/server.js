@@ -9,7 +9,8 @@ const connectDB = require('./utils/connectDB')
 const { notFound, errorHandler } = require('./middlewares/errorMiddlewares')
 const userRoutes = require('./routes/userRoutes')
 const boardRoutes = require('./routes/boardRoutes')
-
+const postRoutes = require('./routes/postRoutes')
+const uploadRoute = require('./routes/uploadRoute')
 // Connect to database
 connectDB()
 
@@ -27,6 +28,8 @@ app.use(express.json())
 // app.use('/api/notes', noteRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/board', boardRoutes)
+app.use('/api/post', postRoutes)
+app.use('/api/upload', uploadRoute)
 
 // Serve client in production mode
 if (process.env.NODE_ENV === 'production') {

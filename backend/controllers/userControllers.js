@@ -109,61 +109,112 @@ const authenticateUser = asyncHandler(async (req, res) => {
 // @route GET /api/user/:username
 // @access Public
 const getUser = asyncHandler(async (req, res) => {
-    const user = await User.findOne({ username: req.params.username }, 'username avatar posts comments disabled createdAt')
+  let username = req.params.username
 
-		if (!user) {
-        res.status(404)
-        throw new Error('User not found')
-    } else if (user.disabled) {
-			res.status(404)
-			throw new Error('User not found')
-    }
+  // Username must be 1 - 20 length and only contains numbers and letters
+  if (username < 1 || username > 20) {
+		res.status(400)
+    throw new Error('Username must be 1-20 characters')
+  } else if (/\W/.test(username)) {
+    res.status(400)
+    throw new Error('Username can only have numbers and letters')
+  }
 
-		res.json({
-			username: user.username,
-			avatar: user.avatar,
-			posts: user.posts,
-			comments: user.comments,
-			createdAt: user.createdAt,
-		})
+  const user = await User.findOne({ username: req.params.username }, 'username avatar posts comments disabled createdAt')
+
+	if (!user) {
+      res.status(404)
+      throw new Error('User not found')
+  } else if (user.disabled) {
+		res.status(404)
+		throw new Error('User not found')
+  }
+	res.json({
+		username: user.username,
+		avatar: user.avatar,
+		posts: user.posts,
+		comments: user.comments,
+		createdAt: user.createdAt,
+	})
+})
+
+// @desc Update User Profile
+// @route PUT /api/user/update
+// @access Private
+const updateUser = asyncHandler(async (req, res) => {
+  const { avatar } = req.body
+
+  if (avatar === undefined) {
+    res.status(400)
+    throw new Error('Provide all feilds')
+  }
+
+  req.user.avatar = avatar
+
+  await req.user.save()
+
+  res.status(200)
+  res.json(req.user)
 })
 
 // @desc Disable User
 // @route DELETE /api/user/:username
 // @access Private/Admin
 const disableUser = asyncHandler(async (req, res) => {
-    const user = await User.findOne({username: req.params.username})
+  let username = req.params.username
+
+  // Username must be 1 - 20 length and only contains numbers and letters
+  if (username < 1 || username > 20) {
+		res.status(400)
+    throw new Error('Username must be 1-20 characters')
+  } else if (/\W/.test(username)) {
+    res.status(400)
+    throw new Error('Username can only have numbers and letters')
+  }  
     
-    if (!user) {
-      res.status(404)
-      throw new Error('User not found')
-    } else if (user.disabled) {
-			res.status(400)
-			throw new Error('User is already disabled')
-		} else {
-      user.disabled = true
-      await user.save()
-      res.json({message: 'User Disabled'})
-    }
+  const user = await User.findOne({username: req.params.username})
+    
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  } else if (user.disabled) {
+		res.status(400)
+		throw new Error('User is already disabled')
+	} else {
+    user.disabled = true
+    await user.save()
+    res.json({message: 'User Disabled'})
+  }
 })
 
 // @desc Enable User
 // @route PUT /api/user/:username
 // @access Private/Admin
 const enableUser = asyncHandler(async (req, res) => {
-		const user = await User.findOne({username: req.params.username})
-    
-    if (!user) {
-      res.status(404)
-      throw new Error('User not found')
-    } else if (!user.disabled) {
-			res.status(400)
-			throw new Error('User is already enabled')
-		} else {
-      user.disabled = false
-      await user.save()
-      res.json({message: 'User Enabled'})
-    }
+  let username = req.params.username
+
+  // Username must be 1 - 20 length and only contains numbers and letters
+  if (username < 1 || username > 20) {
+		res.status(400)
+    throw new Error('Username must be 1-20 characters')
+  } else if (/\W/.test(username)) {
+    res.status(400)
+    throw new Error('Username can only have numbers and letters')
+  }
+
+	const user = await User.findOne({username: req.params.username})
+  
+  if (!user) {
+    res.status(404)
+    throw new Error('User not found')
+  } else if (!user.disabled) {
+		res.status(400)
+		throw new Error('User is already enabled')
+	} else {
+    user.disabled = false
+    await user.save()
+    res.json({message: 'User Enabled'})
+  }
 })
 
 module.exports = {
@@ -171,6 +222,7 @@ module.exports = {
   loginUser,
   authenticateUser,
   getUser,
+  updateUser,
   disableUser,
   enableUser,
 }

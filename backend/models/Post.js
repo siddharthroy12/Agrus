@@ -35,7 +35,7 @@ const postSchema = mongoose.Schema({
 		default: 0 
 	},
 	edited: {
-		type: Boolean
+		type: Boolean,
 		default: false
 	}
 }, {

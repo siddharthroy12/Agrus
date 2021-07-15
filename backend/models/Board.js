@@ -26,4 +26,4 @@ const boardSchema = mongoose.Schema({
     timestamp: true
 })
 
-module.exports = Post = mongoose.model('Board', boardSchema)
+module.exports = Board = mongoose.model('Board', boardSchema)

@@ -2,6 +2,7 @@ const express = require('express')
 const {
 	createBoard,
 	updateBoard,
+	getBoard,
 	deleteBoard,
 	getAllBoards,
 	joinBoard
@@ -13,10 +14,11 @@ router.post('/', protect, createBoard)
 router.route('/:boardName')
 	.put(protect, updateBoard)
 	.delete(protect, deleteBoard)
+	.get(getBoard)
 router.post('/:boardName/join', protect, joinBoard)
 
-
 if (process.env.NODE_ENV === 'development') {
-	router.get('/all', getAllBoards)
+	router.get('/', getAllBoards)
 }
+
 module.exports =  router

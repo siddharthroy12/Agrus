@@ -18,6 +18,15 @@ const createBoard = asyncHandler(async (req, res) => {
 		throw new Error('Provide all feilds')
 	}
 
+	// Boardname must be 1 - 20 length and only contains numbers and letters
+  if (boardName < 1 || boardName > 20) {
+		res.status(400)
+    throw new Error('Boardname must be 1-20 characters')
+  } else if (/\W/.test(boardName)) {
+    res.status(400)
+    throw new Error('BoardName can only have numbers and letters')
+  }
+
 	const boardExist = await Board.findOne({boardName: boardName.trim()})
 
 	if (boardExist) {
@@ -45,6 +54,16 @@ const createBoard = asyncHandler(async (req, res) => {
 // @route PUT /api/board/:boardName
 // @access Private
 const updateBoard = asyncHandler(async (req, res) => {
+	const boardName = req.params.boardName
+	// Boardname must be 1 - 20 length and only contains numbers and letters
+	if (boardName < 1 || boardName > 20) {
+		res.status(400)
+		throw new Error('Boardname must be 1-20 characters')
+	} else if (/\W/.test(boardName)) {
+		res.status(400)
+		throw new Error('BoardName can only have numbers and letters')
+	}
+
 	const board = await Board.findOne({boardName: req.params.boardName})
 
 	if (!board) {
@@ -86,6 +105,16 @@ const updateBoard = asyncHandler(async (req, res) => {
 // @route DELETE /api/board/:boardName
 // @access Private
 const deleteBoard = asyncHandler(async (req, res) => {
+	const boardName = req.params.boardName
+	// Boardname must be 1 - 20 length and only contains numbers and letters
+	if (boardName < 1 || boardName > 20) {
+		res.status(400)
+		throw new Error('Boardname must be 1-20 characters')
+	} else if (/\W/.test(boardName)) {
+		res.status(400)
+		throw new Error('BoardName can only have numbers and letters')
+	}
+
 	const board = await Board.findOne({boardName: req.params.boardName})
 
 	if (!board) {
@@ -110,10 +139,45 @@ const deleteBoard = asyncHandler(async (req, res) => {
 	res.json({message: 'Board deleted successfully'})
 })
 
+// @desc Get Board Details
+// @route POST /api/board/:boardName
+// @access Public
+const getBoard = asyncHandler(async (req, res) => {
+	const boardName = req.params.boardName
+	// Boardname must be 1 - 20 length and only contains numbers and letters
+	if (boardName < 1 || boardName > 20) {
+		res.status(400)
+		throw new Error('Boardname must be 1-20 characters')
+	} else if (/\W/.test(boardName)) {
+		res.status(400)
+		throw new Error('BoardName can only have numbers and letters')
+	}
+
+	const board = await Board.findById(req.params.boardName)
+	
+	if (!board) {
+		res.status(404)
+		throw new Error('Board not found')
+	}
+
+	res.status(200)
+	res.json(board)
+})
+
 // @desc Join and Leave Board
 // @route POST /api/board/:boardName/join
 // @access Private
 const joinBoard = asyncHandler(async (req, res) => {
+	const boardName = req.params.boardName
+	// Boardname must be 1 - 20 length and only contains numbers and letters
+	if (boardName < 1 || boardName > 20) {
+		res.status(400)
+		throw new Error('Boardname must be 1-20 characters')
+	} else if (/\W/.test(boardName)) {
+		res.status(400)
+		throw new Error('BoardName can only have numbers and letters')
+	}
+
 	const board = await Board.findOne({boardName: req.params.boardName})
 
 	if (!board) {
@@ -165,6 +229,7 @@ const joinBoard = asyncHandler(async (req, res) => {
 const getAllBoards = asyncHandler(async (req, res) => {
 	if (process.env.NODE_ENV === 'development') {
 		const boards = await Board.find({})
+		res.status(200)
 		res.json(boards)
 	} else {
 		res.status(400)
@@ -176,6 +241,7 @@ module.exports = {
 	createBoard,
 	updateBoard,
 	deleteBoard,
+	getBoard,
 	getAllBoards,
 	joinBoard,
 }
