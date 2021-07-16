@@ -30,19 +30,19 @@ const userSchema = mongoose.Schema({
 		type: mongoose.Schema.ObjectId,
 		ref: 'Post'
 	}],
-	upVotedPost: [{
+	upvotedPosts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Post'
 	}],
-	downVotedPost: [{
+	downvotedPosts: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Post'
 	}],
-	upVotedComment: [{
+	upvotedComments: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Comment'
 	}],
-	downVotedComment: [{
+	downvotedComments: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Comment'
 	}],

@@ -217,11 +217,26 @@ const enableUser = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc Get All Users
+// @route GET /api/user/
+// @access Public/Development
+const getAllUsers = asyncHandler(async (req, res) => {
+	if (process.env.NODE_ENV === 'development') {
+		const users = await User.find({})
+		res.status(200)
+		res.json(users)
+	} else {
+		res.status(400)
+		throw new Error('Not permitted')
+	}
+})
+
 module.exports = {
   registerUser,
   loginUser,
   authenticateUser,
   getUser,
+  getAllUsers,
   updateUser,
   disableUser,
   enableUser,

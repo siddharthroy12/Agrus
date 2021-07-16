@@ -4,6 +4,7 @@ const {
   loginUser,
 	authenticateUser,
 	getUser,
+	getAllUsers,
 	updateUser,
 	enableUser,
 	disableUser
@@ -19,5 +20,9 @@ router.route('/:username')
 	.get(getUser)
 	.put(protect, admin, enableUser)
 	.delete(protect, admin, disableUser)
+
+if (process.env.NODE_ENV === 'development') {
+	router.get('/', getAllUsers)
+}
 
 module.exports =  router

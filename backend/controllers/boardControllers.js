@@ -224,7 +224,7 @@ const joinBoard = asyncHandler(async (req, res) => {
 
 
 // @desc Get All Boards
-// @route GET /api/board/all
+// @route GET /api/board/
 // @access Public/Development
 const getAllBoards = asyncHandler(async (req, res) => {
 	if (process.env.NODE_ENV === 'development') {

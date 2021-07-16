@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const Post = require('../models/Post')
 const Board = require('../models/Board')
+const { listeners } = require('../models/Post')
 
 // @desc Create a post
 // @route POST /api/post
@@ -125,6 +126,221 @@ const getPost = asyncHandler(async (req, res) => {
 	res.json(post)
 })
 
+// @desc Edit a post
+// @route PUT /api/post/:id
+// @access Private
+const editPost = asyncHandler(async (req, res) => {
+	if (!(req.params.id.match(/^[0-9a-fA-F]{24}$/))) {
+		res.status(400)
+		throw Error('Not valid id')	
+	}
+
+	const post = await Post.findById(req.params.id)
+
+	if (!post) {
+		res.status(404)
+		throw new Error('Post not found')
+	}
+
+	if (post.author.toString() !== req.user._id.toString() && req.user.isAdmin === false) {
+		res.status(403)
+		throw new Error("It's not your post buddy")
+	}
+
+	let { title, body } = req.body
+
+	if (title !== undefined) {
+		if (title.trim() === '') {
+			res.status(400)
+			throw new Error("Title can't be empty")
+		}
+	}
+
+	switch(post.type) {
+		case 'text':
+			if (body !== undefined) {
+				if (body.trim() === '') {
+					res.status(400)
+					throw new Error("Title can't be empty")
+				}
+			}
+			break;
+
+		case 'image':
+		case 'video':
+			if (body !== undefined) { // Becase body should be empty for media post
+				body = ''
+			}
+	}
+
+	post.title = title
+	post.body = body
+
+	await post.save()
+
+	res.status(200)
+	res.json(post)
+})
+
+// @desc Upvote a post
+// @route POST /api/post/:id/upvote
+// @access Private
+const upvotePost = asyncHandler(async (req, res) => {
+	if (!(req.params.id.match(/^[0-9a-fA-F]{24}$/))) {
+		res.status(400)
+		throw Error('Not valid id')	
+	}
+
+	const post = await Post.findById(req.params.id)
+
+	if (!post) {
+		res.status(404)
+		throw new Error('Post not found')
+	}
+
+	const isUpvoted = req.user.upvotedPosts.filter(postId => {
+		return postId.toString() === post._id.toString()
+	}).length
+
+	if (isUpvoted) {
+		req.user.upvotedPosts = req.user.upvotedPosts.filter(postId => {
+			return postId.toString() !== post._id.toString()
+		})
+
+		await Post.updateOne({_id: req.params.id}, {
+			$inc: {
+				score: -1
+			}
+		})
+
+		await req.user.save()
+
+		res.status(200)
+		res.json({message: 'Post un-upvoted'})
+	} else {
+		const isDownvoted = req.user.downvotedPosts.filter(postId => {
+			return postId.toString() === post._id.toString()
+		}).length
+
+		if (isDownvoted) {
+			req.user.downvotedPosts = req.user.downvotedPosts.filter(postId => {
+				return postId.toString() !== post._id.toString()
+			})
+		}
+
+		req.user.upvotedPosts.push(post._id)
+		await req.user.save()
+
+		await Post.updateOne({_id: req.params.id}, {
+			$inc: {
+				score: isDownvoted ? 2 : 1
+			}
+		})
+
+		res.status(200)
+		res.json({message: 'Post upvoted'})
+	}
+})
+
+// @desc Downvote a post
+// @route POST /api/post/:id/downvote
+// @access Private
+const downvotePost = asyncHandler(async (req, res) => {
+	if (!(req.params.id.match(/^[0-9a-fA-F]{24}$/))) {
+		res.status(400)
+		throw Error('Not valid id')	
+	}
+
+	const post = await Post.findById(req.params.id)
+
+	if (!post) {
+		res.status(404)
+		throw new Error('Post not found')
+	}
+
+	const isDownvoted = req.user.downvotedPosts.filter(postId => {
+		return postId.toString() === post._id.toString()
+	}).length
+
+	if (isDownvoted) {
+		req.user.downvotedPosts = req.user.downvotedPosts.filter(postId => {
+			return postId.toString() !== post._id.toString()
+		})
+
+		await Post.updateOne({_id: req.params.id}, {
+			$inc: {
+				score: 1
+			}
+		})
+
+		await req.user.save()
+
+		res.status(200)
+		res.json({message: 'Post un-downvoted'})
+	} else {
+		const isUpvoted = req.user.upvotedPosts.filter(postId => {
+			return postId.toString() === post._id.toString()
+		}).length
+
+		if (isUpvoted) {
+			req.user.upvotedPosts = req.user.upvotedPosts.filter(postId => {
+				return postId.toString() !== post._id.toString()
+			})
+		}
+
+		req.user.downvotedPosts.push(post._id)
+		await req.user.save()
+
+		await Post.updateOne({_id: req.params.id}, {
+			$inc: {
+				score: isUpvoted ? -2 : -1
+			}
+		})
+
+		res.status(200)
+		res.json({message: 'Post downvoted'})
+	}
+})
+
+
+// @desc Save and unsave a post
+// @route POST /api/post/:id/save
+// @access Private
+const savePost = asyncHandler(async (req, res) => {
+	if (!(req.params.id.match(/^[0-9a-fA-F]{24}$/))) {
+		res.status(400)
+		throw Error('Not valid id')	
+	}
+
+	const post = await Post.findById(req.params.id)
+
+	if (!post) {
+		res.status(404)
+		throw new Error('Post not found')
+	}
+
+	const isSaved = req.user.savedPosts.filter(postId => {
+		return postId.toString() === post._id.toString()
+	}).length
+
+	if (isSaved) {
+		req.user.savedPosts = req.user.savedPosts.filter(postId => {
+			return postId.toString() !== post._id.toString()
+		})
+		await req.user.save()
+
+		res.status(200)
+		res.json({message: 'Post unsaved'})
+	} else {
+		req.user.savedPosts.push(post._id)
+		await req.user.save()
+
+		res.status(200)
+		res.json({message: 'Post saved'})
+	}
+})
+
+
 // @desc Delete a post
 // @route DELETE /api/post/:id
 // @access Private
@@ -141,7 +357,7 @@ const deletePost = asyncHandler(async (req, res) => {
 		throw new Error('Post not found')
 	}
 
-	if (post.owner.toString() !== req.user._id.toString()) {
+	if (post.author.toString() !== req.user._id.toString() && req.user.isAdmin === false) {
 		res.status(403)
 		throw new Error("It's not your post buddy")
 	}
@@ -154,7 +370,7 @@ const deletePost = asyncHandler(async (req, res) => {
 })
 
 // @desc Get All Posts
-// @route GET /api/post/all
+// @route GET /api/post/
 // @access Public/Development
 const getAllPosts = asyncHandler(async (req, res) => {
 	if (process.env.NODE_ENV === 'development') {
@@ -171,6 +387,10 @@ const getAllPosts = asyncHandler(async (req, res) => {
 module.exports = {
   createPost,
 	getPost,
+	editPost,
+	upvotePost,
+	downvotePost,
+	savePost,
 	getAllPosts,
 	deletePost,
 }
