@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 
 import { 
 	AppBar, Toolbar, IconButton,
@@ -114,9 +114,9 @@ const UserMenu = styled.div`
 
 export default function Header() {
 	const [loggedIn, setLoggedIn] = useState(true)
-	const [userMenuIsOpen, setUserMenuIsOpen] = useState(false)
+	const [userMenuIsOpen, setUserMenuIsOpen] = useState<Element | boolean>(false)
 
-	const handleUserMenuBtnClick = (e) => {
+	const handleUserMenuBtnClick = (e: SyntheticEvent) => {
 		setUserMenuIsOpen(e.currentTarget)
 	}
 
@@ -157,7 +157,7 @@ export default function Header() {
 						/>
 						<Popover
 							id="simple-menu"
-							anchorEl={userMenuIsOpen}
+							anchorEl={userMenuIsOpen as Element}
 							keepMounted
 							open={Boolean(userMenuIsOpen)}
 							onClose={handleCloseMenu} 

@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
 import { 
   BrowserRouter as Router, 
   Switch, 
@@ -16,6 +19,12 @@ const Background = styled.div`
 `
 
 function App() {
+
+  // Check if token is present try authenticate and login
+  useEffect(() => {
+
+  }, [])
+
   return (
     <Router>
       <ThemeProvider theme={lightTheme}>

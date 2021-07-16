@@ -30,7 +30,11 @@ const MoreInfoRow = styled.div`
 	}
 `
 
-export default ({ children }) => {
+type propsType = {
+	children: Element
+}
+
+export default ({ children }: propsType) => {
 	return (
 		<Wrapper>
 			{ children }
