@@ -9,7 +9,9 @@ import {
 	LOGOUT
 } from '../Constants/loginConstants'
 
-export const login = (username, password) => async (dispatch) => {
+import { DispatchType } from '../Store'
+
+export const login = (username: String, password: String) => async (dispatch: DispatchType) => {
 	try {
 		dispatch({
 			type: LOGIN_REQUEST
@@ -37,13 +39,14 @@ export const login = (username, password) => async (dispatch) => {
 	}
 }
 
-export const authenticate = () => async (dispatch) => {
+// Only when loginInfo exist in localstorage
+export const authenticate = () => async (dispatch: DispatchType) => {
   try {
 		dispatch({
 			type: AUTHENTICATION_REQUEST
 		})
 
-  	const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(localStorage.getItem('loginInfo')) : null
+  	const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
 		const config = {
     	headers: {
@@ -66,7 +69,7 @@ export const authenticate = () => async (dispatch) => {
 	}
 }
 
-export const logout = () => (dispatch) => {
+export const logout = () => (dispatch: DispatchType) => {
   dispatch({
       type: LOGOUT
   })

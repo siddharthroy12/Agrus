@@ -8,7 +8,13 @@ import {
 	AUTHENTICATION_FAIL
 } from '../Constants/loginConstants'
 
-const loginReducer = (state = { }, action) => {
+type actionType = {
+	type: string,
+	payload?: any
+}
+
+
+const loginReducer = (state = { }, action: actionType) => {
 	switch(action.type) {
 		case LOGIN_REQUEST:
 			return { loading: true }

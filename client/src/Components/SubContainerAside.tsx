@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { Paper, Typography } from '@material-ui/core'
+import { ReactNode } from 'react'
 
 const Wrapper = styled.aside`
 	width: 30rem;
@@ -31,7 +32,7 @@ const MoreInfoRow = styled.div`
 `
 
 type propsType = {
-	children: Element
+	children: ReactNode
 }
 
 export default ({ children }: propsType) => {

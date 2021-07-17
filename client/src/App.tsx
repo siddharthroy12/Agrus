@@ -4,38 +4,39 @@ import { useSelector, useDispatch } from 'react-redux'
 import { 
   BrowserRouter as Router, 
   Switch, 
-  Route
 } from 'react-router-dom'
 
 import HomeScreen from './Screens/HomeScreen'
-import Header from './Components/Header'
+import LoginScreen from './Screens/LoginScreen'
+
+import PublicRoute from './Routes/PublicRoute'
+import ProtectedRoute from './Routes/ProtectedRoute'
 
 import { lightTheme } from './themes'
-import styled, { ThemeProvider } from 'styled-components'
+import { ThemeProvider } from 'styled-components'
 
-
-const Background = styled.div`
-  background-color: ${(props) => props.theme.secondary};
-`
 
 function App() {
 
+  const loginState = useSelector<any>(state => state.login)
+  const dispatch = useDispatch()
+
   // Check if token is present try authenticate and login
   useEffect(() => {
+    const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
+    if (userInfoFromStorage) {
+      // Authenticate
+    }
   }, [])
 
   return (
     <Router>
       <ThemeProvider theme={lightTheme}>
-        <Header />
-        <Background>
-          <Switch>
-            <Route exact path="/">
-              <HomeScreen />
-            </Route>
-          </Switch>
-        </Background>
+        <Switch>
+          <ProtectedRoute exact path="/login" component={LoginScreen} />
+          <PublicRoute exact path="/" component={HomeScreen} />
+        </Switch>
       </ThemeProvider>
     </Router>
   );
