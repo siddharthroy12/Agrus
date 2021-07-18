@@ -55,11 +55,11 @@ const registerUser = asyncHandler(async (req, res) => {
     })
 
     let objectToReturn = {
-      ...newUser,
+      ...newUser._doc,
       token: generateToken(newUser._id),
     }
 
-    delete objectToReturn.password // Do not send password (Even if it's encrypted)
+    delete objectToReturn.password // Must not send password (Even if it's encrypted)
 
     res.status(201).json(objectToReturn)
 
@@ -80,10 +80,10 @@ const loginUser = asyncHandler(async (req, res) => {
       throw new Error('Provide all feilds')
     }
 
-    const user = await User.findOne({ username }).select('-password')
+    const user = await User.findOne({ username })
 
     if (!user) {
-      res.status(400)
+      res.status(404)
       throw new Error('Username not found')
     }
 
@@ -93,10 +93,14 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     
     if ((await user.matchPassword(password))) {
-      res.json({
-        ...user,
-      	token: generateToken(user._id)
-      })
+      let objectToReturn = {
+        ...user._doc,
+        token: generateToken(user._id),
+      }
+  
+      delete objectToReturn.password // Must not send password (Even if it's encrypted)
+  
+      res.json(objectToReturn)
     } else {
       res.status(400)
       throw new Error('Invalid password')

@@ -16,6 +16,7 @@ import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
 
 import { StateType } from './Store'
+import { authenticate } from './Actions/loginActions'
 
 function App() {
 
@@ -27,7 +28,7 @@ function App() {
     const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
     if (userInfoFromStorage) {
-      // Authenticate
+      dispatch(authenticate())
     }
   }, [])
 

@@ -13,17 +13,19 @@ type actionType = {
 	payload?: any
 }
 
-
 const loginReducer = (state = { }, action: actionType) => {
 	switch(action.type) {
 		case LOGIN_REQUEST:
 			return { loading: true }
 		case AUTHENTICATION_REQUEST:
-			return { loading: true }
+			return { loading: true, ...state }
 		case AUTHENTICATION_SUCCESS:
 			return { loggedIn: true, info: action.payload }
 		case AUTHENTICATION_FAIL:
-			localStorage.removeItem('loginInfo')
+			// If authentication failed eg. Token expired or invalid, log out permanently
+			if (action.payload.error.response ) {
+				localStorage.removeItem('loginInfo')
+			}
 			return { loggedIn: false }
 		case LOGIN_SUCCESS:
 			localStorage.setItem('loginInfo', JSON.stringify(action.payload))

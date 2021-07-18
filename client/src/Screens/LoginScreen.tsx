@@ -70,14 +70,10 @@ const Alert = styled(SnackbarContent)<AlertProps>`
 		switch(props.severity) {
 			case 'info':
 				return props.theme.primary
-				break
 			case 'error':
 				return '#F44336'
-				break
 			case 'success':
 				return '#4CAF50'
-				return ''
-				break
 			default:
 			return '#151719'
 		}
@@ -115,7 +111,7 @@ export default function LoginScreen() {
 			if (error.response) {
 				// Request made and server responded (Failed to Login)
 				setAlert({
-					message: error.message,
+					message: error.response.data.message,
 					severity: 'error'
 				})
 			  } else if (error.request) {
@@ -161,13 +157,14 @@ export default function LoginScreen() {
 					/>
 					<TextField
 						label="Password"
+						type="password"
 						value={password}
 						onChange={e => setPassword(e.target.value)}
 						required={true}
 					/>
 					<Divider />
 					<SubmitButtonContainer>
-						<SubmitButton variant="contained" type="submit">
+						<SubmitButton variant="contained" type="submit" disabled={loginState.loading}>
 							Login
 						</SubmitButton>
 					</SubmitButtonContainer>
