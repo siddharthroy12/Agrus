@@ -8,7 +8,7 @@ const Background = styled.div`
 `
 
 type CustomRoutePropsType = {
-	component: any // Couldn't find the type
+	component: React.ComponentType
 } & RouteProps
 
 

@@ -15,10 +15,11 @@ import ProtectedRoute from './Routes/ProtectedRoute'
 import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
 
+import { StateType } from './Store'
 
 function App() {
 
-  const loginState = useSelector<any>(state => state.login)
+  const loginState = useSelector<StateType>(state => state.login)
   const dispatch = useDispatch()
 
   // Check if token is present try authenticate and login

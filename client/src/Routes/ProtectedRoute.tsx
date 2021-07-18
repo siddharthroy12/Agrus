@@ -1,7 +1,7 @@
 import { Route, RouteProps } from 'react-router-dom'
 
 type CustomRoutePropsType = {
-	component: any // Couldn't find the type
+	component: React.ComponentType
 } & RouteProps
 
 
