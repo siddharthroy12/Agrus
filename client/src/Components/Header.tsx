@@ -73,7 +73,7 @@ const SearchIconButton = styled(IconButton)`
 	color: white;
 	padding: 0.5rem;
 
-	@media screen and (min-width: 450px) {
+	@media screen and (min-width: 451px) {
 		display: none !important;
 	}
 `
@@ -143,7 +143,7 @@ export default function Header() {
 				<MenuIcon />
 			</IconButton>
 			<Typography variant="h6">
-				0x80
+				Agrus
 			</Typography>
 			<CenterHorizontal>
 				<SearchBox>

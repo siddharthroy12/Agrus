@@ -76,16 +76,11 @@ type propsType = {
 }
 
 export default function Post({ post }: propsType) {
-	// const post = {
-	// 	type: 'media', // media | text
-	// 	title: 'The council has spoken',
-	// 	media: 'https://preview.redd.it/wuxlazynzdu41.png?width=640&height=699&crop=smart&auto=webp&s=0cb5df500dbf89092f616eabf9a5acb7b34184a1',
-	// 	body: 'Title is pretty self-explanatory. Feel feel to share your own advice/experiences as well. \n\nEdit: Got some downvotes, unfortunately, but I want to clarify: Im doing this to cope and to...',
-	// 	board: 'uso',
-	// 	author: 'siddharthroy',
-	// 	score: 250,
-	// 	comments: 25
-	// }
+
+	const getHumanReadableDate = (rawdate: string) => {
+		const date = new Date(rawdate)
+		return `Posted on ${date.getDate()}, ${date.getMonth()}, ${date.getFullYear()}`
+	}
 
 	return (
 		<Card elevation={3}>
@@ -109,11 +104,11 @@ export default function Post({ post }: propsType) {
 							•
 						</Typography>
 						<Typography>
-							Posted by { post.author }
+							{ post.author }
 						</Typography>
 					</HeaderText>
 				}
-        subheader={post.createdAt}
+        subheader={getHumanReadableDate(post.createdAt)}
 			/>
 			<PostContent>
 					<PostTitle>

@@ -9,9 +9,11 @@ import {
 import HomeScreen from './Screens/HomeScreen'
 import LoginScreen from './Screens/LoginScreen'
 import RegisterScreen from './Screens/RegisterScreen'
+import SubmitScreen from './Screens/SubmitScreen'
 
 import PublicRoute from './Routes/PublicRoute'
 import ProtectedRoute from './Routes/ProtectedRoute'
+import PrivateRoute from './Routes/PrivateRoute'
 
 import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
@@ -38,6 +40,7 @@ function App() {
         <Switch>
           <ProtectedRoute exact path='/register' component={RegisterScreen} />
           <ProtectedRoute exact path="/login" component={LoginScreen} />
+          <PrivateRoute exact path='/submit' component={SubmitScreen} />
           <PublicRoute exact path="/" component={HomeScreen} />
         </Switch>
       </ThemeProvider>

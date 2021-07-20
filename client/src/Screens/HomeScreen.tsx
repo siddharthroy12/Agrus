@@ -144,7 +144,7 @@ export default function HomeScreen() {
 						<PageDescription>
 							Your personal Reddit frontpage. Come here to check in with your favorite communities.
 						</PageDescription>
-						<Button>Create a Post</Button>
+						<Button variant="contained" disableElevation>Create a Post</Button>
 					</PageDescriptionBox>
 				</SubContainerAside>
 			</Container>
