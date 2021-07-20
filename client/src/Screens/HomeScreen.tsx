@@ -1,11 +1,19 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+import axios from 'axios'
+
 import Container from '../Components/Container'
 import SubContainerMain from '../Components/SubContainerMain'
 import SubContainerAside from '../Components/SubContainerAside'
 import CreatePost from '../Components/CreatePost'
 import Post from '../Components/Post'
 
-import { Paper, Typography, Button } from '@material-ui/core'
+import { Paper, Typography, Button, Snackbar } from '@material-ui/core'
 import { Home as HomeIcon } from '@material-ui/icons'
+
+import Alert from '../Components/Alert'
+
+import useAlert, { AlertType } from '../Hooks/useAlert'
 
 import styled from 'styled-components'
 
@@ -26,13 +34,107 @@ const PageDescription = styled(Typography)`
 `
 
 export default function HomeScreen() {
+	const [feed, setFeed] = useState([])
+	const [page, setPage] = useState(1)
+	const [oneShot, setOneShot] = useState(false)
+	const [alert, setAlert] = useAlert(false)
+	const [feedLoading, setFeedLoading] = useState(false)
+	const mounted = useRef(false)
+
+	const updateFeed = useCallback(() => {
+		console.log(feedLoading)
+		if (!feedLoading) {
+			console.log('updating', page)
+			setFeedLoading(true)
+			axios.get(`/api/post/feed/get?page=${page}&perpage=${5}`)
+				.then(res => {
+					if (mounted.current) {
+						// @ts-ignore
+						setFeed((prevFeed) => {
+							return [...prevFeed, res.data ]
+						})
+						setPage(page => page + 1)
+						setFeedLoading(false)
+					}
+				}).catch(function (error) {
+					setFeedLoading(false)
+					if (mounted.current) {
+						if (error.response) {
+							// Request made and server responded (Failed to Login)
+							setAlert({
+								message: error.response.data.message,
+								severity: 'error'
+							})
+							} else if (error.request) {
+							// The request was made but no response was received (Slow Internet)
+							setAlert({
+								message: 'Failed to posts due to slow network',
+								severity: 'error'
+							})
+							} else {
+							setAlert({
+								message: error + '',
+								severity: 'error'
+							})
+						}
+					}
+				}
+			)
+		}
+	}, [feedLoading, page, setAlert])
+
+
+	const handleAlertClose = () => {
+		setAlert(false)
+	}
+
+	useEffect(() => {
+		if (!oneShot) { // Run only once
+			updateFeed()
+			setOneShot(true)
+		}
+		
+	}, [updateFeed, oneShot, setOneShot])
+
+	useEffect(() => {
+		mounted.current = true
+		console.log('ran')
+
+		return () => { 
+			mounted.current = false
+		}
+	}, [])
+
+	useEffect(() => {
+		const onScrollCheck = () => {
+			// When on end of the page
+			if ((window.innerHeight + window.scrollY) >= window.document.body.offsetHeight) {
+				updateFeed()
+			}
+		}
+
+		window.addEventListener('scroll', onScrollCheck)
+
+		return () => {
+			window.removeEventListener('scroll', onScrollCheck)
+		}
+	}, [updateFeed])
+
 	return (
-		<div>
+		<>
+			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleAlertClose}>
+				<Alert
+					severity={(alert as AlertType).severity}
+					message={(alert as AlertType).message}
+				/>
+			</Snackbar>
 			<Container>
 				<SubContainerMain>
+					{feedLoading && <p>Loading</p>}
 					<CreatePost />
 						<Post />
 						<Post />
+					{feedLoading && <p>Loading</p>}
 				</SubContainerMain>
 				<SubContainerAside>
 					<PageDescriptionBox elevation={3}>
@@ -47,6 +149,6 @@ export default function HomeScreen() {
 					</PageDescriptionBox>
 				</SubContainerAside>
 			</Container>
-		</div>
+		</>
 	)
 }

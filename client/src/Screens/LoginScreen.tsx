@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 
 import {
-	Paper, Typography, Button, SnackbarContent,
+	Paper, Typography, Button,
 	TextField, Divider, Link, Snackbar
 } from '@material-ui/core'
 
@@ -15,6 +15,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { StateType } from '../Store'
 import { login } from '../Actions/loginActions'
+
+import Alert from '../Components/Alert'
+import useAlert, { AlertType } from '../Hooks/useAlert'
 
 const Header = styled.div`
 	display: flex;
@@ -60,35 +63,10 @@ const Bottom = styled.div`
 	padding: 1rem;
 `
 
-type AlertProps = {
-	severity: String
-}
-
-const Alert = styled(SnackbarContent)<AlertProps>`
-	color: white !important; 
-	background-color: ${(props) => {
-		switch(props.severity) {
-			case 'info':
-				return props.theme.primary
-			case 'error':
-				return '#F44336'
-			case 'success':
-				return '#4CAF50'
-			default:
-			return '#151719'
-		}
-	}} !important;
-`
-
-type AlertType = {
-	message: String,
-	severity: String,
-}
-
 export default function LoginScreen() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
-	const [alert, setAlert] = useState<AlertType | boolean>(false)
+	const [alert, setAlert] = useAlert(false)
 
 	const history = useHistory()
 	const dispatch = useDispatch()
@@ -125,7 +103,7 @@ export default function LoginScreen() {
 					message: 'Unknown Error',
 					severity: 'error'
 				})
-			  }
+			}
 		} else {
 			setAlert(false)
 		}
