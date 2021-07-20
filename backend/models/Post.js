@@ -39,7 +39,7 @@ const postSchema = mongoose.Schema({
 		default: false
 	}
 }, {
-    timestamp: true
+    timestamps: true
 })
 
 module.exports = Post = mongoose.model('Post', postSchema)

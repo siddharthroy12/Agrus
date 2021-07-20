@@ -10,8 +10,14 @@ import {
 import {
 	Menu as MenuIcon,
 	Search as SearchIcon,
+	Settings as SettingsIcon,
 	AccountCircle as AccountCircleIcon
 } from '@material-ui/icons'
+
+import { Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { StateType } from '../Store'
+import { logout } from '../Actions/loginActions'
 
 import styled from 'styled-components'
 
@@ -58,8 +64,8 @@ const LeftOptions = styled.div`
 	display: flex;
 	align-items: center;
 
-	& > * {
-		margin-left: 1rem;
+	> * {
+		margin-left: 1rem !important;
 	}
 `
 
@@ -68,7 +74,7 @@ const SearchIconButton = styled(IconButton)`
 	padding: 0.5rem;
 
 	@media screen and (min-width: 450px) {
-		display: none;
+		display: none !important;
 	}
 `
 
@@ -113,8 +119,10 @@ const UserMenu = styled.div`
 `
 
 export default function Header() {
-	const [loggedIn, setLoggedIn] = useState(true)
 	const [userMenuIsOpen, setUserMenuIsOpen] = useState<Element | boolean>(false)
+
+	const loginState:any = useSelector((state:StateType) => state.login)
+	const dispatch = useDispatch()
 
 	const handleUserMenuBtnClick = (e: SyntheticEvent) => {
 		setUserMenuIsOpen(e.currentTarget)
@@ -122,6 +130,10 @@ export default function Header() {
 
 	const handleCloseMenu = () => {
 		setUserMenuIsOpen(false)
+	}
+
+	const handleLogoutButton = () => {
+		dispatch(logout())
 	}
 
 	return (
@@ -148,11 +160,11 @@ export default function Header() {
 				<SearchIconButton style={{color: 'white'}}>
 					<SearchIcon />
 				</SearchIconButton>
-				{ loggedIn ? (
+				{ loginState.loggedIn ? (
 					<>
 						<Chip
 							icon={<AccountCircleIcon />}
-							label="Siddharth Roy"
+							label={loginState.info.username}
 							onClick={handleUserMenuBtnClick}
 						/>
 						<Popover
@@ -182,7 +194,10 @@ export default function Header() {
 									</div>
 									<List className="subMenuList">
 										<ListItem className="subMenuListItem">
-											Hallo
+											Profile
+										</ListItem>
+										<ListItem className="subMenuListItem" button onClick={handleLogoutButton}>
+											Logout
 										</ListItem>
 									</List>
 								</div>
@@ -190,15 +205,15 @@ export default function Header() {
 								<div className="subMenu">
 									<div className="subMenuHeader">
 										<div className="subMenuHeaderIcon">
-											<AccountCircleIcon />
+											<SettingsIcon />
 										</div>
 										<div className="subMenuHeaderText">
-											My Stuffs
+											Settings
 										</div>
 									</div>
 									<List className="subMenuList">
 										<ListItem className="subMenuListItem">
-											Hallo
+											Switch Theme
 										</ListItem>
 									</List>
 								</div>
@@ -207,8 +222,9 @@ export default function Header() {
 					</>
 				) : (
 					<>
-						<Button variant="contained" disableElevation>Login</Button>
-						<SignUpButton variant="outlined">Sign Up</SignUpButton>
+						<Button variant="contained" disableElevation component={Link} to='/login'>Login</Button>
+						{ /* @ts-ignore */ }
+						<SignUpButton variant="outlined" component={Link} to='/register'>Sign Up</SignUpButton>
 					</>
 				)}
 			</LeftOptions>

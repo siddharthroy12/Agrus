@@ -10,7 +10,11 @@ const reducers = combineReducers({
 
 const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
-const initialState = {
+type InitialState = {
+	login: any
+}
+
+const initialState: InitialState = {
 	login: userInfoFromStorage === null ? { loggedIn: false } : { loggedIn: true, info : userInfoFromStorage }
 }
 

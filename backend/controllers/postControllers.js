@@ -126,6 +126,23 @@ const getPost = asyncHandler(async (req, res) => {
 	res.json(post)
 })
 
+// @desc Get feed
+// @route Get /api/post/feed/get?page=1&perpage=2
+// @access Public
+const getPostFeed = asyncHandler(async (req, res) => {
+	const { page, perpage } = req.query
+
+	if (page === undefined || perpage === undefined) {
+		res.status(400)
+		throw new Error('Provide page and perpage')
+	}
+
+	var query = await Post.find({}).sort({ createdAt: -1 }).skip((page-1) * perpage).limit(perpage * 1)
+
+	res.status(200)
+	res.json(query)
+})
+
 // @desc Edit a post
 // @route PUT /api/post/:id
 // @access Private
@@ -387,6 +404,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 module.exports = {
   createPost,
 	getPost,
+	getPostFeed,
 	editPost,
 	upvotePost,
 	downvotePost,

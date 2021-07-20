@@ -23,7 +23,7 @@ const boardSchema = mongoose.Schema({
 		default: 0
 	},
 }, {
-    timestamp: true
+    timestamps: true
 })
 
 module.exports = Board = mongoose.model('Board', boardSchema)

@@ -35,7 +35,7 @@ type propsType = {
 	children: ReactNode
 }
 
-export default ({ children }: propsType) => {
+export default function SubContainerAside({ children }: propsType) {
 	return (
 		<Wrapper>
 			{ children }

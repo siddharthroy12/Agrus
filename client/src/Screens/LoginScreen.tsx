@@ -130,7 +130,7 @@ export default function LoginScreen() {
 			setAlert(false)
 		}
 
-	}, [loginState])
+	}, [loginState, history])
 
 	const handleClose = () => {
 		setAlert(false)

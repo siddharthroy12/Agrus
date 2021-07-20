@@ -6,7 +6,10 @@ import {
   AUTHENTICATION_FAIL,
 	LOGIN_FAIL,
 	LOGIN_SUCCESS,
-	LOGOUT
+	LOGOUT,
+  REGISTER_REQUEST,
+  REGISTER_SUCCESS,
+  REGISTER_FAIL
 } from '../Constants/loginConstants'
 
 import { DispatchType } from '../Store'
@@ -34,6 +37,34 @@ export const login = (username: String, password: String) => async (dispatch: Di
 	} catch (error) {
 		dispatch({
       type: LOGIN_FAIL,
+      payload: error
+    })
+	}
+}
+
+export const register = (username: String, password: String) => async (dispatch: DispatchType) => {
+  try {
+		dispatch({
+			type: REGISTER_REQUEST
+		})
+
+		const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+  	}
+
+		const { data } = await axios.post('/api/user/register', {
+      username, password
+    }, config)
+
+		dispatch({
+      type: REGISTER_SUCCESS,
+      payload: data
+    })
+	} catch (error) {
+		dispatch({
+      type: REGISTER_FAIL,
       payload: error
     })
 	}
