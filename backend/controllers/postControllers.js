@@ -45,15 +45,12 @@ const createPost = asyncHandler(async (req, res) => {
 				}
 
 				newPost = {
-					author: req.user._id,
-					title,
 					body,
-					type,
-					board: board === undefined ? '' : board
 				}
 				break
 
 			case 'image':
+			case 'video':
 				// If type is image then meida is required
 				if (media === undefined) {
 					res.status(400)
@@ -65,31 +62,7 @@ const createPost = asyncHandler(async (req, res) => {
 				}
 
 				newPost = {
-					author: req.user._id,
-					title,
-					type,
 					media,
-					board: board === undefined ? '' : board
-				}
-				break
-
-			case 'video':
-				// If type is video then meida is required
-				if (media === undefined) {
-					res.status(400)
-					throw Error("Where's the media?1!")
-				}
-				if (media.trim() === '') {
-					res.status(400)
-					throw Error("Media can't be empty")
-				}
-				
-				newPost = {
-					author: req.user._id,
-					title,
-					type,
-					media,
-					board: board === undefined ? '' : board
 				}
 				break
 
@@ -98,6 +71,14 @@ const createPost = asyncHandler(async (req, res) => {
 		}
 	} catch(error) {
 		throw new Error(err.message)
+	}
+
+	newPost = {
+		...newPost,
+		author: req.user.username,
+		title,
+		type,
+		board: board === undefined ? '' : board
 	}
 
 	const newCreatedPost = await Post.create(newPost)

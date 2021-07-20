@@ -42,16 +42,14 @@ export default function HomeScreen() {
 	const mounted = useRef(false)
 
 	const updateFeed = useCallback(() => {
-		console.log(feedLoading)
 		if (!feedLoading) {
-			console.log('updating', page)
 			setFeedLoading(true)
 			axios.get(`/api/post/feed/get?page=${page}&perpage=${5}`)
 				.then(res => {
 					if (mounted.current) {
 						// @ts-ignore
 						setFeed((prevFeed) => {
-							return [...prevFeed, res.data ]
+							return [...prevFeed, ...res.data ]
 						})
 						setPage(page => page + 1)
 						setFeedLoading(false)
@@ -88,7 +86,7 @@ export default function HomeScreen() {
 		setAlert(false)
 	}
 
-	useEffect(() => {
+	useEffect(() => { // Update one time at start
 		if (!oneShot) { // Run only once
 			updateFeed()
 			setOneShot(true)
@@ -96,16 +94,15 @@ export default function HomeScreen() {
 		
 	}, [updateFeed, oneShot, setOneShot])
 
-	useEffect(() => {
+	useEffect(() => { // To check if component is mounted or not
 		mounted.current = true
-		console.log('ran')
 
 		return () => { 
 			mounted.current = false
 		}
 	}, [])
 
-	useEffect(() => {
+	useEffect(() => { // If Update function changes reapply the event listner
 		const onScrollCheck = () => {
 			// When on end of the page
 			if ((window.innerHeight + window.scrollY) >= window.document.body.offsetHeight) {
@@ -120,6 +117,8 @@ export default function HomeScreen() {
 		}
 	}, [updateFeed])
 
+	console.log('feed:', feed)
+
 	return (
 		<>
 			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleAlertClose}>
@@ -130,10 +129,10 @@ export default function HomeScreen() {
 			</Snackbar>
 			<Container>
 				<SubContainerMain>
-					{feedLoading && <p>Loading</p>}
 					<CreatePost />
-						<Post />
-						<Post />
+						{
+							feed.map(post => <Post post={post} />)
+						}
 					{feedLoading && <p>Loading</p>}
 				</SubContainerMain>
 				<SubContainerAside>
@@ -145,7 +144,7 @@ export default function HomeScreen() {
 						<PageDescription>
 							Your personal Reddit frontpage. Come here to check in with your favorite communities.
 						</PageDescription>
-						<Button>s</Button>
+						<Button>Create a Post</Button>
 					</PageDescriptionBox>
 				</SubContainerAside>
 			</Container>

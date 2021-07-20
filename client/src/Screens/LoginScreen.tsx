@@ -108,7 +108,7 @@ export default function LoginScreen() {
 			setAlert(false)
 		}
 
-	}, [loginState, history])
+	}, [loginState, history, setAlert])
 
 	const handleClose = () => {
 		setAlert(false)

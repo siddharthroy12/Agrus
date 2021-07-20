@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 
 const postSchema = mongoose.Schema({
 	author: {
-		type: mongoose.Schema.ObjectId,
-		ref: 'User',
+		type: String,
 		required: true
 	},
 	board: {

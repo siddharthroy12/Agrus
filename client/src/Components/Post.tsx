@@ -58,17 +58,34 @@ const PostActions = styled(CardActions)`
 	}
 `
 
-export default function Post() {
-	const post = {
-		type: 'media', // media | text
-		title: 'The council has spoken',
-		media: 'https://preview.redd.it/wuxlazynzdu41.png?width=640&height=699&crop=smart&auto=webp&s=0cb5df500dbf89092f616eabf9a5acb7b34184a1',
-		body: 'Title is pretty self-explanatory. Feel feel to share your own advice/experiences as well. \n\nEdit: Got some downvotes, unfortunately, but I want to clarify: Im doing this to cope and to...',
-		board: 'uso',
-		author: 'siddharthroy',
-		score: 250,
-		comments: 25
-	}
+type PostType = {
+	author: string,
+	board: string,
+	title: string,
+	type: string,
+	media: string,
+	body: string,
+	score: number,
+	commentCount: number,
+	edited: boolean,
+	createdAt: string,
+}
+
+type propsType = {
+	post: PostType
+}
+
+export default function Post({ post }: propsType) {
+	// const post = {
+	// 	type: 'media', // media | text
+	// 	title: 'The council has spoken',
+	// 	media: 'https://preview.redd.it/wuxlazynzdu41.png?width=640&height=699&crop=smart&auto=webp&s=0cb5df500dbf89092f616eabf9a5acb7b34184a1',
+	// 	body: 'Title is pretty self-explanatory. Feel feel to share your own advice/experiences as well. \n\nEdit: Got some downvotes, unfortunately, but I want to clarify: Im doing this to cope and to...',
+	// 	board: 'uso',
+	// 	author: 'siddharthroy',
+	// 	score: 250,
+	// 	comments: 25
+	// }
 
 	return (
 		<Card elevation={3}>
@@ -96,7 +113,7 @@ export default function Post() {
 						</Typography>
 					</HeaderText>
 				}
-        subheader="September 14, 2016"
+        subheader={post.createdAt}
 			/>
 			<PostContent>
 					<PostTitle>
@@ -108,7 +125,7 @@ export default function Post() {
 						</PostBody>
 					)}
 			</PostContent>
-			{ post.type === 'media' && (
+			{ post.type === 'image' && (
 				<MediaContainer>
 					<CardMedia
 						component="img"
@@ -134,7 +151,7 @@ export default function Post() {
 					<MessageIcon />
 				</IconButton>
 				<Typography>
-					{ post.comments }
+					{ post.commentCount }
 				</Typography>
 				<IconButton size="small">
 					<BookmarkIcon />
