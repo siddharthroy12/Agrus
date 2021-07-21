@@ -142,8 +142,6 @@ const getUser = asyncHandler(async (req, res) => {
 	res.json({
 		username: user.username,
 		avatar: user.avatar,
-		posts: user.posts,
-		comments: user.comments,
 		createdAt: user.createdAt,
 	})
 })

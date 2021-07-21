@@ -37,6 +37,7 @@ const PageDescription = styled(Typography)`
 export default function HomeScreen() {
 	const [feed, setFeed] = useState([])
 	const [page, setPage] = useState(1)
+	const [feedEnded, setFeedEnded] = useState(false)
 	const [oneShot, setOneShot] = useState(false)
 	const [alert, setAlert] = useAlert(false)
 	const [feedLoading, setFeedLoading] = useState(false)
@@ -44,43 +45,49 @@ export default function HomeScreen() {
 
 	const updateFeed = useCallback(() => {
 		if (!feedLoading) {
-			setFeedLoading(true)
-			axios.get(`/api/post/feed/get?page=${page}&perpage=${5}`)
-				.then(res => {
-					if (mounted.current) {
-						// @ts-ignore
-						setFeed((prevFeed) => {
-							return [...prevFeed, ...res.data ]
-						})
-						setPage(page => page + 1)
+			if (!feedEnded) {
+				setFeedLoading(true)
+				axios.get(`/api/post/feed/get?page=${page}&perpage=${5}`)
+					.then(res => {
+						if (mounted.current) {
+								console.log(res.data)
+								if (res.data.length === 0) {
+									setFeedEnded(true)
+								}
+									// @ts-ignore
+								setFeed((prevFeed) => {
+									return [...prevFeed, ...res.data ]
+								})
+								setPage(page => page + 1)
+								setFeedLoading(false)
+						}
+					}).catch(function (error) {
 						setFeedLoading(false)
-					}
-				}).catch(function (error) {
-					setFeedLoading(false)
-					if (mounted.current) {
-						if (error.response) {
-							// Request made and server responded (Failed to Login)
-							setAlert({
-								message: error.response.data.message,
-								severity: 'error'
-							})
-							} else if (error.request) {
-							// The request was made but no response was received (Slow Internet)
-							setAlert({
-								message: 'Failed to posts due to slow network',
-								severity: 'error'
-							})
-							} else {
-							setAlert({
-								message: error + '',
-								severity: 'error'
-							})
+						if (mounted.current) {
+							if (error.response) {
+								// Request made and server responded (Failed to Login)
+								setAlert({
+									message: error.response.data.message,
+									severity: 'error'
+								})
+								} else if (error.request) {
+								// The request was made but no response was received (Slow Internet)
+								setAlert({
+									message: 'Failed to posts due to slow network',
+									severity: 'error'
+								})
+								} else {
+								setAlert({
+									message: error + '',
+									severity: 'error'
+								})
+							}
 						}
 					}
-				}
-			)
+				)
+			}
 		}
-	}, [feedLoading, page, setAlert])
+	}, [feedLoading, page, setAlert, feedEnded])
 
 
 	const handleAlertClose = () => {
@@ -118,8 +125,6 @@ export default function HomeScreen() {
 		}
 	}, [updateFeed])
 
-	console.log('feed:', feed)
-
 	return (
 		<>
 			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleAlertClose}>
@@ -132,7 +137,8 @@ export default function HomeScreen() {
 				<SubContainerMain>
 					<CreatePost />
 						{
-							feed.map(post => <Post post={post} />)
+							// @ts-ignore
+							feed.map(post => <Post post={post} key={post._id}/>)
 						}
 					{feedLoading && <p>Loading</p>}
 				</SubContainerMain>

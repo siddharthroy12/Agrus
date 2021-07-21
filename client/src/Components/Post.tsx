@@ -47,6 +47,21 @@ const PostTitle = styled(Typography)`
 const PostBody = styled(Typography)`
 	color: #505050;
 	//background-color: rgba(0, 0, 0, 0.1);
+	position: relative;
+
+	height: 5rem;
+	overflow: hidden;
+
+	:after {
+		position: absolute;
+    content:"";
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+		background-image: linear-gradient( white,#060606 );
+		opacity: 0.3;
+	}
 `
 
 const PostActions = styled(CardActions)`
@@ -87,7 +102,7 @@ export default function Post({ post }: propsType) {
 			<CardHeader
 				avatar={
 					<IconButton size="small">
-						<Avatar style={{width: '40xp', height: '40px'}}>H</Avatar>
+						<Avatar style={{width: '40xp', height: '40px'}}>{ post.author[0].toUpperCase() }</Avatar>
 					</IconButton>
 				}
 				action={
@@ -97,12 +112,16 @@ export default function Post({ post }: propsType) {
         }
         title={
 					<HeaderText	>
-						<BoardName>
-							{ post.board }
-						</BoardName>
-						<Typography>
-							•
-						</Typography>
+						{ post.board !== '' ? (
+							<>
+								<BoardName>
+									{ post.board }
+								</BoardName>
+								<Typography>
+									•
+								</Typography>
+							</>
+						): null}
 						<Typography>
 							{ post.author }
 						</Typography>
