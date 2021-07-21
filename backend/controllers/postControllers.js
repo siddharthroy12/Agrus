@@ -21,7 +21,7 @@ const createPost = asyncHandler(async (req, res) => {
 	}
 
 	// If post is on board then check if the board exists
-	if (board !== undefined) {
+	if (board !== undefined && board.trim() !== '') {
 		const boardExist = await Board.findOne({boardName: board})
 		if (!boardExist) {
 			res.status(400)

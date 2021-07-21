@@ -12,6 +12,7 @@ import { Paper, Typography, Button, Snackbar } from '@material-ui/core'
 import { Home as HomeIcon } from '@material-ui/icons'
 
 import Alert from '../Components/Alert'
+import { Link } from 'react-router-dom'
 
 import useAlert, { AlertType } from '../Hooks/useAlert'
 
@@ -144,7 +145,7 @@ export default function HomeScreen() {
 						<PageDescription>
 							Your personal Reddit frontpage. Come here to check in with your favorite communities.
 						</PageDescription>
-						<Button variant="contained" disableElevation>Create a Post</Button>
+						<Button variant="contained" disableElevation component={Link} to='/submit'>Create a Post</Button>
 					</PageDescriptionBox>
 				</SubContainerAside>
 			</Container>
