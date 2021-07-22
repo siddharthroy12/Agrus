@@ -332,6 +332,7 @@ export default function SubmitScreen() {
 												variant="contained"
 												color="primary"
 												disableElevation
+												disabled={uploading}
 												onClick={submitPost}>
 													Post
 											</PostButton>
@@ -367,6 +368,7 @@ export default function SubmitScreen() {
 												variant="contained"
 												color="primary"
 												disableElevation
+												disabled={uploading}
 												onClick={submitPost}>
 													Post
 											</PostButton>

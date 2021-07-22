@@ -1,4 +1,7 @@
+import { useState } from 'react'
+import axios from 'axios'
 import styled from 'styled-components'
+import { useSelector, useDispatch } from 'react-redux'
 
 import {
 	Card, CardHeader, CardMedia, CardContent,
@@ -12,6 +15,15 @@ import {
 	MoreVert as MoreVertIcon,
 	Message as MessageIcon
 } from '@material-ui/icons'
+
+import useMounted from '../Hooks/useMounted'
+
+import { StateType } from '../Store'
+
+import { 
+	upvote,
+	downvote
+} from '../Actions/postActions'
 
 const HeaderText = styled.div`
 	display: flex;
@@ -49,7 +61,7 @@ const PostBody = styled(Typography)`
 	//background-color: rgba(0, 0, 0, 0.1);
 	position: relative;
 
-	height: 5rem;
+	max-height: 5rem;
 	overflow: hidden;
 
 	:after {
@@ -59,8 +71,8 @@ const PostBody = styled(Typography)`
     width:100%;
     top:0;
     left:0;
-		background-image: linear-gradient( white,#060606 );
-		opacity: 0.3;
+		background-image: linear-gradient( rgba(0,0,0,0), white );
+		opacity: 0.6;
 	}
 `
 
@@ -73,7 +85,24 @@ const PostActions = styled(CardActions)`
 	}
 `
 
+type UpvoteIconProps = {
+	upvoted: boolean
+}
+
+const UpvoteIcon = styled(ArrowUpwardIcon)<UpvoteIconProps>`
+	color: ${(props) => props.upvoted ? props.theme.primary : props.theme.fontColor };
+`
+
+type DownvoteIconProps = {
+	downvoted: boolean
+}
+
+const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
+	color: ${(props) => props.downvoted ? props.theme.primary : props.theme.fontColor };
+`
+
 type PostType = {
+	_id:string
 	author: string,
 	board: string,
 	title: string,
@@ -90,11 +119,143 @@ type propsType = {
 	post: PostType
 }
 
-export default function Post({ post }: propsType) {
+export default function Post({ post: _post }: propsType) {
+	const [post, setPost] = useState(_post)
+	const [voteRequestPending, setVoteRequestPending] = useState(false)
+	const loginState:any = useSelector<StateType>(state => state.login)
+	const mounted = useMounted()
+	const dispatch = useDispatch()
 
 	const getHumanReadableDate = (rawdate: string) => {
 		const date = new Date(rawdate)
 		return `Posted on ${date.getDate()}, ${date.getMonth()}, ${date.getFullYear()}`
+	}
+
+	const isUpvoted = () => {
+		if (loginState.loggedIn) {
+			const upvoted = loginState.info.upvotedPosts.filter((id:string) => id === post._id)
+			return upvoted.length > 0 ? true : false
+		} else {
+			return false
+		}
+	}
+
+	const isDownvoted = () => {
+		if (loginState.loggedIn) {
+			const downvoted = loginState.info.downvotedPosts.filter((id:string) => id === post._id)
+			return downvoted.length > 0 ? true : false
+		} else {
+			return false
+		}
+	}
+
+	const genConfig  = () => {
+		const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
+
+		return {
+    	headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userInfoFromStorage.token}`
+      }
+  	}
+	}
+
+	const upvoteButtonHandler = () => {
+		if (!voteRequestPending && loginState.loggedIn) {
+			setVoteRequestPending(true)
+			if (isUpvoted()) {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score - 1}
+				})
+			} else if (isDownvoted()) {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score + 2}
+				})
+			} else {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score + 1}
+				})
+			}
+
+			dispatch(upvote(post._id))
+			axios.post(`/api/post/${post._id}/upvote`, {}, genConfig())
+				.then(res => {
+					if (mounted) {
+						setVoteRequestPending(false)
+					}
+				}).catch(function (error) {
+					dispatch(upvote(post._id)) // Undo the upvote if fails
+					
+					if (isDownvoted()) {
+						dispatch(downvote(post._id))
+					}
+					if (mounted) {
+						if (isUpvoted()) {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score + 1}
+							})
+						} else if (isDownvoted()) {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score - 2}
+							})
+						} else {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score - 1}
+							})
+						}
+						setVoteRequestPending(false)
+					}
+				}
+			)
+		}
+	}
+
+	const downvoteButtonHandler = () => {
+		if (!voteRequestPending && loginState.loggedIn) {
+			setVoteRequestPending(true)
+			if (isDownvoted()) {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score + 1}
+				})
+			} else if (isUpvoted()) {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score - 2}
+				})
+			} else {
+				setPost(prevPost => {
+					return {...prevPost, score: prevPost.score - 1}
+				})
+			}
+			dispatch(downvote(post._id))
+			axios.post(`/api/post/${post._id}/downvote`, {}, genConfig())
+				.then(res => {
+					if (mounted) {
+						setVoteRequestPending(false)
+					}
+				}).catch(function (error) {
+					dispatch(downvote(post._id)) // Undo the downvote if fails
+					if (isUpvoted()) {
+						dispatch(upvote(post._id))
+					}
+					if (mounted) {
+						if (isUpvoted()) {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score - 1}
+							})
+						} else if (isUpvoted()) {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score + 2}
+							})
+						} else {
+							setPost(prevPost => {
+								return {...prevPost, score: prevPost.score + 1}
+							})
+						}
+						setVoteRequestPending(false)
+					}
+				}
+			)
+		}
 	}
 
 	return (
@@ -143,23 +304,34 @@ export default function Post({ post }: propsType) {
 				<MediaContainer>
 					<CardMedia
 						component="img"
-						alt="Contemplative Reptile"
+						alt="bruh"
 						style={{height: '25rem', width: 'auto'}}
 						image={post.media}
-						title="Paella dish"
+						title="image"
+					/>
+				</MediaContainer>
+			)}
+			{ post.type === 'video' && (
+				<MediaContainer>
+					<CardMedia
+						component="video"
+						style={{ width: '100%'}}
+						controls
+						src={post.media}
+						title="video"
 					/>
 				</MediaContainer>
 			)}
 			
 			<PostActions>
-				<IconButton size="small">
-					<ArrowUpwardIcon />
+				<IconButton size="small" onClick={upvoteButtonHandler}>
+					<UpvoteIcon upvoted={isUpvoted()} />
 				</IconButton>
 				<Typography>
 					{ post.score }
 				</Typography>
-				<IconButton size="small">
-					<ArrowDownwardIcon />
+				<IconButton size="small" onClick={downvoteButtonHandler}>
+					<DownvoteIcon downvoted={isDownvoted()} />
 				</IconButton>
 				<IconButton size="small">
 					<MessageIcon />

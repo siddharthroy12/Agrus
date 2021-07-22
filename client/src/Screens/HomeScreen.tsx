@@ -50,7 +50,6 @@ export default function HomeScreen() {
 				axios.get(`/api/post/feed/get?page=${page}&perpage=${5}`)
 					.then(res => {
 						if (mounted.current) {
-								console.log(res.data)
 								if (res.data.length === 0) {
 									setFeedEnded(true)
 								}
@@ -62,8 +61,8 @@ export default function HomeScreen() {
 								setFeedLoading(false)
 						}
 					}).catch(function (error) {
-						setFeedLoading(false)
 						if (mounted.current) {
+							setFeedLoading(false)
 							if (error.response) {
 								// Request made and server responded (Failed to Login)
 								setAlert({
@@ -149,7 +148,7 @@ export default function HomeScreen() {
 							<Typography>Home</Typography>
 						</PageDescriptionTop>
 						<PageDescription>
-							Your personal Reddit frontpage. Come here to check in with your favorite communities.
+							This is the front page of this site, you can join boards, create posts, interact with others and lot more, but behave properly
 						</PageDescription>
 						<Button variant="contained" disableElevation component={Link} to='/submit'>Create a Post</Button>
 					</PageDescriptionBox>

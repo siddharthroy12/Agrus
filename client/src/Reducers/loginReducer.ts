@@ -11,6 +11,11 @@ import {
 	REGISTER_FAIL
 } from '../Constants/loginConstants'
 
+import {
+	UPVOTE_POST,
+	DOWNVOTE_POST
+} from '../Constants/postContants'
+
 type actionType = {
 	type: string,
 	payload?: any
@@ -22,7 +27,9 @@ type LoginType = {
 }
 
 const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType) => {
+	let info:any = {}
 	switch(action.type) {
+		// Login actions
 		case LOGIN_REQUEST:
 		case REGISTER_REQUEST:
 			return { loading: true }
@@ -45,6 +52,46 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 			return { loading: false, loggedIn: false, error: action.payload }
 		case LOGOUT:
 			return { loggedin: false }
+		// Post actions
+		case UPVOTE_POST:
+			info = state.info
+
+			const isUpvoted = info.upvotedPosts.filter((postId:string) => postId === action.payload).length
+
+			if (isUpvoted) {
+				info.upvotedPosts = info.upvotedPosts.filter((postId:string) => postId !== action.payload)
+			} else {
+				info.upvotedPosts.push(action.payload)
+
+				// Remove from downvotes posts if it is in
+				const isDownvoted = info.downvotedPosts.filter((postId:string) => postId === action.payload).length
+				
+				if (isDownvoted) {
+					info.downvotedPosts = info.downvotedPosts.filter((postId:string) => postId !== action.payload)
+				}
+			}
+
+			return { ...state, info }
+		case DOWNVOTE_POST:
+			info = state.info
+			
+			const isDownvoted = info.downvotedPosts.filter((postId:string) => postId === action.payload).length
+
+			if (isDownvoted) {
+				info.downvotedPosts = info.downvotedPosts.filter((postId:string) => postId !== action.payload)
+			} else {
+				info.downvotedPosts.push(action.payload)
+
+				// Remove from upvoted posts if it is in
+				const isUpvoted = info.upvotedPosts.filter((postId:string) => postId === action.payload).length
+
+				if (isUpvoted) {
+					info.upvotedPosts = info.upvotedPosts.filter((postId:string) => postId !== action.payload)
+				}
+			}
+
+			return { ...state , info }
+
 		default:
 			return state
 	}
