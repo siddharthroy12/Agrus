@@ -13,7 +13,8 @@ import {
 
 import {
 	UPVOTE_POST,
-	DOWNVOTE_POST
+	DOWNVOTE_POST,
+	SAVE_POST
 } from '../Constants/postContants'
 
 type actionType = {
@@ -72,6 +73,7 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 			}
 
 			return { ...state, info }
+
 		case DOWNVOTE_POST:
 			info = state.info
 			
@@ -91,6 +93,19 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 			}
 
 			return { ...state , info }
+
+		case SAVE_POST:
+			info = state.info
+
+			const isSaved = info.savedPosts.filter((postId:string) => postId === action.payload).length
+
+			if (isSaved) {
+				info.savedPosts = info.savedPosts.filter((postId:string) => postId !== action.payload)
+			} else {
+				info.savedPosts.push(action.payload)
+			}
+
+			return { ...state, info }
 
 		default:
 			return state

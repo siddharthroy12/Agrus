@@ -22,7 +22,8 @@ import { StateType } from '../Store'
 
 import { 
 	upvote,
-	downvote
+	downvote,
+	save
 } from '../Actions/postActions'
 
 const HeaderText = styled.div`
@@ -101,6 +102,18 @@ const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
 	color: ${(props) => props.downvoted ? props.theme.primary : props.theme.fontColor };
 `
 
+type SaveIconProps = {
+	saved: boolean
+}
+
+const SaveIcon = styled(BookmarkIcon)<SaveIconProps>`
+	color: ${(props) => props.saved ? props.theme.primary : props.theme.fontColor };
+`
+
+const CommentIcon = styled(MessageIcon)`
+	color: ${(props) => props.theme.fontColor };
+`
+
 type PostType = {
 	_id:string
 	author: string,
@@ -121,6 +134,7 @@ type propsType = {
 
 export default function Post({ post: _post }: propsType) {
 	const [post, setPost] = useState(_post)
+	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const mounted = useMounted()
@@ -144,6 +158,15 @@ export default function Post({ post: _post }: propsType) {
 		if (loginState.loggedIn) {
 			const downvoted = loginState.info.downvotedPosts.filter((id:string) => id === post._id)
 			return downvoted.length > 0 ? true : false
+		} else {
+			return false
+		}
+	}
+
+	const isSaved = () => {
+		if (loginState.loggedIn) {
+			const saved = loginState.info.savedPosts.filter((id:string) => id === post._id)
+			return saved.length > 0 ? true : false
 		} else {
 			return false
 		}
@@ -258,6 +281,26 @@ export default function Post({ post: _post }: propsType) {
 		}
 	}
 
+	const saveButtonHandler = () => {
+		if (!saveRequestPending && loginState.loggedIn) {
+			setSaveRequestPending(true)
+
+			dispatch(save(post._id))
+			axios.post(`/api/post/${post._id}/save`, {}, genConfig())
+				.then(res => {
+					if (mounted) {
+						setSaveRequestPending(false)
+					}
+				}).catch(function (error) {
+					dispatch(save(post._id)) // Undo the save if fails
+					if (mounted) {
+						setSaveRequestPending(false)
+					}
+				}
+			)
+		}
+	}
+
 	return (
 		<Card elevation={3}>
 			<CardHeader
@@ -334,13 +377,13 @@ export default function Post({ post: _post }: propsType) {
 					<DownvoteIcon downvoted={isDownvoted()} />
 				</IconButton>
 				<IconButton size="small">
-					<MessageIcon />
+					<CommentIcon />
 				</IconButton>
 				<Typography>
 					{ post.commentCount }
 				</Typography>
-				<IconButton size="small">
-					<BookmarkIcon />
+				<IconButton size="small" onClick={saveButtonHandler}>
+					<SaveIcon saved={isSaved()} />
 				</IconButton>
 			</PostActions>
 		</Card>

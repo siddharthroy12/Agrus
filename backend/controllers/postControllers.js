@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler')
 const Post = require('../models/Post')
 const Board = require('../models/Board')
-const { listeners } = require('../models/Post')
 
 // @desc Create a post
 // @route POST /api/post
