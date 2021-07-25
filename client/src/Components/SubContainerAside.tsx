@@ -39,8 +39,8 @@ export default function SubContainerAside({ children }: propsType) {
 	return (
 		<Wrapper>
 			{ children }
-			<Divider elevation={3}/>
-			<MoreInfoBox elevation={3}>
+			<Divider elevation={1}/>
+			<MoreInfoBox elevation={1}>
 				<MoreInfoRow>
 					<Typography>
 						Made By

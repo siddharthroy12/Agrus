@@ -1,24 +1,28 @@
-import { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux'
 
 import {
-	Card, CardHeader, CardMedia, CardContent,
-	Avatar, IconButton, Typography, CardActions
+	Card, CardHeader, CardMedia, CardContent, List, ListItem,
+	Avatar, IconButton, Typography, CardActions, Popover
 } from '@material-ui/core'
+
+import { Link } from 'react-router-dom'
 
 import {
 	ArrowUpward as ArrowUpwardIcon,
 	ArrowDownward as ArrowDownwardIcon,
 	Bookmark as BookmarkIcon,
 	MoreVert as MoreVertIcon,
-	Message as MessageIcon
+	Message as MessageIcon,
 } from '@material-ui/icons'
 
 import useMounted from '../Hooks/useMounted'
 
 import { StateType } from '../Store'
+
+import Alert from '../Components/Alert'
 
 import { 
 	upvote,
@@ -86,6 +90,12 @@ const PostActions = styled(CardActions)`
 	}
 `
 
+const Menu = styled.div`
+	.menu-item {
+		padding: 1rem;
+	}
+`
+
 type UpvoteIconProps = {
 	upvoted: boolean
 }
@@ -114,6 +124,11 @@ const CommentIcon = styled(MessageIcon)`
 	color: ${(props) => props.theme.fontColor };
 `
 
+const PlainLink = styled(Link)`
+	text-decoration: none;
+	color: unset;
+`
+
 type PostType = {
 	_id:string
 	author: string,
@@ -136,7 +151,10 @@ export default function Post({ post: _post }: propsType) {
 	const [post, setPost] = useState(_post)
 	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
+	const [deletePending, setDeletePending] = useState(false)
+	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
+	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
 	const mounted = useMounted()
 	const dispatch = useDispatch()
 
@@ -173,7 +191,8 @@ export default function Post({ post: _post }: propsType) {
 	}
 
 	const genConfig  = () => {
-		const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
+		const userInfoFromStorage = localStorage.getItem('loginInfo') ?
+			JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
 		return {
     	headers: {
@@ -301,91 +320,187 @@ export default function Post({ post: _post }: propsType) {
 		}
 	}
 
+	const deleteButtonHandler = () => {
+		if (!deletePending) {
+			setDeletePending(true)
+
+			axios.delete(`/api/post/${post._id}`, genConfig())
+				.then(res => {
+					if (mounted) {
+						setDeleted(true)
+						setDeletePending(false)
+					}
+				})
+				.catch(error => {
+					if (mounted) {
+						setDeletePending(false)
+					}
+				})
+		}
+	}
+
+	const menuButtonHandler = (e: SyntheticEvent) => {
+		setMenuIsOpen(e.currentTarget)
+	}
+
+	const closeMenu = () => {
+		setMenuIsOpen(false)
+	}
+
 	return (
-		<Card elevation={3}>
-			<CardHeader
-				avatar={
-					<IconButton size="small">
-						<Avatar style={{width: '40xp', height: '40px'}}>{ post.author[0].toUpperCase() }</Avatar>
-					</IconButton>
-				}
-				action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title={
-					<HeaderText	>
-						{ post.board !== '' ? (
-							<>
-								<BoardName>
-									{ post.board }
-								</BoardName>
-								<Typography>
-									•
-								</Typography>
-							</>
-						): null}
+		<Card elevation={1}>
+			{ deleted ? (
+				<Alert 
+					severity={'error'}
+					message={'Deleted'}
+				/>
+			) : (
+				deletePending ? (
+					<Alert 
+						severity={'error'}
+						message={'Deleting'}
+					/>
+				) : (<>
+					<CardHeader
+						avatar={
+							<IconButton size="small">
+								<Avatar
+									style={{width: '40xp', height: '40px'}}>
+										{ post.author[0].toUpperCase() }
+								</Avatar>
+							</IconButton>
+						}
+						action={<>
+							<IconButton
+								aria-label="settings"
+								onClick={menuButtonHandler}>
+								<MoreVertIcon />
+							</IconButton>
+							<Popover
+								id="simple-menu"
+								anchorEl={menuIsOpen as Element}
+								keepMounted
+								open={Boolean(menuIsOpen)}
+								onClose={closeMenu} 
+								anchorOrigin={{
+									vertical: 'bottom',
+									horizontal: 'right',
+								}}
+								transformOrigin={{
+									vertical: 'top',
+									horizontal: 'right',
+								}}
+							>
+								<Menu>
+									<List>
+										<ListItem 
+											className="menu-item"
+											button
+											component={Link}
+											to={`/u/${post.author}`}>
+												Visit User
+										</ListItem>
+										{ post.board !== '' ? (
+											<ListItem
+												className="menu-item" 
+												button
+												component={Link}
+												to={`/b/${post.board}`}>
+													Visit Board
+											</ListItem>
+										): null}
+										
+										{loginState.info.username === post.author ? (
+											<ListItem
+												className="menu-item"
+												button
+												onClick={deleteButtonHandler}>
+													Delete Post
+											</ListItem>
+										) : null}
+									</List>
+								</Menu>
+							</Popover>
+						</>}
+        		title={
+							<HeaderText	>
+								{ post.board !== '' ? (
+									<>
+										<PlainLink to={`/b/${post.board}`}>
+											<BoardName>
+												{ post.board }
+											</BoardName>
+										</PlainLink>
+										<Typography>
+											•
+										</Typography>
+									</>
+								): null}
+								<PlainLink to={`/u/${post.author}`}>
+									<Typography>
+										{ post.author }
+									</Typography>
+								</PlainLink>
+							</HeaderText>
+						}
+        		subheader={getHumanReadableDate(post.createdAt)}
+					/>
+					<PlainLink to={`/post/${post._id}`}>
+						<PostContent>
+								<PostTitle>
+									{ post.title }
+								</PostTitle>
+								{ post.type === 'text' && (
+									<PostBody>
+										{ post.body }
+									</PostBody>
+								)}
+						</PostContent>
+						{ post.type === 'image' && (
+							<MediaContainer>
+								<CardMedia
+									component="img"
+									alt="bruh"
+									style={{height: '25rem', width: 'auto'}}
+									image={post.media}
+									title="image"
+								/>
+							</MediaContainer>
+						)}
+						{ post.type === 'video' && (
+							<MediaContainer>
+								<CardMedia
+									component="video"
+									style={{ width: '100%'}}
+									controls
+									src={post.media}
+									title="video"
+								/>
+							</MediaContainer>
+						)}
+					</PlainLink>
+					<PostActions>
+						<IconButton size="small" onClick={upvoteButtonHandler}>
+							<UpvoteIcon upvoted={isUpvoted()} />
+						</IconButton>
 						<Typography>
-							{ post.author }
+							{ post.score }
 						</Typography>
-					</HeaderText>
-				}
-        subheader={getHumanReadableDate(post.createdAt)}
-			/>
-			<PostContent>
-					<PostTitle>
-						{ post.title }
-					</PostTitle>
-					{ post.type === 'text' && (
-						<PostBody>
-							{ post.body }
-						</PostBody>
-					)}
-			</PostContent>
-			{ post.type === 'image' && (
-				<MediaContainer>
-					<CardMedia
-						component="img"
-						alt="bruh"
-						style={{height: '25rem', width: 'auto'}}
-						image={post.media}
-						title="image"
-					/>
-				</MediaContainer>
+						<IconButton size="small" onClick={downvoteButtonHandler}>
+							<DownvoteIcon downvoted={isDownvoted()} />
+						</IconButton>
+						<IconButton size="small">
+							<CommentIcon />
+						</IconButton>
+						<Typography>
+							{ post.commentCount }
+						</Typography>
+						<IconButton size="small" onClick={saveButtonHandler}>
+							<SaveIcon saved={isSaved()} />
+						</IconButton>
+					</PostActions>
+				</>)
 			)}
-			{ post.type === 'video' && (
-				<MediaContainer>
-					<CardMedia
-						component="video"
-						style={{ width: '100%'}}
-						controls
-						src={post.media}
-						title="video"
-					/>
-				</MediaContainer>
-			)}
-			
-			<PostActions>
-				<IconButton size="small" onClick={upvoteButtonHandler}>
-					<UpvoteIcon upvoted={isUpvoted()} />
-				</IconButton>
-				<Typography>
-					{ post.score }
-				</Typography>
-				<IconButton size="small" onClick={downvoteButtonHandler}>
-					<DownvoteIcon downvoted={isDownvoted()} />
-				</IconButton>
-				<IconButton size="small">
-					<CommentIcon />
-				</IconButton>
-				<Typography>
-					{ post.commentCount }
-				</Typography>
-				<IconButton size="small" onClick={saveButtonHandler}>
-					<SaveIcon saved={isSaved()} />
-				</IconButton>
-			</PostActions>
 		</Card>
 	)
 }

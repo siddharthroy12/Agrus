@@ -3,8 +3,8 @@ import { useState, SyntheticEvent } from 'react'
 import { 
 	AppBar, Toolbar, IconButton,
 	Typography, Button, InputBase,
-	Chip, List, ListItem, Popover,
-	Divider
+	List, ListItem, Popover,
+	Divider, Avatar
 } from "@material-ui/core"
 
 import {
@@ -162,11 +162,12 @@ export default function Header() {
 				</SearchIconButton>
 				{ loginState.loggedIn ? (
 					<>
-						<Chip
-							icon={<AccountCircleIcon />}
-							label={loginState.info.username}
-							onClick={handleUserMenuBtnClick}
-						/>
+					<IconButton onClick={handleUserMenuBtnClick}>
+						<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
+							{loginState.info.username[0].toUpperCase()}	
+						</Avatar>
+					</IconButton>
+				
 						<Popover
 							id="simple-menu"
 							anchorEl={userMenuIsOpen as Element}

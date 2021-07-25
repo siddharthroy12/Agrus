@@ -10,6 +10,9 @@ import HomeScreen from './Screens/HomeScreen'
 import LoginScreen from './Screens/LoginScreen'
 import RegisterScreen from './Screens/RegisterScreen'
 import SubmitScreen from './Screens/SubmitScreen'
+import PostScreen from './Screens/PostScreen'
+import UserScreen from './Screens/UserScreen'
+import BoardScreen from './Screens/BoardScreen'
 
 import PublicRoute from './Routes/PublicRoute'
 import ProtectedRoute from './Routes/ProtectedRoute'
@@ -38,6 +41,9 @@ function App() {
     <Router>
       <ThemeProvider theme={lightTheme}>
         <Switch>
+          <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
+          <PublicRoute exact path='/u/:username' component={UserScreen} />
+          <PublicRoute exact path='/post/:id' component={PostScreen} />
           <ProtectedRoute exact path='/register' component={RegisterScreen} />
           <ProtectedRoute exact path="/login" component={LoginScreen} />
           <PrivateRoute exact path='/submit' component={SubmitScreen} />

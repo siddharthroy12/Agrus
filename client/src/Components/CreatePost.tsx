@@ -10,6 +10,8 @@ import {
 
 import styled from 'styled-components'
 
+import { useSelector } from 'react-redux'
+
 const Wrapper = styled(Paper)`
 	display: flex;
 	width: 100%;
@@ -22,7 +24,7 @@ const AvatarBox = styled.div`
 
 const InputBox = styled.div`
 	padding: 0.5rem;
-	background-color: rgba(0, 0, 0, 0.07);
+	background-color: rgba(0, 0, 0, 0.02);
 	border-radius: 3px;
 	width: 100%;
 	display: flex;
@@ -32,6 +34,8 @@ const InputBox = styled.div`
 	& > * {
 		width: 100%;
 	}
+
+	box-shadow: 0px 0px 2px 1px #c1c1c1 inset;
 `
 
 const PostTypeButtons = styled.div`
@@ -40,11 +44,16 @@ const PostTypeButtons = styled.div`
 `
 
 export default function CreatePost() {
+	// Type doesn't matter here and I'm lazu
+	const loginState = useSelector((state:any) => state.login)
+
 	return (
-		<Wrapper elevation={3}>
+		<Wrapper elevation={1}>
 			<AvatarBox>
 				<IconButton size="small" aria-label="Go to Profile">
-					<Avatar>H</Avatar>
+					<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
+						{loginState.info.username[0].toUpperCase()}	
+						</Avatar>
 				</IconButton>
 			</AvatarBox>
 			<InputBox>
