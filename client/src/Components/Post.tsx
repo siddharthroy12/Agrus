@@ -30,7 +30,9 @@ import {
 	save
 } from '../Actions/postActions'
 
-const HeaderText = styled.div`
+import genConfig from '../Utils/genConfig'
+
+export const HeaderText = styled.div`
 	display: flex;
 	align-items: center;
 
@@ -39,29 +41,29 @@ const HeaderText = styled.div`
 	}
 `
 
-const BoardName = styled(Typography)`
+export const BoardName = styled(Typography)`
 	font-weight: 500;
 `
 
-const PostContent = styled(CardContent)`
+export const PostContent = styled(CardContent)`
 	padding-top: 0;
 	padding-bottom: 1rem;
 	font-weight: 300;
 	padding-bottom: 0;
 `
 
-const MediaContainer = styled.div`
+export const MediaContainer = styled.div`
 	display:flex;
 	justify-content: center;
 	background-color: black;
 `
 
-const PostTitle = styled(Typography)`
+export const PostTitle = styled(Typography)`
 	font-weight: 500;
 	margin-bottom: 0.5rem;
 `
 
-const PostBody = styled(Typography)`
+export const PostBody = styled(Typography)`
 	color: #505050;
 	//background-color: rgba(0, 0, 0, 0.1);
 	position: relative;
@@ -81,7 +83,7 @@ const PostBody = styled(Typography)`
 	}
 `
 
-const PostActions = styled(CardActions)`
+export const PostActions = styled(CardActions)`
 	display: flex;
 
 	& > * {
@@ -90,37 +92,37 @@ const PostActions = styled(CardActions)`
 	}
 `
 
-const Menu = styled.div`
+export const Menu = styled.div`
 	.menu-item {
 		padding: 1rem;
 	}
 `
 
-type UpvoteIconProps = {
+export type UpvoteIconProps = {
 	upvoted: boolean
 }
 
-const UpvoteIcon = styled(ArrowUpwardIcon)<UpvoteIconProps>`
+export const UpvoteIcon = styled(ArrowUpwardIcon)<UpvoteIconProps>`
 	color: ${(props) => props.upvoted ? props.theme.primary : props.theme.fontColor };
 `
 
-type DownvoteIconProps = {
+export type DownvoteIconProps = {
 	downvoted: boolean
 }
 
-const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
+export const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
 	color: ${(props) => props.downvoted ? props.theme.primary : props.theme.fontColor };
 `
 
-type SaveIconProps = {
+export type SaveIconProps = {
 	saved: boolean
 }
 
-const SaveIcon = styled(BookmarkIcon)<SaveIconProps>`
+export const SaveIcon = styled(BookmarkIcon)<SaveIconProps>`
 	color: ${(props) => props.saved ? props.theme.primary : props.theme.fontColor };
 `
 
-const CommentIcon = styled(MessageIcon)`
+export const CommentIcon = styled(MessageIcon)`
 	color: ${(props) => props.theme.fontColor };
 `
 
@@ -129,7 +131,12 @@ const PlainLink = styled(Link)`
 	color: unset;
 `
 
-type PostType = {
+export const getHumanReadableDate = (rawdate: string) => {
+	const date = new Date(rawdate)
+	return `Posted on ${date.getDate()}, ${date.getMonth()}, ${date.getFullYear()}`
+}
+
+export type PostType = {
 	_id:string
 	author: string,
 	board: string,
@@ -158,11 +165,6 @@ export default function Post({ post: _post }: propsType) {
 	const mounted = useMounted()
 	const dispatch = useDispatch()
 
-	const getHumanReadableDate = (rawdate: string) => {
-		const date = new Date(rawdate)
-		return `Posted on ${date.getDate()}, ${date.getMonth()}, ${date.getFullYear()}`
-	}
-
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
 			const upvoted = loginState.info.upvotedPosts.filter((id:string) => id === post._id)
@@ -188,18 +190,6 @@ export default function Post({ post: _post }: propsType) {
 		} else {
 			return false
 		}
-	}
-
-	const genConfig  = () => {
-		const userInfoFromStorage = localStorage.getItem('loginInfo') ?
-			JSON.parse(String(localStorage.getItem('loginInfo'))) : null
-
-		return {
-    	headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userInfoFromStorage.token}`
-      }
-  	}
 	}
 
 	const upvoteButtonHandler = () => {

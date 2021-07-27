@@ -12,6 +12,8 @@ import styled from 'styled-components'
 
 import { useSelector } from 'react-redux'
 
+import { useHistory } from 'react-router'
+
 const Wrapper = styled(Paper)`
 	display: flex;
 	width: 100%;
@@ -20,6 +22,7 @@ const Wrapper = styled(Paper)`
 
 const AvatarBox = styled.div`
 	margin-right: 0.5rem;
+	display: flex;
 `
 
 const InputBox = styled.div`
@@ -46,9 +49,10 @@ const PostTypeButtons = styled.div`
 export default function CreatePost() {
 	// Type doesn't matter here and I'm lazu
 	const loginState = useSelector((state:any) => state.login)
+	const history = useHistory()
 
 	return (
-		<Wrapper elevation={1}>
+		<Wrapper elevation={1} onClick={() => history.push('/submit')}>
 			<AvatarBox>
 				<IconButton size="small" aria-label="Go to Profile">
 					<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
