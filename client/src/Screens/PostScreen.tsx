@@ -4,8 +4,8 @@ import { useParams } from 'react-router'
 import Container from '../Components/Container'
 
 import {
-	Card, CardHeader, IconButton, CardMedia,
-	Avatar, Typography, Snackbar, LinearProgress
+	Card, CardHeader, IconButton, CardMedia, Paper, Button,
+	Avatar, Typography, Snackbar, LinearProgress, TextField
 } from '@material-ui/core'
 
 import { 
@@ -33,9 +33,34 @@ import { StateType } from '../Store'
 
 import styled from 'styled-components'
 
-export const PostBody = styled(Typography)`
+const PostBody = styled(Typography)`
 	color: #505050;
 	overflow: hidden;
+`
+
+const Wrapper = styled(Container)`
+	display: flex;
+	flex-direction: column;
+`
+
+const CommentBox = styled(Paper)`
+	margin: 1rem 0;
+	padding: 1rem;
+`
+
+const CommentBoxActions = styled.div`
+	display: flex;
+	padding-top: 1rem;
+	flex-direction: row-reverse;
+`
+
+const PostCommentButton = styled(Button)`
+	background-color: ${(props) => props.theme.primary};
+	color: white;
+`
+
+const PostField = styled(TextField)`
+	width: 100%;
 `
 
 export default function PostScreen() {
@@ -237,6 +262,8 @@ export default function PostScreen() {
 		}
 	}
 
+	console.log({ postLoading, post})
+
 	return (
 		<>
 			<Snackbar
@@ -248,88 +275,101 @@ export default function PostScreen() {
 						message={(alert as AlertType).message}
 					/>
 			</Snackbar>
-			<Container>
+			<Wrapper>
 				{postLoading ? (
 					<LinearProgress />
 				) : post && (
-						<Card elevation={1} style={{width: '100%'}}>
-						<CardHeader
-							avatar={
-								<IconButton size="small">
-									<Avatar
-										style={{width: '40xp', height: '40px'}}>
-											{ (post as PostType).author[0].toUpperCase() }
-									</Avatar>
-								</IconButton>
-							}
-							title={
-								<HeaderText	>
-									{ (post as PostType).board !== '' ? (
-										<>
-											<BoardName>
-												{ (post as PostType).board }
-											</BoardName>
+						<>
+							<Card elevation={1} style={{width: '100%'}}>
+							<CardHeader
+								avatar={
+									<IconButton size="small">
+										<Avatar
+											style={{width: '40xp', height: '40px'}}>
+												{ (post as PostType).author[0].toUpperCase() }
+										</Avatar>
+									</IconButton>
+								}
+								title={
+									<HeaderText	>
+										{ (post as PostType).board !== '' ? (
+											<>
+												<BoardName>
+													{ (post as PostType).board }
+												</BoardName>
+												<Typography>
+													•
+												</Typography>
+											</>
+										): null}
 											<Typography>
-												•
+												{ (post as PostType).author }
 											</Typography>
-										</>
-									): null}
-										<Typography>
-											{ (post as PostType).author }
-										</Typography>
-								</HeaderText>
-							}
-							subheader={getHumanReadableDate((post as PostType).createdAt)}
-						/>
-						<PostContent>
-								<PostTitle>
-									{ (post as PostType).title }
-								</PostTitle>
-								{ (post as PostType).type === 'text' && (
-									<PostBody>
-										{ (post as PostType).body }
-									</PostBody>
-								)}
-						</PostContent>
-						{ (post as PostType).type === 'image' && (
-							<MediaContainer>
-								<CardMedia
-									component="img"
-									alt="bruh"
-									style={{height: '25rem', width: 'auto'}}
-									image={(post as PostType).media}
-									title="image"
-								/>
-							</MediaContainer>
-						)}
-						{ (post as PostType).type === 'video' && (
-							<MediaContainer>
-								<CardMedia
-									component="video"
-									style={{ width: '100%'}}
-									controls
-									src={(post as PostType).media}
-									title="video"
-								/>
-							</MediaContainer>
-						)}
-						<PostActions>
-							<IconButton size="small" onClick={upvoteButtonHandler}>
-								<UpvoteIcon upvoted={isUpvoted()} />
-							</IconButton>
-							<Typography>
-								{ (post as PostType).score }
-							</Typography>
-							<IconButton size="small" onClick={downvoteButtonHandler}>
-								<DownvoteIcon downvoted={isDownvoted()} />
-							</IconButton>
-							<IconButton size="small" onClick={saveButtonHandler}>
-								<SaveIcon saved={isSaved()} />
-							</IconButton>
-						</PostActions>
-					</Card>
+									</HeaderText>
+								}
+								subheader={getHumanReadableDate((post as PostType).createdAt)}
+							/>
+							<PostContent>
+									<PostTitle>
+										{ (post as PostType).title }
+									</PostTitle>
+									{ (post as PostType).type === 'text' && (
+										<PostBody>
+											{ (post as PostType).body }
+										</PostBody>
+									)}
+							</PostContent>
+							{ (post as PostType).type === 'image' && (
+								<MediaContainer>
+									<CardMedia
+										component="img"
+										alt="bruh"
+										style={{height: '25rem', width: 'auto'}}
+										image={(post as PostType).media}
+										title="image"
+									/>
+								</MediaContainer>
+							)}
+							{ (post as PostType).type === 'video' && (
+								<MediaContainer>
+									<CardMedia
+										component="video"
+										style={{ width: '100%'}}
+										controls
+										src={(post as PostType).media}
+										title="video"
+									/>
+								</MediaContainer>
+							)}
+							<PostActions>
+								<IconButton size="small" onClick={upvoteButtonHandler}>
+									<UpvoteIcon upvoted={isUpvoted()} />
+								</IconButton>
+								<Typography>
+									{ (post as PostType).score }
+								</Typography>
+								<IconButton size="small" onClick={downvoteButtonHandler}>
+									<DownvoteIcon downvoted={isDownvoted()} />
+								</IconButton>
+								<IconButton size="small" onClick={saveButtonHandler}>
+									<SaveIcon saved={isSaved()} />
+								</IconButton>
+							</PostActions>
+						</Card>
+						<CommentBox>
+							<PostField
+								id="filled-basic"
+								label="Post a comment"
+								variant="filled"
+								multiline
+							/>
+							<CommentBoxActions>
+								<PostCommentButton variant="contained" color="primary">Post</PostCommentButton>
+							</CommentBoxActions>
+						</CommentBox>
+					</>
 				)}
-			</Container>
+			</Wrapper>
 		</>
 	)
 }

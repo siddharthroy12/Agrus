@@ -11,6 +11,8 @@ const userRoutes = require('./routes/userRoutes')
 const boardRoutes = require('./routes/boardRoutes')
 const postRoutes = require('./routes/postRoutes')
 const uploadRoute = require('./routes/uploadRoute')
+const commentRoute = require('./routes/commentRoutes')
+
 // Connect to database
 connectDB()
 
@@ -24,12 +26,11 @@ if (process.env.NODE_ENV === 'development') {
 
 
 app.use(express.json())
-// app.use('/api/label', labelRoutes)
-// app.use('/api/notes', noteRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/board', boardRoutes)
 app.use('/api/post', postRoutes)
 app.use('/api/upload', uploadRoute)
+app.use('/api/comment', commentRoute)
 
 // Serve client in production mode
 if (process.env.NODE_ENV === 'production') {
