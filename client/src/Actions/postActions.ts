@@ -6,21 +6,21 @@ import {
 
 import { DispatchType } from '../Store'
 
-export const upvote = (postId: string) => async (dispatch: DispatchType) => {
+export const upvotePost = (postId: string) => async (dispatch: DispatchType) => {
 	dispatch({
 		type: UPVOTE_POST,
 		payload: postId
 	})
 }
 
-export const downvote = (postId: string) => async (dispatch: DispatchType) => {
+export const downvotePost = (postId: string) => async (dispatch: DispatchType) => {
 	dispatch({
 		type: DOWNVOTE_POST,
 		payload: postId
 	})
 }
 
-export const save = (postId: string) => async (dispatch: DispatchType) => {
+export const savePost = (postId: string) => async (dispatch: DispatchType) => {
 	dispatch({
 		type: SAVE_POST,
 		payload: postId

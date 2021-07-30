@@ -23,7 +23,7 @@ const createComment = asyncHandler(async (req, res) => {
 	}
 
 	const newComment = await Comment.create({
-		author: req.user._id,
+		author: req.user.username,
 		parentPost: post,
 		body: body,
 	})
@@ -35,7 +35,7 @@ const createComment = asyncHandler(async (req, res) => {
 
 
 // @desc Get get comments of a post
-// @route Get /api/comment/feed/:postId/get?page=1&perpage=2
+// @route Get /api/comment/feed/:postId?page=1&perpage=2
 // @access Public
 const getPostComments = asyncHandler(async (req, res) => {
 	const { page, perpage } = req.query
@@ -188,7 +188,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 		throw new Error('Post not found')
 	}
 
-	if (comment.author.toString() !== req.user._id.toString() && req.user.isAdmin === false) {
+	if (comment.author.toString() !== req.user.username.toString() && req.user.isAdmin === false) {
 		res.status(403)
 		throw new Error("It's not your comment buddy")
 	}

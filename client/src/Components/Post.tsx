@@ -25,9 +25,9 @@ import { StateType } from '../Store'
 import Alert from '../Components/Alert'
 
 import { 
-	upvote,
-	downvote,
-	save
+	upvotePost,
+	downvotePost,
+	savePost
 } from '../Actions/postActions'
 
 import genConfig from '../Utils/genConfig'
@@ -162,7 +162,7 @@ export default function Post({ post: _post }: propsType) {
 	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
-	const mounted = useMounted()
+	const isMounted = useMounted()
 	const dispatch = useDispatch()
 
 	const isUpvoted = () => {
@@ -209,19 +209,19 @@ export default function Post({ post: _post }: propsType) {
 				})
 			}
 
-			dispatch(upvote(post._id))
+			dispatch(upvotePost(post._id))
 			axios.post(`/api/post/${post._id}/upvote`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setVoteRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(upvote(post._id)) // Undo the upvote if fails
+					dispatch(upvotePost(post._id)) // Undo the upvote if fails
 					
 					if (isDownvoted()) {
-						dispatch(downvote(post._id))
+						dispatch(downvotePost(post._id))
 					}
-					if (mounted) {
+					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost(prevPost => {
 								return {...prevPost, score: prevPost.score + 1}
@@ -258,18 +258,18 @@ export default function Post({ post: _post }: propsType) {
 					return {...prevPost, score: prevPost.score - 1}
 				})
 			}
-			dispatch(downvote(post._id))
+			dispatch(downvotePost(post._id))
 			axios.post(`/api/post/${post._id}/downvote`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setVoteRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(downvote(post._id)) // Undo the downvote if fails
+					dispatch(downvotePost(post._id)) // Undo the downvote if fails
 					if (isUpvoted()) {
-						dispatch(upvote(post._id))
+						dispatch(upvotePost(post._id))
 					}
-					if (mounted) {
+					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost(prevPost => {
 								return {...prevPost, score: prevPost.score - 1}
@@ -294,15 +294,15 @@ export default function Post({ post: _post }: propsType) {
 		if (!saveRequestPending && loginState.loggedIn) {
 			setSaveRequestPending(true)
 
-			dispatch(save(post._id))
+			dispatch(savePost(post._id))
 			axios.post(`/api/post/${post._id}/save`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setSaveRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(save(post._id)) // Undo the save if fails
-					if (mounted) {
+					dispatch(savePost(post._id)) // Undo the save if fails
+					if (isMounted()) {
 						setSaveRequestPending(false)
 					}
 				}
@@ -316,13 +316,13 @@ export default function Post({ post: _post }: propsType) {
 
 			axios.delete(`/api/post/${post._id}`, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setDeleted(true)
 						setDeletePending(false)
 					}
 				})
 				.catch(error => {
-					if (mounted) {
+					if (isMounted()) {
 						setDeletePending(false)
 					}
 				})
@@ -399,15 +399,16 @@ export default function Post({ post: _post }: propsType) {
 													Visit Board
 											</ListItem>
 										): null}
-										
-										{loginState.info.username === post.author ? (
-											<ListItem
-												className="menu-item"
-												button
-												onClick={deleteButtonHandler}>
-													Delete Post
-											</ListItem>
-										) : null}
+										{
+											loginState.loggedIn ? loginState.info.username === post.author ? (
+												<ListItem
+													className="menu-item"
+													button
+													onClick={deleteButtonHandler}>
+														Delete Post
+												</ListItem>
+											): null : null
+										}
 									</List>
 								</Menu>
 							</Popover>

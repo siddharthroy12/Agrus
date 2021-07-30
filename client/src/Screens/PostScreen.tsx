@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router'
 import Container from '../Components/Container'
@@ -14,14 +14,16 @@ import {
 	PostActions, DownvoteIcon, SaveIcon, UpvoteIcon
 } from '../Components/Post'
 
+import Comment from '../Components/Comment'
+
 import Alert from '../Components/Alert'
 
 import { useSelector, useDispatch } from 'react-redux'
 
 import { 
-	upvote,
-	downvote,
-	save
+	upvotePost,
+	downvotePost,
+	savePost
 } from '../Actions/postActions'
 
 import genConfig from '../Utils/genConfig'
@@ -64,54 +66,69 @@ const PostField = styled(TextField)`
 `
 
 export default function PostScreen() {
+	const [page, setPage] = useState(1)
+	const [oneShotForPost, setOneShotForPost] = useState(false)
+	const [oneShotForComments, setOneShotForComments] = useState(false)
 	const params:any = useParams()
 	const [postLoading, setPostLoading] = useState(true)
 	const [alert, setAlert] = useAlert(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
+	const [commentPostRequestPending, setCommentPostRequestPending] = useState(false)
+	const [comment, setComment] = useState('')
+	const [comments, setComments] = useState([])
+	const [postedComments, setPostedComments] = useState([])
 	const [post, setPost] = useState<PostType | null>(null)
-	const mounted = useMounted()
+	const [commentFeedLoading, setCommentFeedLoading] = useState(false)
+	const [commentFeedEnded, setCommentFeedEnded] = useState(false)
+	const isMounted = useMounted()
 	const dispatch = useDispatch()
 
+	const fetchPost = useCallback(() => {
+		console.log('getting post')
+		axios.get(`/api/post/${params.id}`)
+			.then(res => {
+				console.log(isMounted())
+				
+				if (isMounted()) {
+					console.log({data: res.data})
+					setPost(res.data)
+					setPostLoading(false)
+				}
+			})
+			.catch(error => {
+				if (isMounted()) {
+					setPostLoading(false)
+					if (error.response) {
+						// Request made and server responded (Failed to Login)
+						setAlert({
+							message: error.response.data.message,
+							severity: 'error'
+						})
+						} else if (error.request) {
+						// The request was made but no response was received (Slow Internet)
+						setAlert({
+							message: 'Failed load post due to slow network',
+							severity: 'error'
+						})
+						} else {
+						setAlert({
+							message: error + '',
+							severity: 'error'
+						})
+					}
+				}
+			})
+	}, [setAlert, params.id])
 
 	// Fetch Post data on first run
 	useEffect(() => {
-		const fetchPostData = () => {
-			axios.get(`/api/post/${params.id}`)
-				.then(res => {
-					if (mounted) {
-						setPost(res.data)
-						setPostLoading(false)
-					}
-				})
-				.catch(error => {
-					if (mounted) {
-						setPostLoading(false)
-						if (error.response) {
-							// Request made and server responded (Failed to Login)
-							setAlert({
-								message: error.response.data.message,
-								severity: 'error'
-							})
-							} else if (error.request) {
-							// The request was made but no response was received (Slow Internet)
-							setAlert({
-								message: 'Failed load post due to slow network',
-								severity: 'error'
-							})
-							} else {
-							setAlert({
-								message: error + '',
-								severity: 'error'
-							})
-						}
-					}
-				})
+		if (!oneShotForPost) {
+			fetchPost()
+			setOneShotForPost(false)
 		}
-
-		fetchPostData()
-	}, [mounted, params.id, setAlert])
+	}, [fetchPost, oneShotForPost])
 
 	const handleAlertClose = () => {
 		setAlert(false)
@@ -161,19 +178,19 @@ export default function PostScreen() {
 				})
 			}
 
-			dispatch(upvote((post as PostType)._id))
+			dispatch(upvotePost((post as PostType)._id))
 			axios.post(`/api/post/${(post as PostType)._id}/upvote`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setVoteRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(upvote((post as PostType)._id)) // Undo the upvote if fails
+					dispatch(upvotePost((post as PostType)._id)) // Undo the upvote if fails
 					
 					if (isDownvoted()) {
-						dispatch(downvote((post as PostType)._id))
+						dispatch(downvotePost((post as PostType)._id))
 					}
-					if (mounted) {
+					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost((prevPost: PostType | null) => {
 								return {...(prevPost as PostType), score: (prevPost as PostType).score + 1}
@@ -210,18 +227,18 @@ export default function PostScreen() {
 					return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
 				})
 			}
-			dispatch(downvote((post as PostType)._id))
+			dispatch(downvotePost((post as PostType)._id))
 			axios.post(`/api/post/${(post as PostType)._id}/downvote`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setVoteRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(downvote((post as PostType)._id)) // Undo the downvote if fails
+					dispatch(downvotePost((post as PostType)._id)) // Undo the downvote if fails
 					if (isUpvoted()) {
-						dispatch(upvote((post as PostType)._id))
+						dispatch(upvotePost((post as PostType)._id))
 					}
-					if (mounted) {
+					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost(prevPost => {
 								return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
@@ -246,15 +263,15 @@ export default function PostScreen() {
 		if (!saveRequestPending && loginState.loggedIn) {
 			setSaveRequestPending(true)
 
-			dispatch(save((post as PostType)._id))
+			dispatch(savePost((post as PostType)._id))
 			axios.post(`/api/post/${(post as PostType)._id}/save`, {}, genConfig())
 				.then(res => {
-					if (mounted) {
+					if (isMounted()) {
 						setSaveRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(save((post as PostType)._id)) // Undo the save if fails
-					if (mounted) {
+					dispatch(savePost((post as PostType)._id)) // Undo the save if fails
+					if (isMounted()) {
 						setSaveRequestPending(false)
 					}
 				}
@@ -262,7 +279,125 @@ export default function PostScreen() {
 		}
 	}
 
-	console.log({ postLoading, post})
+	const postComment = () => {
+		if (!commentPostRequestPending) {
+			setCommentPostRequestPending(true)
+
+			const reqBody = {
+				body: comment,
+				post: params.id
+			}
+
+			axios.post(`/api/comment`, reqBody, genConfig())
+				.then(res => {
+					if (isMounted()) {
+						setCommentPostRequestPending(false)
+						setPostedComments((prevComments) => {
+							let copy = [...prevComments]
+							copy.push((res.data as never)) // Weird type cast
+							return copy
+						})
+					}
+				})
+				.catch(error => {
+					if (isMounted()) {
+						setCommentPostRequestPending(false)
+						if (error.response) {
+							// Request made and server responded (Failed to Login)
+							setAlert({
+								message: error.response.data.message,
+								severity: 'error'
+							})
+							} else if (error.request) {
+							// The request was made but no response was received (Slow Internet)
+							setAlert({
+								message: 'Failed to comment due to slow network',
+								severity: 'error'
+							})
+							} else {
+							setAlert({
+								message: error + '',
+								severity: 'error'
+							})
+						}
+					}
+				})
+		}
+	}
+
+	const updateCommentFeed = useCallback(() => {
+		if (!commentFeedLoading && !commentFeedEnded && post !== null) {
+			setCommentFeedLoading(true)
+			axios.get(`/api/comment/feed/${(post as PostType)._id}?page=${page}&perpage=${5}`)
+				.then(res => {
+					if (isMounted()) {
+							if (res.data.length === 0) {
+								setCommentFeedEnded(true)
+							}
+								// @ts-ignore
+							setComments((prevComments) => {
+								return [...prevComments, ...res.data ]
+							})
+							setPage(page => page + 1)
+							setCommentFeedLoading(false)
+					}
+				}).catch(function (error) {
+					if (isMounted()) {
+						setCommentFeedLoading(false)
+						if (error.response) {
+							// Request made and server responded (Failed to Login)
+							setAlert({
+								message: error.response.data.message,
+								severity: 'error'
+							})
+							} else if (error.request) {
+							// The request was made but no response was received (Slow Internet)
+							setAlert({
+								message: 'Failed to load comments due to slow network',
+								severity: 'error'
+							})
+							} else {
+							setAlert({
+								message: error + '',
+								severity: 'error'
+							})
+						}
+					}
+				}
+			)
+		}
+	}, [
+		commentFeedEnded, commentFeedLoading,
+		isMounted, page, setAlert, post
+	])
+
+	useEffect(() => {
+		if (!oneShotForComments && post !== null) {
+			updateCommentFeed()
+			setOneShotForComments(true)
+		}
+	}, [oneShotForComments, updateCommentFeed, post])
+
+	useEffect(() => { // If Update function changes reapply the event listner
+		const onScrollCheck = () => {
+			// When on end of the page
+			if (
+				(window.innerHeight + window.scrollY) 
+				>= window.document.body.offsetHeight) {
+					updateCommentFeed()
+			}
+		}
+
+		window.addEventListener('scroll', onScrollCheck)
+
+		return () => {
+			window.removeEventListener('scroll', onScrollCheck)
+		}
+	}, [updateCommentFeed])
+
+
+	// Removing this line seems to break the app because of quantum mechanics (maybe)
+	//console.log({ postLoading, post})
 
 	return (
 		<>
@@ -361,12 +496,22 @@ export default function PostScreen() {
 								id="filled-basic"
 								label="Post a comment"
 								variant="filled"
+								value={comment}
+								onChange={(e:any) => setComment(e.target.value)}
 								multiline
 							/>
 							<CommentBoxActions>
-								<PostCommentButton variant="contained" color="primary">Post</PostCommentButton>
+								<PostCommentButton
+									variant="contained"
+									color="primary"
+									disabled={commentPostRequestPending}
+									onClick={postComment}>
+										Post
+								</PostCommentButton>
 							</CommentBoxActions>
 						</CommentBox>
+						{postedComments.map(comment => <Comment comment={comment} />)}
+						{comments.map(comment => <Comment comment={comment} />)}
 					</>
 				)}
 			</Wrapper>

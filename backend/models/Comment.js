@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 
 const commentSchema = mongoose.Schema({
 	author: {
-		type: mongoose.Schema.ObjectId,
-		ref: 'User',
+		type: String,
 		required: true
 	},
 	parentPost: {

@@ -354,7 +354,7 @@ const deletePost = asyncHandler(async (req, res) => {
 		throw new Error('Post not found')
 	}
 
-	if (post.author.toString() !== req.user._id.toString() && req.user.isAdmin === false) {
+	if (post.author.toString() !== req.user.username.toString() && req.user.isAdmin === false) {
 		res.status(403)
 		throw new Error("It's not your post buddy")
 	}
