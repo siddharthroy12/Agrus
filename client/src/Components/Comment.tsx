@@ -47,7 +47,6 @@ type PropsType = {
 
 export default function Comment({ comment: _comment }: PropsType) {
 	const [comment, setComment] = useState(_comment)
-	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
 	const [deletePending, setDeletePending] = useState(false)
 	const [deleted, setDeleted] = useState(false)

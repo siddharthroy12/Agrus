@@ -126,34 +126,34 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 			} else {
 				info.upvotedComments.push(action.payload)
 				// Remove from downvotes posts if it is in
-				isDownvoted = info.upvotedComments.filter((commentId:string) => commentId === action.payload).length
+				isDownvoted = info.downvotedComments.filter((commentId:string) => commentId === action.payload).length
 				
 				if (isDownvoted) {
-					info.upvotedComments = info.upvotedComments.filter((commentId:string) => commentId !== action.payload)
+					info.downvotedComments = info.downvotedComments.filter((commentId:string) => commentId !== action.payload)
 				}
 			}
 
 			return { ...state, info }
 
-			case DOWNVOTE_COMMENT:
-				info = state.info
-				
-				isDownvoted = info.downvotedComments.filter((commentId:string) => commentId === action.payload).length
-	
-				if (isDownvoted) {
-					info.downvotedComments = info.downvotedComments.filter((commentId:string) => commentId !== action.payload)
-				} else {
-					info.downvotedComments.push(action.payload)
-	
-					// Remove from upvoted posts if it is in
-					isUpvoted = info.downvotedComments.filter((commentId:string) => commentId === action.payload).length
-	
-					if (isUpvoted) {
-						info.downvotedComments = info.downvotedComments.filter((commentId:string) => commentId !== action.payload)
-					}
+		case DOWNVOTE_COMMENT:
+			info = state.info
+			
+			isDownvoted = info.downvotedComments.filter((commentId:string) => commentId === action.payload).length
+
+			if (isDownvoted) {
+				info.downvotedComments = info.downvotedComments.filter((commentId:string) => commentId !== action.payload)
+			} else {
+				info.downvotedComments.push(action.payload)
+
+				// Remove from upvoted posts if it is in
+				isUpvoted = info.upvotedComments.filter((commentId:string) => commentId === action.payload).length
+
+				if (isUpvoted) {
+					info.upvotedComments = info.upvotedComments.filter((commentId:string) => commentId !== action.payload)
 				}
-	
-				return { ...state , info }
+			}
+
+			return { ...state , info }
 			
 		default:
 			return state
