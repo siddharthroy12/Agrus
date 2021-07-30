@@ -86,13 +86,9 @@ export default function PostScreen() {
 	const dispatch = useDispatch()
 
 	const fetchPost = useCallback(() => {
-		console.log('getting post')
 		axios.get(`/api/post/${params.id}`)
 			.then(res => {
-				console.log(isMounted())
-				
 				if (isMounted()) {
-					console.log({data: res.data})
 					setPost(res.data)
 					setPostLoading(false)
 				}
@@ -120,7 +116,7 @@ export default function PostScreen() {
 					}
 				}
 			})
-	}, [setAlert, params.id])
+	}, [setAlert, params.id, isMounted])
 
 	// Fetch Post data on first run
 	useEffect(() => {
@@ -491,7 +487,8 @@ export default function PostScreen() {
 								</IconButton>
 							</PostActions>
 						</Card>
-						<CommentBox>
+						{loginState.loggedIn ? (
+							<CommentBox>
 							<PostField
 								id="filled-basic"
 								label="Post a comment"
@@ -510,8 +507,9 @@ export default function PostScreen() {
 								</PostCommentButton>
 							</CommentBoxActions>
 						</CommentBox>
-						{postedComments.map(comment => <Comment comment={comment} />)}
-						{comments.map(comment => <Comment comment={comment} />)}
+						): null}
+						{postedComments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
+						{comments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
 					</>
 				)}
 			</Wrapper>
