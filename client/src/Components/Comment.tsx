@@ -1,17 +1,20 @@
 import { useState } from 'react'
 
 import {
-	Card, CardHeader, CardMedia, CardContent, List, ListItem,
-	Avatar, IconButton, Typography, CardActions, Popover
+	Card, CardHeader,	Avatar,
+	IconButton, Typography,
 } from '@material-ui/core'
+
+import {
+	Delete as DeleteIcon
+} from '@material-ui/icons'
 
 import axios from 'axios'
 
 import { 
-	PostType, HeaderText, PostContent, PostTitle,
-	BoardName, getHumanReadableDate, MediaContainer,
+ 	HeaderText, getHumanReadableDate,
 	PostActions as CommentActions,
-	DownvoteIcon, SaveIcon, UpvoteIcon,
+	DownvoteIcon, UpvoteIcon,
 	PostContent as CommentContent,
 } from './Post'
 
@@ -23,10 +26,17 @@ import {
 	upvoteComment,
 	downvoteComment,
 } from '../Actions/commentActions'
+import {
+	PlainLink
+} from './Post'
+import Alert from './Alert'
 import genConfig from '../Utils/genConfig'
 
 import useMounted from '../Hooks/useMounted'
 
+export const TrashIcon = styled(DeleteIcon)`
+	color: ${(props) => props.theme.fontColor};
+`
 const CommentBody = styled(Typography)`
 	color: #505050;
 	overflow: hidden;
@@ -48,10 +58,9 @@ type PropsType = {
 export default function Comment({ comment: _comment }: PropsType) {
 	const [comment, setComment] = useState(_comment)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
-	const [deletePending, setDeletePending] = useState(false)
 	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
-	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
+	const [deleteRequestPending, setDeleteRequestPending] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
 
@@ -172,43 +181,79 @@ export default function Comment({ comment: _comment }: PropsType) {
 		}
 	}
 
+	const deleteButtonHandler = () => {
+		if (!deleteRequestPending) {
+			setDeleteRequestPending(true)
+
+			axios.delete(`/api/comment/${comment._id}`, genConfig())
+				.then(res => {
+					if (isMounted()) {
+						setDeleted(true)
+						setDeleteRequestPending(false)
+					}
+				})
+				.catch(error => {
+					if (isMounted()) {
+						setDeleteRequestPending(false)
+					}
+				})
+		}
+	}
+
 
 	return (
 		<Card elevation={1}>
-			<CardHeader
-				avatar={
-					<IconButton size="small">
-						<Avatar
-							style={{width: '40xp', height: '40px'}}>
-								{ comment.author[0].toUpperCase() }
-						</Avatar>
+			{ deleted ? (
+				<Alert 
+					severity={'error'}
+					message={'Deleted'}
+				/>
+			) : deleteRequestPending ? (
+				<Alert 
+					severity={'error'}
+					message={'Deleting'}
+				/>
+			) : (<>
+				<CardHeader
+					avatar={
+						<IconButton size="small">
+							<Avatar
+								style={{width: '40xp', height: '40px'}}>
+									{ comment.author[0].toUpperCase() }
+							</Avatar>
+						</IconButton>
+					}
+					title={
+						<HeaderText	>
+							<PlainLink to={`/u/${comment.author}`}>
+								<Typography>
+									{ comment.author }
+								</Typography>
+							</PlainLink>
+						</HeaderText>
+					}
+					subheader={getHumanReadableDate(comment.createdAt)}
+				/>
+				<CommentContent>
+					<CommentBody>
+						{ comment.body }
+					</CommentBody>
+				</CommentContent>
+				<CommentActions>
+					<IconButton size="small" onClick={upvoteButtonHandler}>
+						<UpvoteIcon $upvoted={isUpvoted()} />
 					</IconButton>
-				}
-				title={
-					<HeaderText	>
-						<Typography>
-							{ comment.author }
-						</Typography>
-					</HeaderText>
-				}
-				subheader={getHumanReadableDate(comment.createdAt)}
-			/>
-			<CommentContent>
-				<CommentBody>
-					{ comment.body }
-				</CommentBody>
-			</CommentContent>
-			<CommentActions>
-				<IconButton size="small" onClick={upvoteButtonHandler}>
-					<UpvoteIcon upvoted={isUpvoted()} />
-				</IconButton>
-				<Typography>
-					{ comment.score }
-				</Typography>
-				<IconButton size="small" onClick={downvoteButtonHandler}>
-					<DownvoteIcon downvoted={isDownvoted()} />
-				</IconButton>
-			</CommentActions>
+					<Typography>
+						{ comment.score }
+					</Typography>
+					<IconButton size="small" onClick={downvoteButtonHandler}>
+						<DownvoteIcon $downvoted={isDownvoted()} />
+					</IconButton>
+					<IconButton size="small" onClick={deleteButtonHandler}>
+						<TrashIcon />
+					</IconButton>
+				</CommentActions>
+			</>)}
 		</Card>
 	)
 }

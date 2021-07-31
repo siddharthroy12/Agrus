@@ -99,34 +99,34 @@ export const Menu = styled.div`
 `
 
 export type UpvoteIconProps = {
-	upvoted: boolean
+	$upvoted: boolean
 }
 
 export const UpvoteIcon = styled(ArrowUpwardIcon)<UpvoteIconProps>`
-	color: ${(props) => props.upvoted ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) => props.$upvoted ? props.theme.primary : props.theme.fontColor };
 `
 
 export type DownvoteIconProps = {
-	downvoted: boolean
+	$downvoted: boolean
 }
 
 export const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
-	color: ${(props) => props.downvoted ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) => props.$downvoted ? props.theme.primary : props.theme.fontColor };
 `
 
 export type SaveIconProps = {
-	saved: boolean
+	$saved: boolean
 }
 
 export const SaveIcon = styled(BookmarkIcon)<SaveIconProps>`
-	color: ${(props) => props.saved ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) => props.$saved ? props.theme.primary : props.theme.fontColor };
 `
 
 export const CommentIcon = styled(MessageIcon)`
 	color: ${(props) => props.theme.fontColor };
 `
 
-const PlainLink = styled(Link)`
+export const PlainLink = styled(Link)`
 	text-decoration: none;
 	color: unset;
 `
@@ -472,13 +472,13 @@ export default function Post({ post: _post }: propsType) {
 					</PlainLink>
 					<PostActions>
 						<IconButton size="small" onClick={upvoteButtonHandler}>
-							<UpvoteIcon upvoted={isUpvoted()} />
+							<UpvoteIcon $upvoted={isUpvoted()} />
 						</IconButton>
 						<Typography>
 							{ post.score }
 						</Typography>
 						<IconButton size="small" onClick={downvoteButtonHandler}>
-							<DownvoteIcon downvoted={isDownvoted()} />
+							<DownvoteIcon $downvoted={isDownvoted()} />
 						</IconButton>
 						<IconButton size="small">
 							<CommentIcon />
@@ -487,7 +487,7 @@ export default function Post({ post: _post }: propsType) {
 							{ post.commentCount }
 						</Typography>
 						<IconButton size="small" onClick={saveButtonHandler}>
-							<SaveIcon saved={isSaved()} />
+							<SaveIcon $saved={isSaved()} />
 						</IconButton>
 					</PostActions>
 				</>)

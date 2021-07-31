@@ -14,6 +14,10 @@ import {
 	PostActions, DownvoteIcon, SaveIcon, UpvoteIcon
 } from '../Components/Post'
 
+import {
+	TrashIcon
+} from '../Components/Comment'
+
 import Comment from '../Components/Comment'
 
 import Alert from '../Components/Alert'
@@ -65,6 +69,12 @@ const PostField = styled(TextField)`
 	width: 100%;
 `
 
+const CommentSection = styled.div`
+	> * {
+		margin-bottom: 1rem;
+	}
+`
+
 export default function PostScreen() {
 	const [page, setPage] = useState(1)
 	const [oneShotForPost, setOneShotForPost] = useState(false)
@@ -82,6 +92,8 @@ export default function PostScreen() {
 	const [post, setPost] = useState<PostType | null>(null)
 	const [commentFeedLoading, setCommentFeedLoading] = useState(false)
 	const [commentFeedEnded, setCommentFeedEnded] = useState(false)
+	const [deleteRequestPending, setDeleteRequestPending] = useState(false)
+	const [deleted, setDeleted] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
 
@@ -275,6 +287,25 @@ export default function PostScreen() {
 		}
 	}
 
+	const deleteButtonHandler = () => {
+		if (!deleteRequestPending) {
+			setDeleteRequestPending(true)
+
+			axios.delete(`/api/post/${(post as PostType)._id}`, genConfig())
+				.then(res => {
+					if (isMounted()) {
+						setDeleted(true)
+						setDeleteRequestPending(false)
+					}
+				})
+				.catch(error => {
+					if (isMounted()) {
+						setDeleteRequestPending(false)
+					}
+				})
+		}
+	}
+
 	const postComment = () => {
 		if (!commentPostRequestPending) {
 			setCommentPostRequestPending(true)
@@ -322,7 +353,7 @@ export default function PostScreen() {
 	}
 
 	const updateCommentFeed = useCallback(() => {
-		if (!commentFeedLoading && !commentFeedEnded && post !== null) {
+		if (!commentFeedLoading && !commentFeedEnded && post !== null && !deleted && !deleteRequestPending) {
 			setCommentFeedLoading(true)
 			axios.get(`/api/comment/feed/${(post as PostType)._id}?page=${page}&perpage=${5}`)
 				.then(res => {
@@ -364,7 +395,8 @@ export default function PostScreen() {
 		}
 	}, [
 		commentFeedEnded, commentFeedLoading,
-		isMounted, page, setAlert, post
+		isMounted, page, setAlert, post, deleted,
+		deleteRequestPending
 	])
 
 	useEffect(() => {
@@ -391,10 +423,6 @@ export default function PostScreen() {
 		}
 	}, [updateCommentFeed])
 
-
-	// Removing this line seems to break the app because of quantum mechanics (maybe)
-	//console.log({ postLoading, post})
-
 	return (
 		<>
 			<Snackbar
@@ -412,104 +440,122 @@ export default function PostScreen() {
 				) : post && (
 						<>
 							<Card elevation={1} style={{width: '100%'}}>
-							<CardHeader
-								avatar={
-									<IconButton size="small">
-										<Avatar
-											style={{width: '40xp', height: '40px'}}>
-												{ (post as PostType).author[0].toUpperCase() }
-										</Avatar>
+								{deleted ? (<>
+									<Alert 
+										severity={'error'}
+										message={'Deleted'}
+									/>
+								</>) : deleteRequestPending ? (<>
+									<Alert 
+										severity={'error'}
+										message={'Deleting'}
+									/>
+								</>) : (<>
+									<CardHeader
+										avatar={
+											<IconButton size="small">
+												<Avatar
+													style={{width: '40xp', height: '40px'}}>
+														{ (post as PostType).author[0].toUpperCase() }
+												</Avatar>
+											</IconButton>
+										}
+										title={
+											<HeaderText	>
+												{ (post as PostType).board !== '' ? (
+													<>
+														<BoardName>
+															{ (post as PostType).board }
+														</BoardName>
+														<Typography>
+															•
+														</Typography>
+													</>
+												): null}
+													<Typography>
+														{ (post as PostType).author }
+													</Typography>
+											</HeaderText>
+										}
+										subheader={getHumanReadableDate((post as PostType).createdAt)}
+									/>
+									<PostContent>
+										<PostTitle>
+											{ (post as PostType).title }
+										</PostTitle>
+										{ (post as PostType).type === 'text' && (
+											<PostBody>
+												{ (post as PostType).body }
+											</PostBody>
+										)}
+									</PostContent>
+								{(post as PostType).type === 'image' && (
+									<MediaContainer>
+										<CardMedia
+											component="img"
+											alt="bruh"
+											style={{height: '25rem', width: 'auto'}}
+											image={(post as PostType).media}
+											title="image"
+										/>
+									</MediaContainer>
+								)}
+								{(post as PostType).type === 'video' && (
+									<MediaContainer>
+										<CardMedia
+											component="video"
+											style={{ width: '100%'}}
+											controls
+											src={(post as PostType).media}
+											title="video"
+										/>
+									</MediaContainer>
+								)}
+								<PostActions>
+									<IconButton size="small" onClick={upvoteButtonHandler}>
+										<UpvoteIcon $upvoted={isUpvoted()} />
 									</IconButton>
-								}
-								title={
-									<HeaderText	>
-										{ (post as PostType).board !== '' ? (
-											<>
-												<BoardName>
-													{ (post as PostType).board }
-												</BoardName>
-												<Typography>
-													•
-												</Typography>
-											</>
-										): null}
-											<Typography>
-												{ (post as PostType).author }
-											</Typography>
-									</HeaderText>
-								}
-								subheader={getHumanReadableDate((post as PostType).createdAt)}
-							/>
-							<PostContent>
-									<PostTitle>
-										{ (post as PostType).title }
-									</PostTitle>
-									{ (post as PostType).type === 'text' && (
-										<PostBody>
-											{ (post as PostType).body }
-										</PostBody>
-									)}
-							</PostContent>
-							{ (post as PostType).type === 'image' && (
-								<MediaContainer>
-									<CardMedia
-										component="img"
-										alt="bruh"
-										style={{height: '25rem', width: 'auto'}}
-										image={(post as PostType).media}
-										title="image"
-									/>
-								</MediaContainer>
-							)}
-							{ (post as PostType).type === 'video' && (
-								<MediaContainer>
-									<CardMedia
-										component="video"
-										style={{ width: '100%'}}
-										controls
-										src={(post as PostType).media}
-										title="video"
-									/>
-								</MediaContainer>
-							)}
-							<PostActions>
-								<IconButton size="small" onClick={upvoteButtonHandler}>
-									<UpvoteIcon upvoted={isUpvoted()} />
-								</IconButton>
-								<Typography>
-									{ (post as PostType).score }
-								</Typography>
-								<IconButton size="small" onClick={downvoteButtonHandler}>
-									<DownvoteIcon downvoted={isDownvoted()} />
-								</IconButton>
-								<IconButton size="small" onClick={saveButtonHandler}>
-									<SaveIcon saved={isSaved()} />
-								</IconButton>
-							</PostActions>
+									<Typography>
+										{ (post as PostType).score }
+									</Typography>
+									<IconButton size="small" onClick={downvoteButtonHandler}>
+										<DownvoteIcon $downvoted={isDownvoted()} />
+									</IconButton>
+									<IconButton size="small" onClick={saveButtonHandler}>
+										<SaveIcon $saved={isSaved()} />
+									</IconButton>
+									<IconButton size="small" onClick={deleteButtonHandler}>
+										<TrashIcon />
+									</IconButton>
+								</PostActions>
+								</>)}
 						</Card>
-						{loginState.loggedIn ? (
+						{loginState.loggedIn && !deleted && !deleteRequestPending ? (<>
 							<CommentBox>
-							<PostField
-								id="filled-basic"
-								label="Post a comment"
-								variant="filled"
-								value={comment}
-								onChange={(e:any) => setComment(e.target.value)}
-								multiline
-							/>
-							<CommentBoxActions>
-								<PostCommentButton
-									variant="contained"
-									color="primary"
-									disabled={commentPostRequestPending}
-									onClick={postComment}>
-										Post
-								</PostCommentButton>
-							</CommentBoxActions>
-						</CommentBox>
-						): null}
-						{postedComments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
-						{comments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
+								<PostField
+									id="filled-basic"
+									label="Post a comment"
+									variant="filled"
+									value={comment}
+									onChange={(e:any) => setComment(e.target.value)}
+									multiline
+								/>
+								<CommentBoxActions>
+									<PostCommentButton
+										variant="contained"
+										color="primary"
+										disabled={commentPostRequestPending}
+										onClick={postComment}>
+											Post
+									</PostCommentButton>
+								</CommentBoxActions>
+							</CommentBox>
+							<CommentSection>
+								{postedComments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
+								{comments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
+							</CommentSection>
+						</>): null}
+						
 					</>
 				)}
 			</Wrapper>
