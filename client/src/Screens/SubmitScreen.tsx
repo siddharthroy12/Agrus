@@ -13,6 +13,8 @@ import SubContainerMain from '../Components/SubContainerMain'
 
 import styled from 'styled-components'
 
+import { useHistory } from 'react-router'
+
 import useAlert, { AlertType } from '../Hooks/useAlert'
 
 const TabContentContainer = styled.div`
@@ -63,6 +65,7 @@ export default function SubmitScreen() {
 	const [alert, setAlert] = useAlert(false)
 	const [uploading, setUploading] = useState(false)
 	const mounted = useRef(false)
+	const history = useHistory()
 
 	const tabHandleChange = (event:any, newValue:any) => {
 		setTab(newValue)
@@ -200,7 +203,7 @@ export default function SubmitScreen() {
 			.then(res => {
 				if (mounted.current) {
 					setUploading(false)
-					// Redirect to post
+					history.push(`/post/${res.data._id}`)
 					setAlert({
 						message: 'Posted successfully',
 						severity: 'info'
