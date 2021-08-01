@@ -9,11 +9,11 @@
     <br />
     <br />
     <br />
-    <a href="https://noteskeepr.herokuapp.com/">View Demo</a>
+    <a href="#">View Demo</a>
     ·
-    <a href="https://github.com/siddharthroy12/keepr/issues">Report Bug</a>
+    <a href="https://github.com/siddharthroy12/Agrus/issues">Report Bug</a>
     ·
-    <a href="https://github.com/siddharthroy12/keepr/issues">Request Feature</a>
+    <a href="https://github.com/siddharthroy12/Agrus/issues">Request Feature</a>
   </p>
 </p>
 
