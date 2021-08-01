@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { StateType } from '../Store'
 import styled  from 'styled-components'
 import Header from '../Components/Header'
+import { useLocation } from 'react-router'
 
 const Background = styled.div`
   background-color: ${(props) => props.theme.secondary};
@@ -17,6 +18,8 @@ type CustomRoutePropsType = {
 export default function PrivateRoute({component: Component, ...rest}: CustomRoutePropsType) {
 	
 	const loginState:any = useSelector((state: StateType) => state.login)
+	const location = useLocation()
+	const redirect = encodeURIComponent(location.pathname + location.search)
 
 	return (
 		<Route {...rest} render={props => {
@@ -30,7 +33,7 @@ export default function PrivateRoute({component: Component, ...rest}: CustomRout
 							</Background>
 						</>
 					): (
-						<Redirect to='/login' />
+						<Redirect to={`/login?redirect=${redirect}`} />
 					)}
 				</>
 			)}}

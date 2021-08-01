@@ -13,9 +13,11 @@ import SubContainerMain from '../Components/SubContainerMain'
 
 import styled from 'styled-components'
 
-import { useHistory } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 
 import useAlert, { AlertType } from '../Hooks/useAlert'
+
+import queryString from 'query-string'
 
 const TabContentContainer = styled.div`
 	padding: 1rem;
@@ -55,10 +57,11 @@ const VideoPreview = styled.video`
 `
 
 export default function SubmitScreen() {
+	const location = useLocation()
 	const [tab, setTab] = useState(0)
 	const [title, setTitle] = useState('')
 	const [body, setBody] = useState('')
-	const [board, setBoard] = useState('')
+	const [board, setBoard] = useState(queryString.parse(location.search).board)
 	const [file, setFile] = useState<any>()
 	const [image, setImage] = useState('')
 	const [video, setVideo] = useState('')
@@ -394,7 +397,7 @@ export default function SubmitScreen() {
 					</Paper>
 				</SubContainerMain>
 				<SubContainerAside>
-
+					{/* Rules card */}
 				</SubContainerAside>
 			</Container>
 		</>

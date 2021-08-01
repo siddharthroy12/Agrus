@@ -3,6 +3,7 @@ const {
 	createBoard,
 	updateBoard,
 	getBoard,
+	getBoardFeed,
 	deleteBoard,
 	getAllBoards,
 	joinBoard
@@ -15,6 +16,8 @@ router.route('/:boardName')
 	.put(protect, updateBoard)
 	.delete(protect, deleteBoard)
 	.get(getBoard)
+
+router.get('/:boardname/feed', getBoardFeed)
 router.post('/:boardName/join', protect, joinBoard)
 
 if (process.env.NODE_ENV === 'development') {

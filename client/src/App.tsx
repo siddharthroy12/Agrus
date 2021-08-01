@@ -41,6 +41,10 @@ function App() {
     <Router>
       <ThemeProvider theme={lightTheme}>
         <Switch>
+          {/* TODO: */}
+          {/* Update Post Screen */}
+          {/* Update Board Screen */}
+          {/* Update User Screen */}
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
           <PublicRoute exact path='/u/:username' component={UserScreen} />
           <PublicRoute exact path='/post/:id' component={PostScreen} />

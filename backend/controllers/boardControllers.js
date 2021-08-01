@@ -153,7 +153,7 @@ const getBoard = asyncHandler(async (req, res) => {
 		throw new Error('BoardName can only have numbers and letters')
 	}
 
-	const board = await Board.findById(req.params.boardName)
+	const board = await Board.findOne({boardName: req.params.boardName})
 	
 	if (!board) {
 		res.status(404)
@@ -162,6 +162,24 @@ const getBoard = asyncHandler(async (req, res) => {
 
 	res.status(200)
 	res.json(board)
+})
+
+// @desc Get feed of board
+// @route Get /api/board/:boardname/feed?page=1&perpage=2
+// @access Public
+const getBoardFeed = asyncHandler(async (req, res) => {
+	const { page, perpage } = req.query
+	const { boardname } = req.params
+
+	if (page === undefined || perpage === undefined) {
+		res.status(400)
+		throw new Error('Provide page and perpage')
+	}
+
+	var query = await Post.find({ board: boardname }).sort({ createdAt: -1 }).skip((page-1) * perpage).limit(perpage * 1)
+
+	res.status(200)
+	res.json(query)
 })
 
 // @desc Join and Leave Board
@@ -242,6 +260,7 @@ module.exports = {
 	updateBoard,
 	deleteBoard,
 	getBoard,
+	getBoardFeed,
 	getAllBoards,
 	joinBoard,
 }

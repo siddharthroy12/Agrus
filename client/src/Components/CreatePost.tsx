@@ -46,13 +46,17 @@ const PostTypeButtons = styled.div`
 	display: flex;
 `
 
-export default function CreatePost() {
+type PropsType = {
+	board?: string
+}
+
+export default function CreatePost({ board }:PropsType) {
 	// Type doesn't matter here and I'm lazu
 	const loginState = useSelector((state:any) => state.login)
 	const history = useHistory()
 
 	return (
-		<Wrapper elevation={1} onClick={() => history.push('/submit')}>
+		<Wrapper elevation={1} onClick={() => history.push(`/submit?board=${board}`)}>
 			<AvatarBox>
 				<IconButton size="small" aria-label="Go to Profile">
 					<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>

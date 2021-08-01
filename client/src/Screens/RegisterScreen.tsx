@@ -7,7 +7,8 @@ import {
 
 
 import { Link as RouterLink } from 'react-router-dom'
-import { useHistory } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
+import queryString from 'query-string'
 
 import styled from 'styled-components'
 
@@ -90,9 +91,11 @@ export default function RegisterScreen() {
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
 	const [alert, setAlert] = useState<AlertType | boolean>(false)
-
+	const location = useLocation()
 	const history = useHistory()
 	const dispatch = useDispatch()
+	const redirect = queryString.parse(location.search).redirect
+		? queryString.parse(location.search).redirect : encodeURIComponent('/')
 
 	const loginState:any = useSelector<StateType>(state => state.login)
 
@@ -113,7 +116,7 @@ export default function RegisterScreen() {
 	// Check if login was successfull or not
 	useEffect(() => {
 		if (loginState.loggedIn) {
-			history.push('/')
+			history.push(redirect as string)
 		}
 
 		if (loginState.error) {
@@ -140,7 +143,11 @@ export default function RegisterScreen() {
 			setAlert(false)
 		}
 
-	}, [loginState, history])
+	}, [
+		loginState, history,
+		location.search,
+		redirect
+	])
 
 	const handleClose = () => {
 		setAlert(false)
@@ -187,7 +194,12 @@ export default function RegisterScreen() {
 					</SubmitButtonContainer>
 				</FormBox>
 				<Bottom>
-					<Link component={RouterLink} to='/login' >Already have account? Login</Link>
+					<Link
+						component={RouterLink}
+						to={`/login?redirect=${redirect}`}
+						>
+							Already have account? Login
+					</Link>
 				</Bottom>
 			</Box>
 		</>
