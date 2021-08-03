@@ -70,7 +70,7 @@ export default function LoginScreen() {
 	const [alert, setAlert] = useAlert(false)
 	const location = useLocation()
 	const redirect = queryString.parse(location.search).redirect
-		? queryString.parse(location.search).redirect : '/'
+		? queryString.parse(location.search).redirect : encodeURIComponent('/')
 	const history = useHistory()
 	const dispatch = useDispatch()
 

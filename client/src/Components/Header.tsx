@@ -4,7 +4,7 @@ import {
 	AppBar, Toolbar, IconButton,
 	Typography, Button, InputBase,
 	List, ListItem, Popover,
-	Divider, Avatar
+	Divider, Avatar, Drawer
 } from "@material-ui/core"
 
 import {
@@ -18,8 +18,14 @@ import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import { logout } from '../Actions/loginActions'
+import DrawerContent from './DrawerContent'
 
 import styled from 'styled-components'
+
+const AppName = styled.span`
+	color: ${props => props.theme.secondary};
+	text-decoration: none;
+`
 
 const SearchBox = styled.div`
 	display: flex;
@@ -120,7 +126,7 @@ const UserMenu = styled.div`
 
 export default function Header() {
 	const [userMenuIsOpen, setUserMenuIsOpen] = useState<Element | boolean>(false)
-
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const loginState:any = useSelector((state:StateType) => state.login)
 	const dispatch = useDispatch()
 
@@ -136,14 +142,29 @@ export default function Header() {
 		dispatch(logout())
 	}
 
+	const openDrawer = () => {
+		setIsDrawerOpen(true)
+	}
+
+	const closeDrawer = () => {
+		setIsDrawerOpen(false)
+	}
+
 	return (
 		<AppBar position="sticky">
 		<Toolbar>
-			<IconButton edge="start" color="inherit" aria-label="menu">
-				<MenuIcon />
-			</IconButton>
-			<Typography variant="h6">
-				Agrus
+			{loginState.loggedIn && (<>
+				<IconButton edge="start" color="inherit" aria-label="menu" onClick={openDrawer}>
+					<MenuIcon />
+				</IconButton>
+				<Drawer anchor="left" open={isDrawerOpen} onClose={closeDrawer}>
+					<DrawerContent />
+				</Drawer>
+			</>)}
+			<Typography variant="h6" component={Link} to='/'>
+				<AppName>
+					Agrus
+				</AppName>
 			</Typography>
 			<CenterHorizontal>
 				<SearchBox>
@@ -167,7 +188,6 @@ export default function Header() {
 							{loginState.info.username[0].toUpperCase()}	
 						</Avatar>
 					</IconButton>
-				
 						<Popover
 							id="simple-menu"
 							anchorEl={userMenuIsOpen as Element}

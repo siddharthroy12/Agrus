@@ -165,6 +165,25 @@ const updateUser = asyncHandler(async (req, res) => {
   res.json(req.user)
 })
 
+// @desc Get All joined boards of user
+// @route GET /api/user/joinedboards/get
+// @access Private
+const getUserJoinedBoards = asyncHandler(async (req, res) => {
+  const userPopulated = await User.populate(req.user, {path: "joinedBoards"})
+
+  res.status(200)
+  res.json(userPopulated.joinedBoards)
+})
+
+// @desc Get saved post of user
+// @route GET /api/user/savedposts/get
+// @access Private
+const getUserSavedPosts = asyncHandler(async (req, res) => {
+  const userPopulated = await User.populate(req.user, { path: "savedPosts" })
+  res.status(200)
+  res.json(userPopulated.savedPosts)
+})
+
 // @desc Disable User
 // @route DELETE /api/user/:username
 // @access Private/Admin
@@ -244,6 +263,8 @@ module.exports = {
   loginUser,
   authenticateUser,
   getUser,
+  getUserJoinedBoards,
+  getUserSavedPosts,
   getAllUsers,
   updateUser,
   disableUser,

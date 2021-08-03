@@ -4,6 +4,8 @@ const {
   loginUser,
 	authenticateUser,
 	getUser,
+	getUserJoinedBoards,
+	getUserSavedPosts,
 	getAllUsers,
 	updateUser,
 	enableUser,
@@ -16,6 +18,8 @@ router.post('/register', registerUser)
 router.put('/update', protect, updateUser)
 router.post('/login', loginUser)
 router.get('/authenticate', protect, authenticateUser)
+router.get('/joinedboards/get', protect, getUserJoinedBoards)
+router.get('/savedposts/get', protect, getUserSavedPosts)
 router.route('/:username')
 	.get(getUser)
 	.put(protect, admin, enableUser)

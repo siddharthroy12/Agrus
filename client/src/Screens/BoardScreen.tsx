@@ -2,12 +2,16 @@ import { useState, useCallback, useEffect } from 'react'
 import { useParams } from 'react-router'
 import axios from 'axios'
 import {
-	Typography, Card, CardHeader,
+	Typography, Card, CardHeader, CardContent,
 	Button, Snackbar, LinearProgress, Avatar
 } from '@material-ui/core'
 
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
+
+import { joinBoard } from '../Actions/boardActions'
+import genConfig from '../Utils/genConfig'
+import { Link } from 'react-router-dom'
 
 import Container from '../Components/Container'
 import SubContainerMain from '../Components/SubContainerMain'
@@ -21,6 +25,7 @@ import useAlert, { AlertType } from '../Hooks/useAlert'
 import useMounted from '../Hooks/useMounted'
 
 type BoardType = {
+	_id: string,
 	author: string,
 	boardName: string,
 	logo: string,
@@ -40,7 +45,20 @@ export default function BoardScreen() {
 	const [board, setBoard] = useState<BoardType | null>(null)
 	const [oneShot, setOneShot] = useState(false)
 	const [boardLoading, setBoardLoading] = useState(true)
+	const [isJoined, setIsJoined] = useState(false)
+	const [joinRequestPending, setJoinRequestPending] = useState(false)
 	const isMounted = useMounted()
+	const dispatch = useDispatch()
+
+	useEffect(() => {
+		if (loginState.loggedIn && board) {
+			console.log('hit')
+			let joined = loginState.info.joinedBoards
+				.filter((boardId:string) => 
+					boardId === (board as BoardType)._id).length ? true : false
+			setIsJoined(joined)
+		}
+	}, [loginState, board])
 
 	const updateFeed = useCallback(() => {
 		if (!feedLoading && !feedEnded) {
@@ -156,6 +174,42 @@ export default function BoardScreen() {
 		setAlert(false)
 	}
 
+	const handleJoinButton = () => {
+		if (!joinRequestPending) {
+			setJoinRequestPending(true)
+			axios.post(`/api/board/${board?.boardName}/join`, {}, genConfig())
+				.then(res => {
+					if (isMounted()) {
+						setJoinRequestPending(false)
+					}
+					dispatch(joinBoard(board))
+				})
+				.catch(function (error) {
+					if (isMounted()) {
+						setJoinRequestPending(false)
+						if (error.response) {
+							// Request made and server responded (Failed to Login)
+							setAlert({
+								message: error.response.data.message,
+								severity: 'error'
+							})
+							} else if (error.request) {
+							// The request was made but no response was received (Slow Internet)
+							setAlert({
+								message: 'Failed to join/;ave due to slow network',
+								severity: 'error'
+							})
+							} else {
+							setAlert({
+								message: error + '',
+								severity: 'error'
+							})
+						}
+					}
+				})
+		}
+	}
+
 	return (<>
 		<Snackbar
 			open={Boolean(alert)}
@@ -169,7 +223,7 @@ export default function BoardScreen() {
 			<Container>
 				{boardLoading ? <LinearProgress style={{width: '100%'}}/> : (<>
 					<SubContainerMain>
-						<Card elevation={1} style={{width: '100%'}}>
+						<Card variant="outlined" style={{width: '100%'}}>
 							<CardHeader
 								avatar={
 									<Avatar
@@ -190,7 +244,7 @@ export default function BoardScreen() {
 							/>
 						</Card>
 						{loginState.loggedIn && <CreatePost board={params.boardname}/>}
-						{feed.map(post => <Post post={post} />)}
+						{feed.map((post:any) => <Post post={post} key={post._id}/>)}
 						{feedLoading && <LinearProgress />}
 					</SubContainerMain>
 					<SubContainerAside>
@@ -216,7 +270,28 @@ export default function BoardScreen() {
 										</Typography>
 									</>}
 								/>
-								{/* Create Post Button */}
+								<CardContent>
+									<Button 
+										variant="contained"
+										disableElevation
+										component={Link}
+										style={{marginRight: '0.25rem'}}
+										to={`/submit?board=${params.boardname}`}>
+											Create a Post
+									</Button>
+									{loginState.loggedIn && (
+										<Button
+											variant="contained"
+											disableElevation
+											onClick={handleJoinButton}
+											style={{marginLeft: '0.25rem'}}>
+												{
+													joinRequestPending ? 'Wait' :
+													isJoined ? 'Leave Board' : 'Join Board'
+												}
+										</Button>
+									)}
+								</CardContent>
 						</Card>
 					</SubContainerAside>
 				</>)}

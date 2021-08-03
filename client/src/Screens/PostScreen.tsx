@@ -439,7 +439,7 @@ export default function PostScreen() {
 					<LinearProgress />
 				) : post && (
 						<>
-							<Card elevation={1} style={{width: '100%'}}>
+							<Card variant="outlined" style={{width: '100%'}}>
 								{deleted ? (<>
 									<Alert 
 										severity={'error'}
@@ -531,7 +531,7 @@ export default function PostScreen() {
 								</>)}
 						</Card>
 						{loginState.loggedIn && !deleted && !deleteRequestPending ? (<>
-							<CommentBox>
+							<CommentBox variant="outlined">
 								<PostField
 									id="filled-basic"
 									label="Post a comment"

@@ -202,7 +202,7 @@ export default function Comment({ comment: _comment }: PropsType) {
 
 
 	return (
-		<Card elevation={1}>
+		<Card variant="outlined">
 			{ deleted ? (
 				<Alert 
 					severity={'error'}

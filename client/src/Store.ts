@@ -3,9 +3,11 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
 import loginReducer from './Reducers/loginReducer'
+import joinedBoardsReducer from './Reducers/joinedBoardsReducer'
 
 const reducers = combineReducers({
-	login: loginReducer
+	login: loginReducer,
+	joinedBoards: joinedBoardsReducer
 })
 
 const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null

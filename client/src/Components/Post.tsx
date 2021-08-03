@@ -338,7 +338,7 @@ export default function Post({ post: _post }: propsType) {
 	}
 
 	return (
-		<Card elevation={1}>
+		<Card variant="outlined">
 			{ deleted ? (
 				<Alert 
 					severity={'error'}

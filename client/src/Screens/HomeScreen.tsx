@@ -158,7 +158,7 @@ export default function HomeScreen() {
 					{feedLoading && <LinearProgress />}
 				</SubContainerMain>
 				<SubContainerAside>
-					<PageDescriptionBox elevation={1}>
+					<PageDescriptionBox variant="outlined">
 						<PageDescriptionTop>
 							<HomeIcon />
 							<Typography>Home</Typography>

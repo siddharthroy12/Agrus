@@ -1,10 +1,13 @@
-import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { 
   BrowserRouter as Router, 
   Switch, 
 } from 'react-router-dom'
+
+import { StateType } from './Store'
+import { fetchJoinedBoards } from './Actions/boardActions'
 
 import HomeScreen from './Screens/HomeScreen'
 import LoginScreen from './Screens/LoginScreen'
@@ -24,8 +27,8 @@ import { ThemeProvider } from 'styled-components'
 import { authenticate } from './Actions/loginActions'
 
 function App() {
-
-  //const loginState = useSelector<StateType>(state => state.login)
+  const [oneShotJoinedBoards, setOneShotJoinedBoards] = useState(false)
+  const loginState:any = useSelector((state:StateType) => state.login)
   const dispatch = useDispatch()
 
   // Check if token is present try authenticate and login
@@ -37,6 +40,13 @@ function App() {
     }
   }, [dispatch])
 
+  useEffect(() => {
+    if (loginState.loggedIn && !oneShotJoinedBoards) {
+      setOneShotJoinedBoards(true)
+      dispatch(fetchJoinedBoards())
+    }
+  }, [loginState, dispatch, oneShotJoinedBoards])
+
   return (
     <Router>
       <ThemeProvider theme={lightTheme}>
@@ -45,6 +55,8 @@ function App() {
           {/* Update Post Screen */}
           {/* Update Board Screen */}
           {/* Update User Screen */}
+          {/* Search Screen */}
+          {/* Create Board Screen */}
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
           <PublicRoute exact path='/u/:username' component={UserScreen} />
           <PublicRoute exact path='/post/:id' component={PostScreen} />

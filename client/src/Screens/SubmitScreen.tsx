@@ -277,7 +277,7 @@ export default function SubmitScreen() {
 						value={board}
 						onChange={e => setBoard(e.target.value)}
 						/>
-					<Paper square elevation={3}>
+					<Paper square elevation={1}>
 						<Tabs
 							value={tab}
 							indicatorColor="primary"

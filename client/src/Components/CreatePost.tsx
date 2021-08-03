@@ -56,7 +56,7 @@ export default function CreatePost({ board }:PropsType) {
 	const history = useHistory()
 
 	return (
-		<Wrapper elevation={1} onClick={() => history.push(`/submit?board=${board}`)}>
+		<Wrapper variant="outlined" onClick={() => history.push(`/submit?board=${board}`)}>
 			<AvatarBox>
 				<IconButton size="small" aria-label="Go to Profile">
 					<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>

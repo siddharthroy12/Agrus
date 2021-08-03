@@ -6,12 +6,17 @@ const Wrapper = styled.aside`
 	width: 30rem;
 	margin-left: 0.5rem;
 
-	& > * {
-		margin-bottom: 1rem;
-	}
-
 	@media screen and (max-width: 850px) {
 		display: none;
+	}
+`
+
+const Sticky = styled.div`
+	position: sticky;
+	top: 80px;
+
+	& > * {
+		margin-bottom: 1rem;
 	}
 `
 
@@ -38,9 +43,10 @@ type propsType = {
 export default function SubContainerAside({ children }: propsType) {
 	return (
 		<Wrapper>
+			<Sticky>
 			{ children }
-			<Divider elevation={1}/>
-			<MoreInfoBox elevation={1}>
+			<Divider variant="outlined"/>
+			<MoreInfoBox variant="outlined">
 				<MoreInfoRow>
 					<Typography>
 						Made By
@@ -57,7 +63,8 @@ export default function SubContainerAside({ children }: propsType) {
 						About
 					</Typography>
 				</MoreInfoRow>
-			</MoreInfoBox>
+				</MoreInfoBox>
+			</Sticky>
 		</Wrapper>
 	)
 }

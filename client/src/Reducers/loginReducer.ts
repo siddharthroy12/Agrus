@@ -1,31 +1,26 @@
 import {
-	LOGIN_REQUEST,
-	AUTHENTICATION_REQUEST,
-	AUTHENTICATION_SUCCESS,
-	LOGIN_FAIL,
-	LOGIN_SUCCESS,
-	LOGOUT,
-	AUTHENTICATION_FAIL,
-	REGISTER_REQUEST,
-	REGISTER_SUCCESS,
-	REGISTER_FAIL
+	LOGIN_REQUEST, AUTHENTICATION_REQUEST, AUTHENTICATION_SUCCESS,
+	LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT, AUTHENTICATION_FAIL,
+	REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_FAIL
 } from '../Constants/loginConstants'
 
 import {
-	UPVOTE_POST,
-	DOWNVOTE_POST,
-	SAVE_POST
+	UPVOTE_POST, DOWNVOTE_POST, SAVE_POST
 } from '../Constants/postContants'
 
 import {
-	UPVOTE_COMMENT,
-	DOWNVOTE_COMMENT,
+	UPVOTE_COMMENT, DOWNVOTE_COMMENT,
 } from '../Constants/commentConstants'
+
+import {
+	JOIN_BOARD
+} from '../Constants/joinedBoardsConstants'
 
 type actionType = {
 	type: string,
 	payload?: any
 }
+
 type LoginType = {
 	loading?: boolean,
 	info?: any,
@@ -37,31 +32,39 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 	let isUpvoted:boolean = false
 	let isDownvoted:boolean = false
 	let isSaved:boolean = false
+	let isJoined:boolean = false
 
 	switch(action.type) {
 		// Login actions
 		case LOGIN_REQUEST:
 		case REGISTER_REQUEST:
 			return { loading: true }
+
 		case AUTHENTICATION_REQUEST:
 			return { loading: true, ...state }
+
 		case AUTHENTICATION_SUCCESS:
 			return { loggedIn: true, info: { ...state.info, ...action.payload } }
+
 		case AUTHENTICATION_FAIL:
 			// If authentication failed eg. Token expired or invalid, log out permanently
 			if (action.payload.response ) {
 				localStorage.removeItem('loginInfo')
 			}
 			return { loggedIn: false }
+
 		case LOGIN_SUCCESS:
 		case REGISTER_SUCCESS:
 			localStorage.setItem('loginInfo', JSON.stringify(action.payload))
 			return { loggedIn: true, info: action.payload }
+
 		case LOGIN_FAIL:
 		case REGISTER_FAIL:
 			return { loading: false, loggedIn: false, error: action.payload }
+
 		case LOGOUT:
 			return { loggedin: false }
+
 		// Post actions
 		case UPVOTE_POST:
 			info = state.info
@@ -154,6 +157,20 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 			}
 
 			return { ...state , info }
+		
+		// Board actions
+		case JOIN_BOARD:
+			info = state.info
+
+			isJoined = info.joinedBoards.filter((boardId:string) => boardId === action.payload._id).length
+
+			if (isJoined) {
+				info.joinedBoards = info.joinedBoards.filter((boardId:string) => boardId !== action.payload._id)
+			} else {
+				info.joinedBoards.push(action.payload._id)
+			}
+
+			return { ...state, info }
 			
 		default:
 			return state
