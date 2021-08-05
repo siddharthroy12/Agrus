@@ -480,7 +480,7 @@ export default function Post({ post: _post }: propsType) {
 						<IconButton size="small" onClick={downvoteButtonHandler}>
 							<DownvoteIcon $downvoted={isDownvoted()} />
 						</IconButton>
-						<IconButton size="small">
+						<IconButton size="small" component={Link} to={`/post/${post._id}`}>
 							<CommentIcon />
 						</IconButton>
 						<Typography>

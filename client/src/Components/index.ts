@@ -1,4 +1,6 @@
 export { default as Alert } from './Alert'
+export { default as AlertDisplay } from './AlertDisplay'
+export {default as Board} from './Board'
 export { default as Comment } from './Comment'
 export { default as Container } from './Container'
 export { default as CreatePost } from './CreatePost'

@@ -11,7 +11,7 @@ import { fetchJoinedBoards } from './Actions/boardActions'
 
 import {
   HomeScreen, LoginScreen, RegisterScreen, CreateBoardScreen,
-  SubmitScreen, PostScreen, UserScreen, BoardScreen
+  SubmitScreen, PostScreen, UserScreen, BoardScreen, SearchScreen
 } from './Screens'
 
 import {
@@ -53,7 +53,7 @@ function App() {
           {/* Update Post Screen */}
           {/* Update Board Screen */}
           {/* Update User Screen */}
-          {/* Search Screen */}
+          <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
           <PublicRoute exact path='/u/:username' component={UserScreen} />

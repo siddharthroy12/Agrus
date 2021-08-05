@@ -19,7 +19,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import { logout } from '../Actions/loginActions'
 import DrawerContent from './DrawerContent'
-
+import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 const AppName = styled.span`
@@ -129,6 +129,7 @@ export default function Header() {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 	const loginState:any = useSelector((state:StateType) => state.login)
 	const dispatch = useDispatch()
+	const history = useHistory()
 
 	const handleUserMenuBtnClick = (e: SyntheticEvent) => {
 		setUserMenuIsOpen(e.currentTarget)
@@ -148,6 +149,12 @@ export default function Header() {
 
 	const closeDrawer = () => {
 		setIsDrawerOpen(false)
+	}
+
+	const handleSearchBoxChange = (event:any) => {
+		if (event.target.value.trim().length > 2) {
+			history.push(`/search?search=${encodeURIComponent(event.target.value.trim())}`)
+		}
 	}
 
 	return (
@@ -174,6 +181,7 @@ export default function Header() {
 					<SearchBoxInput
 						placeholder="Search…"
 						inputProps={{ 'aria-label': 'search' }}
+						onChange={handleSearchBoxChange}
 					/>
 				</SearchBox>
 			</CenterHorizontal>

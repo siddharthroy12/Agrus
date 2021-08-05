@@ -52,7 +52,6 @@ export default function BoardScreen() {
 
 	useEffect(() => {
 		if (loginState.loggedIn && board) {
-			console.log('hit')
 			let joined = loginState.info.joinedBoards
 				.filter((boardId:string) => 
 					boardId === (board as BoardType)._id).length ? true : false
@@ -70,7 +69,12 @@ export default function BoardScreen() {
 								setFeedEnded(true)
 							}
 								// @ts-ignore
-							setFeed((prevFeed) => {
+							setFeed((prevFeed:any) => {
+								if (prevFeed[0] && res.data[0]) {
+									if (prevFeed[0]._id === res.data[0]._id) {
+										return prevFeed
+									}
+								}
 								return [...prevFeed, ...res.data ]
 							})
 							setPage(page => page + 1)
