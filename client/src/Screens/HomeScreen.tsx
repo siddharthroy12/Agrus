@@ -30,7 +30,7 @@ const PageDescriptionBox = styled(Paper)`
 const PageDescriptionTop = styled.div`
 	display: flex;
 	align-items: center;
-	margin-bottom: 1rem;
+	
 	& > * {
 		margin-right: 1rem;
 	}
@@ -38,6 +38,7 @@ const PageDescriptionTop = styled.div`
 
 const PageDescription = styled(Typography)`
 	margin-top: 1rem;
+	margin-bottom: 1rem;
 `
 
 export default function HomeScreen() {
