@@ -26,4 +26,6 @@ const boardSchema = mongoose.Schema({
     timestamps: true
 })
 
+boardSchema.index({boardName: 'text', description: 'text'})
+
 module.exports = Board = mongoose.model('Board', boardSchema)

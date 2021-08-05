@@ -9,17 +9,14 @@ import {
 import { StateType } from './Store'
 import { fetchJoinedBoards } from './Actions/boardActions'
 
-import HomeScreen from './Screens/HomeScreen'
-import LoginScreen from './Screens/LoginScreen'
-import RegisterScreen from './Screens/RegisterScreen'
-import SubmitScreen from './Screens/SubmitScreen'
-import PostScreen from './Screens/PostScreen'
-import UserScreen from './Screens/UserScreen'
-import BoardScreen from './Screens/BoardScreen'
+import {
+  HomeScreen, LoginScreen, RegisterScreen, CreateBoardScreen,
+  SubmitScreen, PostScreen, UserScreen, BoardScreen
+} from './Screens'
 
-import PublicRoute from './Routes/PublicRoute'
-import ProtectedRoute from './Routes/ProtectedRoute'
-import PrivateRoute from './Routes/PrivateRoute'
+import {
+  PublicRoute, ProtectedRoute, PrivateRoute
+} from './Routes'
 
 import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
@@ -33,7 +30,8 @@ function App() {
 
   // Check if token is present try authenticate and login
   useEffect(() => {
-    const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
+    const userInfoFromStorage = localStorage.getItem('loginInfo') ?
+      JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
     if (userInfoFromStorage) {
       dispatch(authenticate())
@@ -56,7 +54,7 @@ function App() {
           {/* Update Board Screen */}
           {/* Update User Screen */}
           {/* Search Screen */}
-          {/* Create Board Screen */}
+          <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
           <PublicRoute exact path='/u/:username' component={UserScreen} />
           <PublicRoute exact path='/post/:id' component={PostScreen} />

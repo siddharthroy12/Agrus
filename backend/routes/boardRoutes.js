@@ -1,6 +1,7 @@
 const express = require('express')
 const {
 	createBoard,
+	searchBoards,
 	updateBoard,
 	getBoard,
 	getBoardFeed,
@@ -17,6 +18,7 @@ router.route('/:boardName')
 	.delete(protect, deleteBoard)
 	.get(getBoard)
 
+router.get('/search/get', searchBoards)
 router.get('/:boardname/feed', getBoardFeed)
 router.post('/:boardName/join', protect, joinBoard)
 

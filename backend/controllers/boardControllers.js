@@ -6,7 +6,7 @@ const Post = require('../models/Post')
 // @route POST /api/board
 // @access Private
 const createBoard = asyncHandler(async (req, res) => {
-	const { boardName, description } = req.body
+	const { boardName, description, logo } = req.body
 
 	if (boardName === undefined || description === undefined) {
 		res.status(400)
@@ -27,6 +27,10 @@ const createBoard = asyncHandler(async (req, res) => {
     throw new Error('BoardName can only have numbers and letters')
   }
 
+	if (logo === undefined) {
+		logo = ''
+	}
+
 	const boardExist = await Board.findOne({boardName: boardName.trim()})
 
 	if (boardExist) {
@@ -38,7 +42,8 @@ const createBoard = asyncHandler(async (req, res) => {
 		const newBoard = await Board.create({
 			author: req.user._id,
 			boardName : boardName.trim(),
-			description: description.trim()
+			description: description.trim(),
+			logo: logo.trim()
 		})
 
 		res.status(200)
@@ -48,6 +53,20 @@ const createBoard = asyncHandler(async (req, res) => {
 		res.status(500)
 		throw new Error(error.message)
 	}
+})
+
+// @desc Search for boards
+// @route GET /api/board/search/get?search=
+// @access Public
+const searchBoards = asyncHandler(async (req, res) => {
+	if (!req.query.search) {
+		res.status(400)
+		throw new Error('search query is empty')
+	}
+
+	const result = await Board.find({$text: {$search: req.query.search}})
+	res.status(200)
+	res.json(result)
 })
 
 // @desc Update a Board (description, logo)
@@ -257,6 +276,7 @@ const getAllBoards = asyncHandler(async (req, res) => {
 
 module.exports = {
 	createBoard,
+	searchBoards,
 	updateBoard,
 	deleteBoard,
 	getBoard,

@@ -1,6 +1,7 @@
 const express = require('express')
 const {
 	createPost,
+	searchPosts,
 	getPost,
 	getPostFeed,
 	editPost,
@@ -21,7 +22,7 @@ router.route('/:id')
 	.put(protect, editPost)
 
 router.get('/feed/get', getPostFeed)
-
+router.get('/search/get', searchPosts)
 router.post('/:id/save', protect, savePost)
 router.post('/:id/upvote', protect, upvotePost)
 router.post('/:id/downvote', protect, downvotePost)

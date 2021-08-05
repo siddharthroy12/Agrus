@@ -324,6 +324,7 @@ export default function PostScreen() {
 							copy.push((res.data as never)) // Weird type cast
 							return copy
 						})
+						setComment('')
 					}
 				})
 				.catch(error => {

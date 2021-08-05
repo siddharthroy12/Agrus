@@ -184,7 +184,7 @@ export default function Header() {
 				{ loginState.loggedIn ? (
 					<>
 					<IconButton onClick={handleUserMenuBtnClick}>
-						<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
+						<Avatar alt="Avatar" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
 							{loginState.info.username[0].toUpperCase()}	
 						</Avatar>
 					</IconButton>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 
 import { 
@@ -62,7 +62,6 @@ export default function SubmitScreen() {
 	const [title, setTitle] = useState('')
 	const [body, setBody] = useState('')
 	const [board, setBoard] = useState(queryString.parse(location.search).board)
-	const [file, setFile] = useState<any>()
 	const [image, setImage] = useState('')
 	const [video, setVideo] = useState('')
 	const [alert, setAlert] = useAlert(false)
@@ -75,104 +74,102 @@ export default function SubmitScreen() {
 	}
 
 	const fileInputHandle = (event: any) => {
-		setFile(event.target.files[0])
+		uploadFile(event.target.files[0])
 	}
 
-	const uploadFile = useCallback(() => {
+	const uploadFile = (file:any) => {
 		setUploading(true)
 
-			const formData = new FormData(); 
+		const formData = new FormData()
+		let mediaType = ''
 
-			let mediaType = ''
+		if (tab === 1) {
+			mediaType = 'image'
+		} else if (tab === 2) {
+			mediaType = 'video'
+		}
 
-			if (tab === 1) {
-				mediaType = 'image'
-			} else if (tab === 2) {
-				mediaType = 'video'
+    // Update the formData object 
+    formData.append( 
+    	mediaType,
+      file
+    )
+
+		const config = {
+			headers: {
+				'Content-Type': 'multipart/form-data'
 			}
+		}
 
-      // Update the formData object 
-      formData.append( 
-      	mediaType,
-        file
-      )
-
-			const config = {
-				headers: {
-					'Content-Type': 'multipart/form-data'
-				}
-			}
-
-			axios.post('api/upload', formData, config)
-				.then(res => {
-					if (mounted.current) {
-						// Do stuff
-						if (mediaType === 'image') {
-							setImage(res.data.data.link)
-							setUploading(false)
-						}
-						
-						if (mediaType === 'video') {
-							axios.get(`/api/upload/poll?ticket=${res.data.data.ticket}`)
-								.then(res2 => {
-									if (mounted.current) {
-										setVideo(res2.data.link)
-										setUploading(false)
-									}
-								}).catch(function (error) {
+		axios.post('api/upload', formData, config)
+			.then(res => {
+				if (mounted.current) {
+					if (mediaType === 'image') {
+						setImage(res.data.data.link)
+						setUploading(false)
+					}
+					if (mediaType === 'video') {
+						axios.get(`/api/upload/poll?ticket=${res.data.data.ticket}`)
+							.then(res2 => {
+								if (mounted.current) {
+									setVideo(res2.data.link)
 									setUploading(false)
-									if (mounted.current) {
-										if (error.response) {
-											// Request made and server responded (Failed to Login)
-											setAlert({
-												message: error.response.data.message,
-												severity: 'error'
-											})
-											} else if (error.request) {
-											// The request was made but no response was received (Slow Internet)
-											setAlert({
-												message: 'Failed to upload due to slow network',
-												severity: 'error'
-											})
-											} else {
-											setAlert({
-												message: error + '',
-												severity: 'error'
-											})
-										}
+								}
+							}).catch(function (error) {
+								if (mounted.current) {
+									setUploading(false)
+									if (error.response) {
+										// Request made and server responded (Failed to Login)
+										setAlert({
+											message: error.response.data.message,
+											severity: 'error'
+										})
+										} else if (error.request) {
+										// The request was made but no response was received (Slow Internet)
+										setAlert({
+											message: 'Failed to upload due to slow network',
+											severity: 'error'
+										})
+										} else {
+										setAlert({
+											message: error + '',
+											severity: 'error'
+										})
 									}
-								})	
-							}
-					}
-				}).catch(function (error) {
-					setUploading(false)
-					if (mounted.current) {
-						if (error.response) {
-							// Request made and server responded (Failed to Login)
-							setAlert({
-								message: error.response.data.message,
-								severity: 'error'
-							})
-							} else if (error.request) {
-							// The request was made but no response was received (Slow Internet)
-							setAlert({
-								message: 'Failed to posts due to slow network',
-								severity: 'error'
-							})
-							} else {
-							setAlert({
-								message: error + '',
-								severity: 'error'
-							})
+								}
+							})	
 						}
+				}
+			}).catch(function (error) {
+				setUploading(false)
+				if (mounted.current) {
+					if (error.response) {
+						// Request made and server responded (Failed to Login)
+						setAlert({
+							message: error.response.data.message,
+							severity: 'error'
+						})
+						} else if (error.request) {
+						// The request was made but no response was received (Slow Internet)
+						setAlert({
+							message: 'Failed to posts due to slow network',
+							severity: 'error'
+						})
+						} else {
+						setAlert({
+							message: error + '',
+							severity: 'error'
+						})
 					}
 				}
-			)
-	}, [file, tab, setAlert])
+			}
+		)
+	}
 
 	const submitPost = () => {
 		setUploading(true)
-		const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
+		const userInfoFromStorage = localStorage.getItem('loginInfo') ?
+			JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 		
 		const config = {
     	headers: {
@@ -238,12 +235,6 @@ export default function SubmitScreen() {
 			})
 	}
 
-	useEffect(() => {
-		if (file) {
-			uploadFile()
-		}
-	}, [file, uploadFile])
-
 	useEffect(() => { // To check if component is mounted or not
 		mounted.current = true
 
@@ -258,7 +249,11 @@ export default function SubmitScreen() {
 
 	return (
 		<>
-			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleAlertClose}>
+			<Snackbar
+				open={Boolean(alert)}
+				autoHideDuration={8000}
+				onClose={handleAlertClose}
+			>
 				<Alert
 					severity={(alert as AlertType).severity}
 					message={(alert as AlertType).message}
@@ -271,7 +266,6 @@ export default function SubmitScreen() {
 					</Typography>
 					<Divider />
 					<BoardInput
-						id="filled-basic"
 						label="Board"
 						variant="standard"
 						value={board}
@@ -283,7 +277,6 @@ export default function SubmitScreen() {
 							indicatorColor="primary"
 							textColor="primary"
 							onChange={tabHandleChange}
-							aria-label="disabled tabs example"
 							variant="fullWidth"
 						>
 							<Tab label="Text" />

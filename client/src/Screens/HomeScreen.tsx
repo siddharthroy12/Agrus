@@ -30,7 +30,7 @@ const PageDescriptionBox = styled(Paper)`
 const PageDescriptionTop = styled.div`
 	display: flex;
 	align-items: center;
-
+	margin-bottom: 1rem;
 	& > * {
 		margin-right: 1rem;
 	}

@@ -227,6 +227,7 @@ export default function BoardScreen() {
 							<CardHeader
 								avatar={
 									<Avatar
+										src={(board as BoardType).logo}
 										style={{width: '40xp', height: '40px'}}>
 										{ (board as BoardType).boardName[0].toUpperCase() }
 									</Avatar>
@@ -252,6 +253,7 @@ export default function BoardScreen() {
 							<CardHeader
 									avatar={
 										<Avatar
+											src={(board as BoardType).logo}
 											style={{width: '40xp', height: '40px'}}>
 											{ (board as BoardType).boardName[0].toUpperCase() }
 										</Avatar>

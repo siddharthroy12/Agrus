@@ -58,7 +58,7 @@ export default function DrawerContent() {
 						Create Post
 					</ListItemText>
 				</ListItem>
-				<ListItem button>
+				<ListItem button component={Link} to='/createboard'>
 					<ListItemIcon>
 						<CreateIcon />
 					</ListItemIcon>
@@ -94,7 +94,7 @@ export default function DrawerContent() {
 								</Avatar>
 							</ListItemIcon>
 							<ListItemText>
-								r/{board.boardName}
+								b/{board.boardName}
 							</ListItemText>
 						</ListItem>
 					))}

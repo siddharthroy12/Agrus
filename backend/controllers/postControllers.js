@@ -86,6 +86,20 @@ const createPost = asyncHandler(async (req, res) => {
 	res.json(newCreatedPost)
 })
 
+// @desc Search for posts
+// @route GET /api/post/search/get?search=
+// @access Public
+const searchPosts = asyncHandler(async (req, res) => {
+	if (!req.query.search) {
+		res.status(400)
+		throw new Error('search query is empty')
+	}
+
+	const result = await Post.find({$text: {$search: req.query.search}})
+	res.status(200)
+	res.json(result)
+})
+
 // @desc Get a post
 // @route Get /api/post/:id
 // @access Public
@@ -383,6 +397,7 @@ const getAllPosts = asyncHandler(async (req, res) => {
 
 module.exports = {
   createPost,
+	searchPosts,
 	getPost,
 	getPostFeed,
 	editPost,

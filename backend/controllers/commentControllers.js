@@ -28,6 +28,12 @@ const createComment = asyncHandler(async (req, res) => {
 		body: body,
 	})
 
+	await Post.updateOne({_id: post}, {
+		$inc: {
+			commentCount: 1
+		}
+	})
+
 	res.status(200)
 	res.json(newComment)
 
