@@ -87,7 +87,7 @@ export default function DrawerContent() {
 							Loading
 						</ListItem>
 					) : joinedBoards.map(board => (
-						<ListItem button component={Link} to={`/b/${board.boardName}`}>
+						<ListItem button component={Link} to={`/b/${board.boardName}`} key={board._id}>
 							<ListItemIcon>
 								<Avatar alt="Remy Sharp" src={board.logo} style={{width: '2rem', height: '2rem'}}>
 									{board.boardName[0].toUpperCase()}	
