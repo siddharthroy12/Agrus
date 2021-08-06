@@ -34,7 +34,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
-				<li><a href="#configuring"></a>Configuring</li>
+				<li><a href="#configuring">Configuring</a></li>
 				<li><a href="#running">Running</a></li>
       </ul>
     </li>
