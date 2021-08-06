@@ -245,9 +245,14 @@ export default function Comment({ comment: _comment }: PropsType) {
 					<IconButton size="small" onClick={downvoteButtonHandler}>
 						<DownvoteIcon $downvoted={isDownvoted()} />
 					</IconButton>
-					<IconButton size="small" onClick={deleteButtonHandler}>
-						<TrashIcon />
-					</IconButton>
+					{loginState.loggedIn && 
+					loginState.info.username === comment.author &&
+					(
+						<IconButton size="small" onClick={deleteButtonHandler}>
+							<TrashIcon />
+						</IconButton>
+					)}
+					
 				</CommentActions>
 			</>)}
 		</Card>

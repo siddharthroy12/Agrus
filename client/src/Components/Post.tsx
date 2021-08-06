@@ -404,14 +404,14 @@ export default function Post({ post: _post }: propsType) {
 											</ListItem>
 										): null}
 										{
-											loginState.loggedIn ? loginState.info.username === post.author ? (
+											loginState.loggedIn && loginState.info.username === post.author && (
 												<ListItem
 													className="menu-item"
 													button
 													onClick={deleteButtonHandler}>
 														Delete Post
 												</ListItem>
-											): null : null
+											)
 										}
 									</List>
 								</Menu>

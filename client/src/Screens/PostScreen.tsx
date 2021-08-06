@@ -39,7 +39,7 @@ const Wrapper = styled(Container)`
 `
 
 const CommentBox = styled(Paper)`
-	margin: 1rem 0;
+	margin-top: 1rem;
 	padding: 1rem;
 `
 
@@ -59,6 +59,7 @@ const PostField = styled(TextField)`
 `
 
 const CommentSection = styled.div`
+	margin-top: 1rem;
 	> * {
 		margin-bottom: 1rem;
 	}
@@ -511,9 +512,11 @@ export default function PostScreen() {
 								<IconButton size="small" onClick={saveButtonHandler}>
 									<SaveIcon $saved={isSaved()} />
 								</IconButton>
-								<IconButton size="small" onClick={deleteButtonHandler}>
-									<TrashIcon />
-								</IconButton>
+								{loginState.loggedIn && loginState.info.username === post.author && (
+									<IconButton size="small" onClick={deleteButtonHandler}>
+										<TrashIcon />
+									</IconButton>
+								)}
 							</PostActions>
 							</>)}
 					</Card>
@@ -537,6 +540,8 @@ export default function PostScreen() {
 								</PostCommentButton>
 							</CommentBoxActions>
 						</CommentBox>
+					</>)}
+					{!deleted && !deleteRequestPending && (
 						<CommentSection>
 							{postedComments.map(comment => (
 								<Comment comment={comment} key={(comment as any)._id}/>
@@ -544,8 +549,9 @@ export default function PostScreen() {
 							{comments.map(comment => (
 								<Comment comment={comment} key={(comment as any)._id}/>
 							))}
+							{commentFeedLoading && <LinearProgress />}
 						</CommentSection>
-					</>)}				
+					)}
 				</>
 			)}
 		</Wrapper>
