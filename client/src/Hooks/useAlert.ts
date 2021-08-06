@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 export type AlertType = {
 	message: String,
-	severity: String,
+	severity: 'info' | 'error' | 'success',
 }
 
 function useAlert(alert: AlertType | boolean) {

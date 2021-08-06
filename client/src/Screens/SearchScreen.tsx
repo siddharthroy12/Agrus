@@ -2,16 +2,15 @@ import axios from 'axios'
 import { useState, useEffect, useCallback } from 'react'
 import { useLocation } from 'react-router'
 import useMounted from '../Hooks/useMounted'
-import useAlert, { AlertType } from '../Hooks/useAlert'
+import reqErrorHandler from '../Utils/reqErrorHandler'
 import {
 	LinearProgress, Typography
 } from '@material-ui/core'
-
 import {
-	Container, AlertDisplay, Post,
+	Container, Post,
 	Board
 } from '../Components'
-
+import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 const Loading = styled(LinearProgress)`
@@ -31,14 +30,13 @@ const Wrapper = styled(Container)`
 	flex-direction: column;
 `
 
-
 export default function SearchScreen() {
 	const [loading, setLoading] = useState(false)
 	const [posts, setPosts] = useState<any[]>([])
 	const [boards, setBoards] = useState<any[]>([])
-	const [alert, setAlert] = useAlert(false)
 	const isMounted = useMounted()
 	const location = useLocation()
+	const dispatch = useDispatch()
 
 	const searchPosts = useCallback(() => {
 		axios.get(`/api/post/search/get${location.search}`)
@@ -51,27 +49,10 @@ export default function SearchScreen() {
 			.catch(function (error) {
 				if (isMounted()) {
 					setLoading(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to get posts due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(error, 'Failed to get posts due to slow network', dispatch)
 				}
 			})
-	}, [location.search, isMounted, setAlert])
+	}, [location.search, isMounted, dispatch])
 
 	const searchBoards = useCallback(() => {
 		axios.get(`/api/board/search/get${location.search}`)
@@ -84,40 +65,19 @@ export default function SearchScreen() {
 			.catch(function (error) {
 				if (isMounted()) {
 					setLoading(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to boards due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(error, 'Failed to get boards due to slow network', dispatch)
 				}
 			})
-	}, [location.search, isMounted, setAlert])
+	}, [location.search, isMounted, dispatch])
 
 	useEffect(() => {
 		setLoading(true)
 		searchPosts()
 		searchBoards()
 		
-	},[location.search, searchPosts, searchBoards ])
+	},[location.search, searchPosts, searchBoards])
 	return (
 		<Wrapper>
-			<AlertDisplay
-				alert={alert as AlertType}
-				setAlert={setAlert}
-			/>
 				{loading && <Loading />}
 				{!loading && (<>
 					<SubHeader variant="h6">Posts</SubHeader>

@@ -1,19 +1,15 @@
 import { useState, useEffect, FormEvent } from 'react'
-
 import {
-	Paper, Typography, Button, SnackbarContent,
-	TextField, Divider, Link, Snackbar
+	Paper, Typography, Button,
+	TextField, Divider, Link,
 } from '@material-ui/core'
-
-
 import { Link as RouterLink } from 'react-router-dom'
 import { useHistory, useLocation } from 'react-router'
 import queryString from 'query-string'
-
 import styled from 'styled-components'
-
 import { useDispatch, useSelector } from 'react-redux'
-
+import reqErrorHandler from '../Utils/reqErrorHandler'
+import { setAlert, clearAlert } from '../Actions/alertActions'
 import { StateType } from '../Store'
 import { register } from '../Actions/loginActions'
 
@@ -61,36 +57,10 @@ const Bottom = styled.div`
 	padding: 1rem;
 `
 
-type AlertProps = {
-	severity: String
-}
-
-const Alert = styled(SnackbarContent)<AlertProps>`
-	color: white !important; 
-	background-color: ${(props) => {
-		switch(props.severity) {
-			case 'info':
-				return props.theme.primary
-			case 'error':
-				return '#F44336'
-			case 'success':
-				return '#4CAF50'
-			default:
-			return '#151719'
-		}
-	}} !important;
-`
-
-type AlertType = {
-	message: String,
-	severity: 'info' | 'error' | 'success'
-}
-
 export default function RegisterScreen() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [confirmPassword, setConfirmPassword] = useState('')
-	const [alert, setAlert] = useState<AlertType | boolean>(false)
 	const location = useLocation()
 	const history = useHistory()
 	const dispatch = useDispatch()
@@ -103,10 +73,10 @@ export default function RegisterScreen() {
 		e.preventDefault()
 
 		if (password !== confirmPassword) {
-			setAlert({
-				message: 'Password and confirm password did not match',
-				severity: 'error'
-			})
+			dispatch(setAlert(
+				'Password and confirm password did not match',
+				'error'
+			))
 			return
 		}
 
@@ -121,87 +91,63 @@ export default function RegisterScreen() {
 
 		if (loginState.error) {
 			let error = loginState.error
-			if (error.response) {
-				// Request made and server responded (Failed to Login)
-				setAlert({
-					message: error.response.data.message,
-					severity: 'error'
-				})
-			  } else if (error.request) {
-				// The request was made but no response was received (Slow Internet)
-				setAlert({
-					message: 'Failed to Login due to slow network',
-					severity: 'error'
-				})
-			  } else {
-				setAlert({
-					message: 'Unknown Error',
-					severity: 'error'
-				})
-			  }
+			reqErrorHandler(error, 'Failed to register due to slow network', dispatch)
 		} else {
-			setAlert(false)
+			dispatch(clearAlert())
 		}
 
 	}, [
 		loginState, history,
 		location.search,
-		redirect
+		redirect, dispatch
 	])
 
-	const handleClose = () => {
-		setAlert(false)
-	}
 
 	return (
-		<>
-			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleClose}>
-				<Alert
-					severity={(alert as AlertType).severity}
-					message={(alert as AlertType).message}
+		<Box elevation={3}>
+			<Header>
+				<Typography variant="h5" component="h1">Register</Typography>
+			</Header>
+			<FormBox onSubmit={onFormSubmit}>
+				<TextField
+					label="Username"
+					value={username}
+					onChange={e => setUsername(e.target.value)}
+					required={true}
 				/>
-			</Snackbar>
-			<Box elevation={3}>
-				<Header>
-					<Typography variant="h5" component="h1">Register</Typography>
-				</Header>
-				<FormBox onSubmit={onFormSubmit}>
-					<TextField
-						label="Username"
-						value={username}
-						onChange={e => setUsername(e.target.value)}
-						required={true}
-					/>
-					<TextField
-						label="Password"
-						type="password"
-						value={password}
-						onChange={e => setPassword(e.target.value)}
-						required={true}
-					/>
-					<TextField
-						label="Confirm Password"
-						type="password"
-						value={confirmPassword}
-						onChange={e => setConfirmPassword(e.target.value)}
-						required={true}
-					/>
-					<Divider />
-					<SubmitButtonContainer>
-						<SubmitButton variant="contained" type="submit" disabled={loginState.loading}>
-							Register
-						</SubmitButton>
-					</SubmitButtonContainer>
-				</FormBox>
-				<Bottom>
-					<Link
-						component={RouterLink}
-						to={`/login?redirect=${redirect}`}
-						>
-							Already have account? Login
-					</Link>
-				</Bottom>
-			</Box>
-		</>
+				<TextField
+					label="Password"
+					type="password"
+					value={password}
+					onChange={e => setPassword(e.target.value)}
+					required={true}
+				/>
+				<TextField
+					label="Confirm Password"
+					type="password"
+					value={confirmPassword}
+					onChange={e => setConfirmPassword(e.target.value)}
+					required={true}
+				/>
+				<Divider />
+				<SubmitButtonContainer>
+					<SubmitButton
+						variant="contained"
+						type="submit"
+						disabled={loginState.loading}
+					>
+						Register
+					</SubmitButton>
+				</SubmitButtonContainer>
+			</FormBox>
+			<Bottom>
+				<Link
+					component={RouterLink}
+					to={`/login?redirect=${redirect}`}
+					>
+						Already have account? Login
+				</Link>
+			</Bottom>
+		</Box>
 	)
 }

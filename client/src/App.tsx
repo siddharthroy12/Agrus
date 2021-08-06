@@ -1,31 +1,28 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
 import { 
   BrowserRouter as Router, 
   Switch, 
 } from 'react-router-dom'
-
+import { AlertDisplay } from './Components'
 import { StateType } from './Store'
 import { fetchJoinedBoards } from './Actions/boardActions'
-
+import { clearAlert } from './Actions/alertActions'
 import {
   HomeScreen, LoginScreen, RegisterScreen, CreateBoardScreen,
   SubmitScreen, PostScreen, UserScreen, BoardScreen, SearchScreen
 } from './Screens'
-
 import {
   PublicRoute, ProtectedRoute, PrivateRoute
 } from './Routes'
-
 import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
-
 import { authenticate } from './Actions/loginActions'
 
 function App() {
   const [oneShotJoinedBoards, setOneShotJoinedBoards] = useState(false)
   const loginState:any = useSelector((state:StateType) => state.login)
+  const alertState:any = useSelector((state:StateType) => state.alert)
   const dispatch = useDispatch()
 
   // Check if token is present try authenticate and login
@@ -48,6 +45,10 @@ function App() {
   return (
     <Router>
       <ThemeProvider theme={lightTheme}>
+        <AlertDisplay
+          alert={alertState}
+          closeAlert={() => dispatch(clearAlert())}
+        />
         <Switch>
           {/* TODO: */}
           {/* Update Post Screen */}

@@ -2,41 +2,30 @@ import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import { useParams } from 'react-router'
 import Container from '../Components/Container'
-
 import {
 	Card, CardHeader, IconButton, CardMedia, Paper, Button,
-	Avatar, Typography, Snackbar, LinearProgress, TextField
+	Avatar, Typography, LinearProgress, TextField
 } from '@material-ui/core'
-
 import { 
 	PostType, HeaderText, PostContent, PostTitle,
 	BoardName, getHumanReadableDate, MediaContainer,
 	PostActions, DownvoteIcon, SaveIcon, UpvoteIcon
 } from '../Components/Post'
-
+import Alert from '../Components/Alert'
 import {
 	TrashIcon
 } from '../Components/Comment'
-
 import Comment from '../Components/Comment'
-
-import Alert from '../Components/Alert'
-
 import { useSelector, useDispatch } from 'react-redux'
-
 import { 
 	upvotePost,
 	downvotePost,
 	savePost
 } from '../Actions/postActions'
-
+import reqErrorHandler from '../Utils/reqErrorHandler'
 import genConfig from '../Utils/genConfig'
-
 import useMounted from '../Hooks/useMounted'
-import useAlert, { AlertType } from '../Hooks/useAlert'
-
 import { StateType } from '../Store'
-
 import styled from 'styled-components'
 
 const PostBody = styled(Typography)`
@@ -81,7 +70,6 @@ export default function PostScreen() {
 	const [oneShotForComments, setOneShotForComments] = useState(false)
 	const params:any = useParams()
 	const [postLoading, setPostLoading] = useState(true)
-	const [alert, setAlert] = useAlert(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
@@ -108,27 +96,14 @@ export default function PostScreen() {
 			.catch(error => {
 				if (isMounted()) {
 					setPostLoading(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed load post due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(
+						error,
+						'Failed to load post due to slow network',
+						dispatch
+					)
 				}
 			})
-	}, [setAlert, params.id, isMounted])
+	}, [dispatch, params.id, isMounted])
 
 	// Fetch Post data on first run
 	useEffect(() => {
@@ -138,13 +113,11 @@ export default function PostScreen() {
 		}
 	}, [fetchPost, oneShotForPost])
 
-	const handleAlertClose = () => {
-		setAlert(false)
-	}
-
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
-			const upvoted = loginState.info.upvotedPosts.filter((id:string) => id === (post as PostType)._id)
+			const upvoted = loginState.info.upvotedPosts.filter(
+				(id:string) => id === (post as PostType)._id
+			)
 			return upvoted.length > 0 ? true : false
 		} else {
 			return false
@@ -153,7 +126,9 @@ export default function PostScreen() {
 
 	const isDownvoted = () => {
 		if (loginState.loggedIn) {
-			const downvoted = loginState.info.downvotedPosts.filter((id:string) => id === (post as PostType)._id)
+			const downvoted = loginState.info.downvotedPosts.filter(
+				(id:string) => id === (post as PostType)._id
+			)
 			return downvoted.length > 0 ? true : false
 		} else {
 			return false
@@ -162,7 +137,9 @@ export default function PostScreen() {
 
 	const isSaved = () => {
 		if (loginState.loggedIn) {
-			const saved = loginState.info.savedPosts.filter((id:string) => id === (post as PostType)._id)
+			const saved = loginState.info.savedPosts.filter(
+				(id:string) => id === (post as PostType)._id
+			)
 			return saved.length > 0 ? true : false
 		} else {
 			return false
@@ -174,15 +151,24 @@ export default function PostScreen() {
 			setVoteRequestPending(true)
 			if (isUpvoted()) {
 				setPost((prevPost: PostType | null) => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score - 1
+					}
 				})
 			} else if (isDownvoted()) {
 				setPost((prevPost: PostType | null) => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score + 2}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score + 2
+					}
 				})
 			} else {
 				setPost((prevPost: PostType | null) => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score + 1}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score + 1
+					}
 				})
 			}
 
@@ -201,15 +187,24 @@ export default function PostScreen() {
 					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost((prevPost: PostType | null) => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score + 1}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score + 1
+								}
 							})
 						} else if (isDownvoted()) {
 							setPost((prevPost: PostType | null) => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score - 2}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score - 2
+								}
 							})
 						} else {
 							setPost((prevPost: PostType | null) => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score - 1
+								}
 							})
 						}
 						setVoteRequestPending(false)
@@ -224,15 +219,24 @@ export default function PostScreen() {
 			setVoteRequestPending(true)
 			if (isDownvoted()) {
 				setPost(prevPost => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score + 1}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score + 1
+					}
 				})
 			} else if (isUpvoted()) {
 				setPost(prevPost => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score - 2}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score - 2
+					}
 				})
 			} else {
 				setPost(prevPost => {
-					return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
+					return {
+						...(prevPost as PostType),
+						score: (prevPost as PostType).score - 1
+					}
 				})
 			}
 			dispatch(downvotePost((post as PostType)._id))
@@ -249,15 +253,24 @@ export default function PostScreen() {
 					if (isMounted()) {
 						if (isUpvoted()) {
 							setPost(prevPost => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score - 1}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score - 1
+								}
 							})
 						} else if (isUpvoted()) {
 							setPost(prevPost => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score + 2}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score + 2
+								}
 							})
 						} else {
 							setPost(prevPost => {
-								return {...(prevPost as PostType), score: (prevPost as PostType).score + 1}
+								return {
+									...(prevPost as PostType),
+									score: (prevPost as PostType).score + 1
+								}
 							})
 						}
 						setVoteRequestPending(false)
@@ -278,7 +291,8 @@ export default function PostScreen() {
 						setSaveRequestPending(false)
 					}
 				}).catch(function (error) {
-					dispatch(savePost((post as PostType)._id)) // Undo the save if fails
+					// Undo the save if fails
+					dispatch(savePost((post as PostType)._id))
 					if (isMounted()) {
 						setSaveRequestPending(false)
 					}
@@ -330,33 +344,28 @@ export default function PostScreen() {
 				.catch(error => {
 					if (isMounted()) {
 						setCommentPostRequestPending(false)
-						if (error.response) {
-							// Request made and server responded (Failed to Login)
-							setAlert({
-								message: error.response.data.message,
-								severity: 'error'
-							})
-							} else if (error.request) {
-							// The request was made but no response was received (Slow Internet)
-							setAlert({
-								message: 'Failed to comment due to slow network',
-								severity: 'error'
-							})
-							} else {
-							setAlert({
-								message: error + '',
-								severity: 'error'
-							})
-						}
+						reqErrorHandler(
+							error,
+							'Failed to comment due to slow network',
+							dispatch
+							)
 					}
 				})
 		}
 	}
 
 	const updateCommentFeed = useCallback(() => {
-		if (!commentFeedLoading && !commentFeedEnded && post !== null && !deleted && !deleteRequestPending) {
+		if (
+			!commentFeedLoading &&
+			!commentFeedEnded &&
+			post !== null &&
+			!deleted &&
+			!deleteRequestPending
+		) {
 			setCommentFeedLoading(true)
-			axios.get(`/api/comment/feed/${(post as PostType)._id}?page=${page}&perpage=${5}`)
+			axios.get(
+				`/api/comment/feed/${(post as PostType)._id}?page=${page}&perpage=${5}`
+			)
 				.then(res => {
 					if (isMounted()) {
 							if (res.data.length === 0) {
@@ -372,31 +381,18 @@ export default function PostScreen() {
 				}).catch(function (error) {
 					if (isMounted()) {
 						setCommentFeedLoading(false)
-						if (error.response) {
-							// Request made and server responded (Failed to Login)
-							setAlert({
-								message: error.response.data.message,
-								severity: 'error'
-							})
-							} else if (error.request) {
-							// The request was made but no response was received (Slow Internet)
-							setAlert({
-								message: 'Failed to load comments due to slow network',
-								severity: 'error'
-							})
-							} else {
-							setAlert({
-								message: error + '',
-								severity: 'error'
-							})
-						}
+						reqErrorHandler(
+							error,
+							'Failed to load comments due to slow network',
+							dispatch
+						)
 					}
 				}
 			)
 		}
 	}, [
 		commentFeedEnded, commentFeedLoading,
-		isMounted, page, setAlert, post, deleted,
+		isMounted, page, dispatch, post, deleted,
 		deleteRequestPending
 	])
 
@@ -425,141 +421,133 @@ export default function PostScreen() {
 	}, [updateCommentFeed])
 
 	return (
-		<>
-			<Snackbar
-				open={Boolean(alert)}
-				autoHideDuration={8000}
-				onClose={handleAlertClose}>
-					<Alert
-						severity={(alert as AlertType).severity}
-						message={(alert as AlertType).message}
-					/>
-			</Snackbar>
-			<Wrapper>
-				{postLoading ? (
-					<LinearProgress />
-				) : post && (
-						<>
-							<Card variant="outlined" style={{width: '100%'}}>
-								{deleted ? (<>
-									<Alert 
-										severity={'error'}
-										message={'Deleted'}
-									/>
-								</>) : deleteRequestPending ? (<>
-									<Alert 
-										severity={'error'}
-										message={'Deleting'}
-									/>
-								</>) : (<>
-									<CardHeader
-										avatar={
-											<IconButton size="small">
-												<Avatar
-													style={{width: '40xp', height: '40px'}}>
-														{ (post as PostType).author[0].toUpperCase() }
-												</Avatar>
-											</IconButton>
-										}
-										title={
-											<HeaderText	>
-												{ (post as PostType).board !== '' ? (
-													<>
-														<BoardName>
-															{ (post as PostType).board }
-														</BoardName>
-														<Typography>
-															•
-														</Typography>
-													</>
-												): null}
-													<Typography>
-														{ (post as PostType).author }
-													</Typography>
-											</HeaderText>
-										}
-										subheader={getHumanReadableDate((post as PostType).createdAt)}
-									/>
-									<PostContent>
-										<PostTitle>
-											{ (post as PostType).title }
-										</PostTitle>
-										{ (post as PostType).type === 'text' && (
-											<PostBody>
-												{ (post as PostType).body }
-											</PostBody>
-										)}
-									</PostContent>
-								{(post as PostType).type === 'image' && (
-									<MediaContainer>
-										<CardMedia
-											component="img"
-											alt="bruh"
-											style={{height: '25rem', width: 'auto'}}
-											image={(post as PostType).media}
-											title="image"
-										/>
-									</MediaContainer>
-								)}
-								{(post as PostType).type === 'video' && (
-									<MediaContainer>
-										<CardMedia
-											component="video"
-											style={{ width: '100%'}}
-											controls
-											src={(post as PostType).media}
-											title="video"
-										/>
-									</MediaContainer>
-								)}
-								<PostActions>
-									<IconButton size="small" onClick={upvoteButtonHandler}>
-										<UpvoteIcon $upvoted={isUpvoted()} />
-									</IconButton>
-									<Typography>
-										{ (post as PostType).score }
-									</Typography>
-									<IconButton size="small" onClick={downvoteButtonHandler}>
-										<DownvoteIcon $downvoted={isDownvoted()} />
-									</IconButton>
-									<IconButton size="small" onClick={saveButtonHandler}>
-										<SaveIcon $saved={isSaved()} />
-									</IconButton>
-									<IconButton size="small" onClick={deleteButtonHandler}>
-										<TrashIcon />
-									</IconButton>
-								</PostActions>
-								</>)}
-						</Card>
-						{loginState.loggedIn && !deleted && !deleteRequestPending ? (<>
-							<CommentBox variant="outlined">
-								<PostField
-									id="filled-basic"
-									label="Post a comment"
-									variant="filled"
-									value={comment}
-									onChange={(e:any) => setComment(e.target.value)}
-									multiline
+		<Wrapper>
+			{postLoading ? (
+				<LinearProgress />
+			) : post && (
+					<>
+						<Card variant="outlined" style={{width: '100%'}}>
+							{deleted ? (<>
+								<Alert 
+									severity={'error'}
+									message={'Deleted'}
 								/>
-								<CommentBoxActions>
-									<PostCommentButton
-										variant="contained"
-										color="primary"
-										disabled={commentPostRequestPending}
-										onClick={postComment}>
-											Post
-									</PostCommentButton>
-								</CommentBoxActions>
-							</CommentBox>
-							<CommentSection>
-								{postedComments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
-								{comments.map(comment => <Comment comment={comment} key={(comment as any)._id}/>)}
-							</CommentSection>
-						</>): null}
-						
-					</>
-				)}
-			</Wrapper>
-		</>
+							</>) : deleteRequestPending ? (<>
+								<Alert 
+									severity={'error'}
+									message={'Deleting'}
+								/>
+							</>) : (<>
+								<CardHeader
+									avatar={
+										<IconButton size="small">
+											<Avatar
+												style={{width: '40xp', height: '40px'}}>
+													{ (post as PostType).author[0].toUpperCase() }
+											</Avatar>
+										</IconButton>
+									}
+									title={
+										<HeaderText	>
+											{ (post as PostType).board !== '' ? (
+												<>
+													<BoardName>
+														{ (post as PostType).board }
+													</BoardName>
+													<Typography>
+														•
+													</Typography>
+												</>
+											): null}
+												<Typography>
+													{ (post as PostType).author }
+												</Typography>
+										</HeaderText>
+									}
+									subheader={getHumanReadableDate((post as PostType).createdAt)}
+								/>
+								<PostContent>
+									<PostTitle>
+										{ (post as PostType).title }
+									</PostTitle>
+									{ (post as PostType).type === 'text' && (
+										<PostBody>
+											{ (post as PostType).body }
+										</PostBody>
+									)}
+								</PostContent>
+							{(post as PostType).type === 'image' && (
+								<MediaContainer>
+									<CardMedia
+										component="img"
+										alt="bruh"
+										style={{height: '25rem', width: 'auto'}}
+										image={(post as PostType).media}
+										title="image"
+									/>
+								</MediaContainer>
+							)}
+							{(post as PostType).type === 'video' && (
+								<MediaContainer>
+									<CardMedia
+										component="video"
+										style={{ width: '100%'}}
+										controls
+										src={(post as PostType).media}
+										title="video"
+									/>
+								</MediaContainer>
+							)}
+							<PostActions>
+								<IconButton size="small" onClick={upvoteButtonHandler}>
+									<UpvoteIcon $upvoted={isUpvoted()} />
+								</IconButton>
+								<Typography>
+									{ (post as PostType).score }
+								</Typography>
+								<IconButton size="small" onClick={downvoteButtonHandler}>
+									<DownvoteIcon $downvoted={isDownvoted()} />
+								</IconButton>
+								<IconButton size="small" onClick={saveButtonHandler}>
+									<SaveIcon $saved={isSaved()} />
+								</IconButton>
+								<IconButton size="small" onClick={deleteButtonHandler}>
+									<TrashIcon />
+								</IconButton>
+							</PostActions>
+							</>)}
+					</Card>
+					{loginState.loggedIn && !deleted && !deleteRequestPending && (<>
+						<CommentBox variant="outlined">
+							<PostField
+								id="filled-basic"
+								label="Post a comment"
+								variant="filled"
+								value={comment}
+								onChange={(e:any) => setComment(e.target.value)}
+								multiline
+							/>
+							<CommentBoxActions>
+								<PostCommentButton
+									variant="contained"
+									color="primary"
+									disabled={commentPostRequestPending}
+									onClick={postComment}>
+										Post
+								</PostCommentButton>
+							</CommentBoxActions>
+						</CommentBox>
+						<CommentSection>
+							{postedComments.map(comment => (
+								<Comment comment={comment} key={(comment as any)._id}/>
+							))}
+							{comments.map(comment => (
+								<Comment comment={comment} key={(comment as any)._id}/>
+							))}
+						</CommentSection>
+					</>)}				
+				</>
+			)}
+		</Wrapper>
 	)
 }

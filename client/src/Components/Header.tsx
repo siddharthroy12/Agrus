@@ -1,19 +1,16 @@
 import { useState, SyntheticEvent } from 'react'
-
-import { 
+import {
 	AppBar, Toolbar, IconButton,
 	Typography, Button, InputBase,
 	List, ListItem, Popover,
 	Divider, Avatar, Drawer
 } from "@material-ui/core"
-
 import {
 	Menu as MenuIcon,
 	Search as SearchIcon,
 	Settings as SettingsIcon,
 	AccountCircle as AccountCircleIcon
 } from '@material-ui/icons'
-
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
@@ -153,7 +150,9 @@ export default function Header() {
 
 	const handleSearchBoxChange = (event:any) => {
 		if (event.target.value.trim().length > 2) {
-			history.push(`/search?search=${encodeURIComponent(event.target.value.trim())}`)
+			history.push(
+				`/search?search=${encodeURIComponent(event.target.value.trim())}`
+			)
 		}
 	}
 
@@ -161,7 +160,12 @@ export default function Header() {
 		<AppBar position="sticky">
 		<Toolbar>
 			{loginState.loggedIn && (<>
-				<IconButton edge="start" color="inherit" aria-label="menu" onClick={openDrawer}>
+				<IconButton
+					edge="start"
+					color="inherit"
+					aria-label="menu"
+					onClick={openDrawer}
+				>
 					<MenuIcon />
 				</IconButton>
 				<Drawer anchor="left" open={isDrawerOpen} onClose={closeDrawer}>
@@ -192,7 +196,11 @@ export default function Header() {
 				{ loginState.loggedIn ? (
 					<>
 					<IconButton onClick={handleUserMenuBtnClick}>
-						<Avatar alt="Avatar" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
+						<Avatar
+							alt={loginState.info.username}
+							src={loginState.info.avatar}
+							style={{width: '2rem', height: '2rem'}}
+						>
 							{loginState.info.username[0].toUpperCase()}	
 						</Avatar>
 					</IconButton>
@@ -225,7 +233,11 @@ export default function Header() {
 										<ListItem className="subMenuListItem">
 											Profile
 										</ListItem>
-										<ListItem className="subMenuListItem" button onClick={handleLogoutButton}>
+										<ListItem
+											className="subMenuListItem"
+											button
+											onClick={handleLogoutButton}
+										>
 											Logout
 										</ListItem>
 									</List>
@@ -251,9 +263,21 @@ export default function Header() {
 					</>
 				) : (
 					<>
-						<Button variant="contained" disableElevation component={Link} to='/login'>Login</Button>
+						<Button
+							variant="contained"
+							disableElevation
+							component={Link}
+							to='/login'
+						>
+							Login
+						</Button>
 						{ /* @ts-ignore */ }
-						<SignUpButton variant="outlined" component={Link} to='/register'>Sign Up</SignUpButton>
+						<SignUpButton component={Link}
+							variant="outlined" 
+							to='/register'
+						>
+							Sign Up
+						</SignUpButton>
 					</>
 				)}
 			</LeftOptions>

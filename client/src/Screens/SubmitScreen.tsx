@@ -1,22 +1,18 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
-
 import { 
 	Typography, Divider, TextField,
-	Paper, Tabs, Tab, Button, Snackbar
+	Paper, Tabs, Tab, Button,
 } from '@material-ui/core'
-
 import Container from '../Components/Container'
-import Alert from '../Components/Alert'
 import SubContainerAside from '../Components/SubContainerAside'
 import SubContainerMain from '../Components/SubContainerMain'
-
 import styled from 'styled-components'
-
+import useMounted from '../Hooks/useMounted'
 import { useHistory, useLocation } from 'react-router'
-
-import useAlert, { AlertType } from '../Hooks/useAlert'
-
+import { useDispatch } from 'react-redux'
+import { setAlert } from '../Actions/alertActions'
+import reqErrorHandler from '../Utils/reqErrorHandler'
 import queryString from 'query-string'
 
 const TabContentContainer = styled.div`
@@ -64,9 +60,9 @@ export default function SubmitScreen() {
 	const [board, setBoard] = useState(queryString.parse(location.search).board)
 	const [image, setImage] = useState('')
 	const [video, setVideo] = useState('')
-	const [alert, setAlert] = useAlert(false)
 	const [uploading, setUploading] = useState(false)
-	const mounted = useRef(false)
+	const dispatch = useDispatch()
+	const isMounted = useMounted()
 	const history = useHistory()
 
 	const tabHandleChange = (event:any, newValue:any) => {
@@ -103,7 +99,7 @@ export default function SubmitScreen() {
 
 		axios.post('api/upload', formData, config)
 			.then(res => {
-				if (mounted.current) {
+				if (isMounted()) {
 					if (mediaType === 'image') {
 						setImage(res.data.data.link)
 						setUploading(false)
@@ -111,56 +107,22 @@ export default function SubmitScreen() {
 					if (mediaType === 'video') {
 						axios.get(`/api/upload/poll?ticket=${res.data.data.ticket}`)
 							.then(res2 => {
-								if (mounted.current) {
+								if (isMounted()) {
 									setVideo(res2.data.link)
 									setUploading(false)
 								}
 							}).catch(function (error) {
-								if (mounted.current) {
+								if (isMounted()) {
 									setUploading(false)
-									if (error.response) {
-										// Request made and server responded (Failed to Login)
-										setAlert({
-											message: error.response.data.message,
-											severity: 'error'
-										})
-										} else if (error.request) {
-										// The request was made but no response was received (Slow Internet)
-										setAlert({
-											message: 'Failed to upload due to slow network',
-											severity: 'error'
-										})
-										} else {
-										setAlert({
-											message: error + '',
-											severity: 'error'
-										})
-									}
+									reqErrorHandler(error, 'Failed to upload video due to slow network', dispatch)
 								}
 							})	
 						}
 				}
 			}).catch(function (error) {
 				setUploading(false)
-				if (mounted.current) {
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to posts due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+				if (isMounted()) {
+					reqErrorHandler(error, 'Failed to upload file due to slow network', dispatch)
 				}
 			}
 		)
@@ -201,64 +163,25 @@ export default function SubmitScreen() {
 
 		axios.post('api/post', data, config)
 			.then(res => {
-				if (mounted.current) {
+				if (isMounted()) {
 					setUploading(false)
 					history.push(`/post/${res.data._id}`)
-					setAlert({
-						message: 'Posted successfully',
-						severity: 'info'
-					})
+					dispatch(setAlert(
+						'Posted successfully',
+						'info'
+					))
 				}
 			}).catch(function (error) {
 				setUploading(false)
-				if (mounted.current) {
+				if (isMounted()) {
 					setUploading(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to posts due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(error, 'Failed to post due to slow network', dispatch)
 				}
 			})
 	}
 
-	useEffect(() => { // To check if component is mounted or not
-		mounted.current = true
-
-		return () => { 
-			mounted.current = false
-		}
-	}, [])
-
-	const handleAlertClose = () => {
-		setAlert(false)
-	}
-
 	return (
 		<>
-			<Snackbar
-				open={Boolean(alert)}
-				autoHideDuration={8000}
-				onClose={handleAlertClose}
-			>
-				<Alert
-					severity={(alert as AlertType).severity}
-					message={(alert as AlertType).message}
-				/>
-			</Snackbar>
 			<Container>
 				<SubContainerMain>
 					<Typography variant="h6" component="h2">
@@ -324,8 +247,9 @@ export default function SubmitScreen() {
 											value={title}
 											onChange={e => setTitle(e.target.value)}
 										/>
-										{ image !== '' ? <ImagePreview src={image} alt="Preview"/> : null}
-										
+										{image !== '' && (
+											<ImagePreview src={image} alt="Preview"/>
+										)}
 										<TabContentBottom>
 											<PostButton
 												variant="contained"
@@ -361,7 +285,14 @@ export default function SubmitScreen() {
 											value={title}
 											onChange={e => setTitle(e.target.value)}
 										/>
-										{ video !== '' ? <VideoPreview controls src={video}>Failed to load Video</VideoPreview> : null}
+										{video !== '' && (
+											<VideoPreview
+												controls
+												src={video}
+											>
+												Failed to load Video
+											</VideoPreview>
+										)}
 										<TabContentBottom>
 											<PostButton
 												variant="contained"

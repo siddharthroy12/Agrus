@@ -1,24 +1,17 @@
 import { useState, useEffect, FormEvent } from 'react'
-
 import {
 	Paper, Typography, Button,
-	TextField, Divider, Link, Snackbar
+	TextField, Divider, Link,
 } from '@material-ui/core'
-
-
 import { Link as RouterLink } from 'react-router-dom'
 import { useHistory, useLocation } from 'react-router'
 import queryString from 'query-string'
-
 import styled from 'styled-components'
-
 import { useDispatch, useSelector } from 'react-redux'
-
 import { StateType } from '../Store'
 import { login } from '../Actions/loginActions'
-
-import Alert from '../Components/Alert'
-import useAlert, { AlertType } from '../Hooks/useAlert'
+import { clearAlert } from '../Actions/alertActions'
+import reqErrorHandler from '../Utils/reqErrorHandler'
 
 const Header = styled.div`
 	display: flex;
@@ -67,13 +60,11 @@ const Bottom = styled.div`
 export default function LoginScreen() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
-	const [alert, setAlert] = useAlert(false)
 	const location = useLocation()
 	const redirect = queryString.parse(location.search).redirect
 		? queryString.parse(location.search).redirect : encodeURIComponent('/')
 	const history = useHistory()
 	const dispatch = useDispatch()
-
 	const loginState:any = useSelector<StateType>(state => state.login)
 
 	const onFormSubmit = (e: FormEvent) => {
@@ -89,80 +80,56 @@ export default function LoginScreen() {
 
 		if (loginState.error) {
 			let error = loginState.error
-			if (error.response) {
-				// Request made and server responded (Failed to Login)
-				setAlert({
-					message: error.response.data.message,
-					severity: 'error'
-				})
-			  } else if (error.request) {
-				// The request was made but no response was received (Slow Internet)
-				setAlert({
-					message: 'Failed to Login due to slow network',
-					severity: 'error'
-				})
-			  } else {
-				setAlert({
-					message: 'Unknown Error',
-					severity: 'error'
-				})
-			}
+			reqErrorHandler(error, 'Failed to login due to slow network', dispatch)
 		} else {
-			setAlert(false)
+			dispatch(clearAlert())
 		}
 
 	}, [
 		loginState, history,
-		setAlert, location.search,
+		dispatch, location.search,
 		redirect
 	])
 
-	const handleClose = () => {
-		setAlert(false)
-	}
 
 	return (
-		<>
-			<Snackbar open={Boolean(alert)} autoHideDuration={8000} onClose={handleClose}>
-				<Alert
-					severity={(alert as AlertType).severity}
-					message={(alert as AlertType).message}
+		<Box elevation={3}>
+			<Header>
+				<Typography variant="h5" component="h1">Login</Typography>
+			</Header>
+			<FormBox onSubmit={onFormSubmit}>
+				<TextField
+					label="Username"
+					value={username}
+					onChange={e => setUsername(e.target.value)}
+					required={true}
 				/>
-			</Snackbar>
-			<Box elevation={3}>
-				<Header>
-					<Typography variant="h5" component="h1">Login</Typography>
-				</Header>
-				<FormBox onSubmit={onFormSubmit}>
-					<TextField
-						label="Username"
-						value={username}
-						onChange={e => setUsername(e.target.value)}
-						required={true}
-					/>
-					<TextField
-						label="Password"
-						type="password"
-						value={password}
-						onChange={e => setPassword(e.target.value)}
-						required={true}
-					/>
-					<Divider />
-					<SubmitButtonContainer>
-						<SubmitButton variant="contained" type="submit" disabled={loginState.loading}>
-							Login
-						</SubmitButton>
-					</SubmitButtonContainer>
-				</FormBox>
-				<Bottom>
-					<Link 
-						component={RouterLink}
-						to={`/register?redirect=${redirect}`}
-						>
-							Don't have account? Register
-					</Link>
-				</Bottom>
-			</Box>
-		</>
+				<TextField
+					label="Password"
+					type="password"
+					value={password}
+					onChange={e => setPassword(e.target.value)}
+					required={true}
+				/>
+				<Divider />
+				<SubmitButtonContainer>
+					<SubmitButton
+						variant="contained"
+						type="submit"
+						disabled={loginState.loading}
+					>
+						Login
+					</SubmitButton>
+				</SubmitButtonContainer>
+			</FormBox>
+			<Bottom>
+				<Link 
+					component={RouterLink}
+					to={`/register?redirect=${redirect}`}
+					>
+						Don't have account? Register
+				</Link>
+			</Bottom>
+		</Box>
 	)
 }

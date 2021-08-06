@@ -1,4 +1,5 @@
 import axios from 'axios'
+import genConfig from '../Utils/genConfig'
 import {
 	LOGIN_REQUEST,
   AUTHENTICATION_REQUEST,
@@ -11,7 +12,6 @@ import {
   REGISTER_SUCCESS,
   REGISTER_FAIL
 } from '../Constants/loginConstants'
-
 import { DispatchType } from '../Store'
 
 export const login = (username: String, password: String) => async (dispatch: DispatchType) => {
@@ -20,15 +20,9 @@ export const login = (username: String, password: String) => async (dispatch: Di
 			type: LOGIN_REQUEST
 		})
 
-		const config = {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-  	}
-
 		const { data } = await axios.post('/api/user/login', {
       username, password
-    }, config)
+    }, genConfig())
 
 		dispatch({
       type: LOGIN_SUCCESS,
@@ -48,15 +42,9 @@ export const register = (username: String, password: String) => async (dispatch:
 			type: REGISTER_REQUEST
 		})
 
-		const config = {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-  	}
-
 		const { data } = await axios.post('/api/user/register', {
       username, password
-    }, config)
+    }, genConfig())
 
 		dispatch({
       type: REGISTER_SUCCESS,
@@ -77,16 +65,7 @@ export const authenticate = () => async (dispatch: DispatchType) => {
 			type: AUTHENTICATION_REQUEST
 		})
 
-  	const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
-
-		const config = {
-    	headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userInfoFromStorage.token}`
-      }
-  	}
-
-		const { data } = await axios.get('/api/user/authenticate', config)
+		const { data } = await axios.get('/api/user/authenticate', genConfig())
 
 		dispatch({
       type: AUTHENTICATION_SUCCESS,

@@ -2,18 +2,14 @@ import {
 	ListItem, List, ListItemIcon,
 	ListItemText, Divider, ListSubheader, Avatar
 } from '@material-ui/core'
-
 import {
 	Home as HomeIcon,
 	Create as CreateIcon,
 	AccountBox as AccountBoxIcon
 } from '@material-ui/icons'
-
 import { Link } from 'react-router-dom'
-
 import { useSelector } from 'react-redux'
 import { StateType } from '../Store'
-
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -33,8 +29,12 @@ const Banner = styled.div`
 `
 
 export default function DrawerContent() {
-	const joinedBoards:any[] = useSelector((state:StateType) => state.joinedBoards.data)
-	const joinedBoardsLoading = useSelector((state:StateType) => state.joinedBoards.loading)
+	const joinedBoards:any[] = useSelector(
+		(state:StateType) => state.joinedBoards.data
+	)
+	const joinedBoardsLoading = useSelector(
+		(state:StateType) => state.joinedBoards.loading
+	)
 
 	return (
 		<Wrapper>
@@ -87,9 +87,16 @@ export default function DrawerContent() {
 							Loading
 						</ListItem>
 					) : joinedBoards.map(board => (
-						<ListItem button component={Link} to={`/b/${board.boardName}`} key={board._id}>
+						<ListItem
+							button
+							component={Link}
+							to={`/b/${board.boardName}`} key={board._id}
+						>
 							<ListItemIcon>
-								<Avatar alt="Remy Sharp" src={board.logo} style={{width: '2rem', height: '2rem'}}>
+								<Avatar
+									alt={board.boardName}
+									src={board.logo}
+									style={{width: '2rem', height: '2rem'}}>
 									{board.boardName[0].toUpperCase()}	
 								</Avatar>
 							</ListItemIcon>

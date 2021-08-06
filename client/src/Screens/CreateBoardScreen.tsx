@@ -1,22 +1,21 @@
 import { useState, useRef } from 'react'
 import axios from 'axios'
 import {
-	Snackbar, Typography, Divider,
+	Typography, Divider,
 	Paper, TextField, Button, IconButton, Avatar
 } from '@material-ui/core'
-
 import {
 	Add as AddIcon
 } from '@material-ui/icons'
-
 import {
-	Alert, Container, SubContainerMain,
+	Container, SubContainerMain,
 	SubContainerAside
 } from '../Components'
 import { useHistory } from 'react-router'
-import useAlert, { AlertType } from '../Hooks/useAlert'
 import genConfig from '../Utils/genConfig'
 import useMounted from '../Hooks/useMounted'
+import { useDispatch } from 'react-redux'
+import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
 
 const FormWrapper = styled(Paper)`
@@ -49,9 +48,9 @@ export default function CreateBoardScreen() {
 	const [createBoardRequestPending, setCreateBoardRequestPending] = useState(false)
 	const [uploading, setUploading] = useState(false)
 	const [logo, setLogo] = useState("")
-	const [alert, setAlert] = useAlert(false)
 	const isMounted = useMounted()
 	const history = useHistory()
+	const dispatch = useDispatch()
 
 	const submitButtonDisabled = boardName.trim() === '' ||
 		boardDescription.trim() === ''
@@ -78,34 +77,17 @@ export default function CreateBoardScreen() {
 			.catch(function (error) {
 				if (isMounted()) {
 					setUploading(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to upload due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(
+						error,
+						'Failed to upload logo due to slow network',
+						dispatch
+					)
 				}
 			})
 	}
 
 	const fileInputHandle = (event: any) => {
 		uploadFile(event.target.files[0])
-	}
-
-	const handleAlertClose = () => {
-		setAlert(false)
 	}
 
 	const createBoard = () => {
@@ -125,92 +107,72 @@ export default function CreateBoardScreen() {
 			.catch(function (error) {
 				if (isMounted()) {
 					setCreateBoardRequestPending(false)
-					if (error.response) {
-						// Request made and server responded (Failed to Login)
-						setAlert({
-							message: error.response.data.message,
-							severity: 'error'
-						})
-						} else if (error.request) {
-						// The request was made but no response was received (Slow Internet)
-						setAlert({
-							message: 'Failed to upload due to slow network',
-							severity: 'error'
-						})
-						} else {
-						setAlert({
-							message: error + '',
-							severity: 'error'
-						})
-					}
+					reqErrorHandler(
+						error,
+						'Failed to create board due to slow network',
+						dispatch
+					)
 				}
 			})
-
 	}
 
 	return (
-		<>
-			<Snackbar
-				open={Boolean(alert)}
-				autoHideDuration={8000}
-				onClose={handleAlertClose}
-			>
-				<Alert
-					severity={(alert as AlertType).severity}
-					message={(alert as AlertType).message}
-				/>
-			</Snackbar>
-			<Container>
-				<SubContainerMain>
-					<Typography variant="h6" component="h2">
-						Create board
-					</Typography>
-					<Divider />
-					<FormWrapper square>
-						<input
-							accept="image/*"
-							onChange={fileInputHandle}
-							type="file"
-							hidden
-							ref={fileInput}
-						/>
-							<IconButton
-								onClick={() => (fileInput as any).current.click()}
-								disabled={uploading || createBoardRequestPending}
-							>
-								<Avatar src={logo}>
-									<AddIcon />
-								</Avatar>
-							</IconButton>
-						<TextInput
-							label="Board Name"
-							variant="outlined"
-							value={boardName}
-							onChange={e => setBoardName(e.target.value)}
-						/>
-						<TextInput
-							label="Description"
-							variant="outlined"
-							value={boardDescription}
-							multiline
-							onChange={e => setBoardDescription(e.target.value)}
-						/>
-						<FormActions>
-							<CreateButton
-								variant="contained"
-								disableElevation
-								color="primary"
-								onClick={createBoard}
-								disabled={uploading||createBoardRequestPending||submitButtonDisabled}
-							>
-								{uploading || createBoardRequestPending ? 'Wait' : 'Create'}
-							</CreateButton>
-						</FormActions>
-					</FormWrapper>
-				</SubContainerMain>
-				<SubContainerAside>
-				</SubContainerAside>
-			</Container>
-		</>
+		<Container>
+			<SubContainerMain>
+				<Typography variant="h6" component="h2">
+					Create board
+				</Typography>
+				<Divider />
+				<FormWrapper square>
+					<input
+						accept="image/*"
+						onChange={fileInputHandle}
+						type="file"
+						hidden
+						ref={fileInput}
+					/>
+						<IconButton
+							onClick={() => (fileInput as any).current.click()}
+							disabled={uploading || createBoardRequestPending}
+						>
+							<Avatar src={logo}>
+								<AddIcon />
+							</Avatar>
+						</IconButton>
+					<TextInput
+						label="Board Name"
+						variant="outlined"
+						value={boardName}
+						onChange={e => setBoardName(e.target.value)}
+					/>
+					<TextInput
+						label="Description"
+						variant="outlined"
+						value={boardDescription}
+						multiline
+						onChange={e => setBoardDescription(e.target.value)}
+					/>
+					<FormActions>
+						<CreateButton
+							variant="contained"
+							disableElevation
+							color="primary"
+							onClick={createBoard}
+							disabled={
+								uploading||
+								createBoardRequestPending||
+								submitButtonDisabled
+							}
+						>
+							{uploading || createBoardRequestPending ?
+								'Wait' : 'Create'
+							}
+						</CreateButton>
+					</FormActions>
+				</FormWrapper>
+			</SubContainerMain>
+			<SubContainerAside>
+			</SubContainerAside>
+		</Container>
 	)
 }

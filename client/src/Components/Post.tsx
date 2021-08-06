@@ -2,14 +2,11 @@ import { useState, SyntheticEvent } from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux'
-
 import {
 	Card, CardHeader, CardMedia, CardContent, List, ListItem,
 	Avatar, IconButton, Typography, CardActions, Popover
 } from '@material-ui/core'
-
 import { Link } from 'react-router-dom'
-
 import {
 	ArrowUpward as ArrowUpwardIcon,
 	ArrowDownward as ArrowDownwardIcon,
@@ -17,19 +14,14 @@ import {
 	MoreVert as MoreVertIcon,
 	Message as MessageIcon,
 } from '@material-ui/icons'
-
 import useMounted from '../Hooks/useMounted'
-
 import { StateType } from '../Store'
-
 import Alert from '../Components/Alert'
-
 import { 
 	upvotePost,
 	downvotePost,
 	savePost
 } from '../Actions/postActions'
-
 import genConfig from '../Utils/genConfig'
 
 export const HeaderText = styled.div`
@@ -103,7 +95,9 @@ export type UpvoteIconProps = {
 }
 
 export const UpvoteIcon = styled(ArrowUpwardIcon)<UpvoteIconProps>`
-	color: ${(props) => props.$upvoted ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) =>
+		props.$upvoted ? props.theme.primary : props.theme.fontColor
+	};
 `
 
 export type DownvoteIconProps = {
@@ -111,7 +105,9 @@ export type DownvoteIconProps = {
 }
 
 export const DownvoteIcon = styled(ArrowDownwardIcon)<DownvoteIconProps>`
-	color: ${(props) => props.$downvoted ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) =>
+		props.$downvoted ? props.theme.primary : props.theme.fontColor
+	};
 `
 
 export type SaveIconProps = {
@@ -119,7 +115,9 @@ export type SaveIconProps = {
 }
 
 export const SaveIcon = styled(BookmarkIcon)<SaveIconProps>`
-	color: ${(props) => props.$saved ? props.theme.primary : props.theme.fontColor };
+	color: ${(props) =>
+		props.$saved ? props.theme.primary : props.theme.fontColor
+	};
 `
 
 export const CommentIcon = styled(MessageIcon)`
@@ -167,7 +165,9 @@ export default function Post({ post: _post }: propsType) {
 
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
-			const upvoted = loginState.info.upvotedPosts.filter((id:string) => id === post._id)
+			const upvoted = loginState.info.upvotedPosts.filter(
+				(id:string) => id === post._id
+			)
 			return upvoted.length > 0 ? true : false
 		} else {
 			return false
@@ -176,7 +176,9 @@ export default function Post({ post: _post }: propsType) {
 
 	const isDownvoted = () => {
 		if (loginState.loggedIn) {
-			const downvoted = loginState.info.downvotedPosts.filter((id:string) => id === post._id)
+			const downvoted = loginState.info.downvotedPosts.filter(
+				(id:string) => id === post._id
+			)
 			return downvoted.length > 0 ? true : false
 		} else {
 			return false
@@ -185,7 +187,9 @@ export default function Post({ post: _post }: propsType) {
 
 	const isSaved = () => {
 		if (loginState.loggedIn) {
-			const saved = loginState.info.savedPosts.filter((id:string) => id === post._id)
+			const saved = loginState.info.savedPosts.filter(
+				(id:string) => id === post._id
+			)
 			return saved.length > 0 ? true : false
 		} else {
 			return false

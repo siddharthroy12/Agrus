@@ -2,16 +2,12 @@ import {
 	Paper, IconButton, Avatar,
 	InputBase
 } from '@material-ui/core'
-
 import {
 	Image as ImageIcon,
 	Link as LinkIcon
 } from '@material-ui/icons'
-
 import styled from 'styled-components'
-
 import { useSelector } from 'react-redux'
-
 import { useHistory } from 'react-router'
 
 const Wrapper = styled(Paper)`
@@ -51,6 +47,9 @@ type PropsType = {
 }
 
 export default function CreatePost({ board }:PropsType) {
+	if (board === undefined) {
+		board = ''
+	}
 	// Type doesn't matter here and I'm lazu
 	const loginState = useSelector((state:any) => state.login)
 	const history = useHistory()
@@ -59,7 +58,11 @@ export default function CreatePost({ board }:PropsType) {
 		<Wrapper variant="outlined" onClick={() => history.push(`/submit?board=${board}`)}>
 			<AvatarBox>
 				<IconButton size="small" aria-label="Go to Profile">
-					<Avatar alt="Remy Sharp" src={loginState.info.avatar} style={{width: '2rem', height: '2rem'}}>
+					<Avatar
+						alt={loginState.info.username}
+						src={loginState.info.avatar}
+						style={{width: '2rem', height: '2rem'}}
+					>
 						{loginState.info.username[0].toUpperCase()}	
 						</Avatar>
 				</IconButton>

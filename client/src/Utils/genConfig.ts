@@ -5,7 +5,7 @@ const genConfig  = () => {
 	return {
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${userInfoFromStorage.token}`
+			'Authorization': `Bearer ${userInfoFromStorage?.token}`
 		}
 	}
 }

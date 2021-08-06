@@ -2,7 +2,7 @@ import { SnackbarContent } from '@material-ui/core'
 import styled from 'styled-components'
 
 type AlertProps = {
-	severity: String
+	severity: 'info' | 'error' | 'success'
 }
 
 const Alert = styled(SnackbarContent)<AlertProps>`

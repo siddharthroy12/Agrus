@@ -1,25 +1,25 @@
-import { AlertType } from '../Hooks/useAlert'
+import { StateType as AlertStateType } from '../Reducers/alertReducer'
 import Alert from './Alert'
 import {
 	Snackbar
 } from '@material-ui/core'
 
 type PropsType = {
-	alert:AlertType,
-	setAlert:(alert:AlertType|boolean) => void
+	alert:AlertStateType,
+	closeAlert:() => void
 }
 
-export default function AlertDisplay({ alert, setAlert}:PropsType) {
+export default function AlertDisplay({ alert, closeAlert }:PropsType) {
 	return (
 		<Snackbar
-				open={Boolean(alert)}
-				autoHideDuration={8000}
-				onClose={() => setAlert(false)}
-			>
-				<Alert
-					severity={(alert as AlertType).severity}
-					message={(alert as AlertType).message}
-				/>
+			open={alert.active}
+			autoHideDuration={8000}
+			onClose={() => closeAlert()}
+		>
+			<Alert
+				severity={alert.severity as any}
+				message={alert.message}
+			/>
 		</Snackbar>
 	)
 }

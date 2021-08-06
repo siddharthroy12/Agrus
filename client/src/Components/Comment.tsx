@@ -1,25 +1,19 @@
 import { useState } from 'react'
-
 import {
 	Card, CardHeader,	Avatar,
 	IconButton, Typography,
 } from '@material-ui/core'
-
 import {
 	Delete as DeleteIcon
 } from '@material-ui/icons'
-
 import axios from 'axios'
-
 import { 
  	HeaderText, getHumanReadableDate,
 	PostActions as CommentActions,
 	DownvoteIcon, UpvoteIcon,
 	PostContent as CommentContent,
 } from './Post'
-
 import styled from 'styled-components'
-
 import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import {
@@ -31,7 +25,6 @@ import {
 } from './Post'
 import Alert from './Alert'
 import genConfig from '../Utils/genConfig'
-
 import useMounted from '../Hooks/useMounted'
 
 export const TrashIcon = styled(DeleteIcon)`
@@ -64,10 +57,11 @@ export default function Comment({ comment: _comment }: PropsType) {
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
 
-
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
-			const upvoted = loginState.info.upvotedComments.filter((id:string) => id === comment._id)
+			const upvoted = loginState.info.upvotedComments.filter(
+				(id:string) => id === comment._id
+			)
 			return upvoted.length > 0 ? true : false
 		} else {
 			return false
@@ -76,7 +70,9 @@ export default function Comment({ comment: _comment }: PropsType) {
 
 	const isDownvoted = () => {
 		if (loginState.loggedIn) {
-			const downvoted = loginState.info.downvotedComments.filter((id:string) => id === comment._id)
+			const downvoted = loginState.info.downvotedComments.filter(
+				(id:string) => id === comment._id
+			)
 			return downvoted.length > 0 ? true : false
 		} else {
 			return false

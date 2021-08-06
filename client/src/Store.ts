@@ -4,25 +4,32 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 
 import loginReducer from './Reducers/loginReducer'
 import joinedBoardsReducer from './Reducers/joinedBoardsReducer'
+import alertReducer from './Reducers/alertReducer'
 
 const reducers = combineReducers({
 	login: loginReducer,
-	joinedBoards: joinedBoardsReducer
+	joinedBoards: joinedBoardsReducer,
+	alert: alertReducer
 })
 
-const userInfoFromStorage = localStorage.getItem('loginInfo') ? JSON.parse(String(localStorage.getItem('loginInfo'))) : null
+const userInfoFromStorage = localStorage.getItem('loginInfo') ?
+	JSON.parse(String(localStorage.getItem('loginInfo'))) : null
 
 type InitialState = {
 	login: any
 }
 
 const initialState: InitialState = {
-	login: userInfoFromStorage === null ? { loggedIn: false } : { loggedIn: true, info : userInfoFromStorage }
+	login: userInfoFromStorage === null ? { loggedIn: false } :
+		{ loggedIn: true, info : userInfoFromStorage }
 }
 
 const middlewre = [thunk]
 
-const store = createStore(reducers, initialState, composeWithDevTools(applyMiddleware(...middlewre)))
+const store = createStore(
+	reducers, initialState,
+	composeWithDevTools(applyMiddleware(...middlewre))
+)
 
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
