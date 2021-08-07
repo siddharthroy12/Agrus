@@ -10,7 +10,7 @@ export default function reqErrorHandler(error:any, message:string, dispatch:any)
 		} else if (error.request) {
 		// The request was made but no response was received (Slow Internet)
 		dispatch(setAlert(
-			'Failed to upload due to slow network',
+			message,
 			'error'
 		))
 		} else {
