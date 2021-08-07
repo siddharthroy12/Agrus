@@ -1,7 +1,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-
+  <a href="https://github.com/siddharthroy12/Agrus">
+    <img src="https://raw.githubusercontent.com/siddharthroy12/Agrus/main/client/public/logo512.png" alt="Logo" width="80" height="80">
+  </a>
   <h3 align="center">Agrus</h3>
 
   <p align="center">
@@ -47,8 +49,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-Agrus is a mvp app made using mern stack to prove my web dev skills
+![](/screenshots/screenshot-1.png)
+Agrus is a mvp app made using MERN stack as a portfolio project.
 
 ### Built With
 
@@ -65,7 +67,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-Make sure you have these install on your system
+Make sure you have these install on your system.
 * [Git](https://nodejs.org/en/download/)
 * [NodeJS](https://nodejs.org/en/download/)
 
@@ -81,7 +83,7 @@ Make sure you have these install on your system
    ```
 
 ### Configuring
-Create a .env file at the root of the project and fill it with these
+Create a .env file at the root of the project and fill it with these.
 
 ```
 DB_URI=
@@ -90,8 +92,11 @@ NODE_ENV=development
 IMGUR_CLIENT_ID=
 ```
 
-To get the DB_URI go to mongodb atlas, create a free cluster and a database and the paste the URI here
-To get the IMGUR_CLIENT_ID go to imgur, create a new application and paste the CLIENT_ID here
+To get the DB_URI go to mongodb atlas, create a free cluster and a database and the paste the URI here.
+
+To get the IMGUR_CLIENT_ID go to imgur, create a new application and paste the CLIENT_ID here.
+
+JWT_SECRET can be anything.
 
 ### Running
 
@@ -105,13 +110,13 @@ Then start the client
 ```
 npm client
 ```
-Use 0.0.0.0:3000 instead of localhost:3000 if you are uploading video through client
+Use 0.0.0.0:3000 instead of localhost:3000 if you are uploading video through client.
 
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 
 <!-- CONTACT -->
