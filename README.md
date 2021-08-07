@@ -5,11 +5,8 @@
     <img src="https://raw.githubusercontent.com/siddharthroy12/Agrus/main/client/public/logo512.png" alt="Logo" width="80" height="80">
   </a>
   <h3 align="center">Agrus</h3>
-
   <p align="center">
    	A Social Media MVP app based on reddit
-    <br />
-    <br />
     <br />
     <a href="#">View Demo</a>
     ·
