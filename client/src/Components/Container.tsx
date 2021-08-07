@@ -6,5 +6,4 @@ export default styled.div`
 	padding-top: 1rem;
 	display: flex;
 	padding: 1rem;
-	background-color: ${(props) => props.theme.secondary}
 `

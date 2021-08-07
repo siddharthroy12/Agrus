@@ -2,13 +2,8 @@ import { Route, RouteProps, Redirect } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 import { StateType } from '../Store'
-import styled  from 'styled-components'
 import Header from '../Components/Header'
 import { useLocation } from 'react-router'
-
-const Background = styled.div`
-  background-color: ${(props) => props.theme.secondary};
-`
 
 type CustomRoutePropsType = {
 	component: React.ComponentType
@@ -28,9 +23,7 @@ export default function PrivateRoute({component: Component, ...rest}: CustomRout
 					{loginState.loggedIn ? (
 						<>
 							<Header />
-							<Background>
-								<Component {...props} />
-							</Background>
+							<Component {...props} />
 						</>
 					): (
 						<Redirect to={`/login?redirect=${redirect}`} />

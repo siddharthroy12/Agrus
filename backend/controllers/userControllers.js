@@ -130,7 +130,7 @@ const getUser = asyncHandler(async (req, res) => {
     throw new Error('Username can only have numbers and letters')
   }
 
-  const user = await User.findOne({ username: req.params.username }, 'username avatar posts comments disabled createdAt')
+  const user = await User.findOne({ username: req.params.username }, 'username avatar disabled createdAt isAdmin')
 
 	if (!user) {
       res.status(404)
@@ -143,6 +143,7 @@ const getUser = asyncHandler(async (req, res) => {
 		username: user.username,
 		avatar: user.avatar,
 		createdAt: user.createdAt,
+    isAdmin: user.isAdmin
 	})
 })
 

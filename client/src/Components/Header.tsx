@@ -19,6 +19,11 @@ import DrawerContent from './DrawerContent'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+const TopBar = styled(AppBar)`
+	box-shadow: none;
+	background-color: ${(props) => props.theme.primary};
+`
+
 const AppName = styled.span`
 	color: ${props => props.theme.secondary};
 	text-decoration: none;
@@ -157,7 +162,7 @@ export default function Header() {
 	}
 
 	return (
-		<AppBar position="sticky">
+		<TopBar position="sticky" style={{boxShadow: 'none'}}>
 		<Toolbar>
 			{loginState.loggedIn && (<>
 				<IconButton
@@ -230,7 +235,11 @@ export default function Header() {
 										</div>
 									</div>
 									<List className="subMenuList">
-										<ListItem className="subMenuListItem">
+										<ListItem
+											className="subMenuListItem"
+											button
+											component={Link}
+											to={`/u/${loginState.info.username}`}>
 											Profile
 										</ListItem>
 										<ListItem
@@ -282,6 +291,6 @@ export default function Header() {
 				)}
 			</LeftOptions>
 		</Toolbar>
-		</AppBar>
+		</TopBar>
 	)
 }

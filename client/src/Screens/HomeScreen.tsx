@@ -1,19 +1,20 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import axios from 'axios'
-import Container from '../Components/Container'
-import SubContainerMain from '../Components/SubContainerMain'
-import SubContainerAside from '../Components/SubContainerAside'
-import CreatePost from '../Components/CreatePost'
-import Post from '../Components/Post'
+import {
+	Container, SubContainerMain, CreatePost,
+	SubContainerAside, ButtonPrimary, Post,
+} from '../Components'
 import {
 	Paper, Typography, 
-	Button, LinearProgress
+	LinearProgress
 } from '@material-ui/core'
 import { Home as HomeIcon } from '@material-ui/icons'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { StateType } from '../Store'
-import useMounted from '../Hooks/useMounted'
+import {
+	useMounted, useEndScroll, useOnMount
+} from '../Hooks'
 import { useDispatch } from 'react-redux'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
@@ -39,7 +40,6 @@ export default function HomeScreen() {
 	const [feed, setFeed] = useState([])
 	const [page, setPage] = useState(1)
 	const [feedEnded, setFeedEnded] = useState(false)
-	const [oneShot, setOneShot] = useState(false)
 	const [feedLoading, setFeedLoading] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
@@ -73,30 +73,9 @@ export default function HomeScreen() {
 		}
 	}, [feedLoading, page, dispatch, feedEnded, isMounted])
 
-	useEffect(() => { // Update one time at start
-		if (!oneShot) { // Run only once
-			updateFeed()
-			setOneShot(true)
-		}
-		
-	}, [updateFeed, oneShot, setOneShot])
 
-	useEffect(() => { // If Update function changes reapply the event listner
-		const onScrollCheck = () => {
-			// When on end of the page
-			if (
-				(window.innerHeight + window.scrollY) 
-				>= window.document.body.offsetHeight) {
-				updateFeed()
-			}
-		}
-
-		window.addEventListener('scroll', onScrollCheck)
-
-		return () => {
-			window.removeEventListener('scroll', onScrollCheck)
-		}
-	}, [updateFeed])
+	useOnMount(updateFeed)
+	useEndScroll(updateFeed)
 
 	return (
 		<Container>
@@ -121,12 +100,14 @@ export default function HomeScreen() {
 						you can join boards, create posts,
 						interact with others and lot more, but behave properly
 					</PageDescription>
-					<Button 
+					{/* @ts-ignore */}
+					<ButtonPrimary component={Link}
 						variant="contained"
-						disableElevation component={Link}
+						disableElevation
+						color="primary"
 						to='/submit'>
 							Create a Post
-					</Button>
+					</ButtonPrimary>
 				</PageDescriptionBox>
 			</SubContainerAside>
 		</Container>

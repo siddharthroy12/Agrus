@@ -8,8 +8,8 @@ import {
 } from '@material-ui/core'
 import { 
 	PostType, HeaderText, PostContent, PostTitle,
-	BoardName, getHumanReadableDate, MediaContainer,
-	PostActions, DownvoteIcon, SaveIcon, UpvoteIcon
+	BoardName, MediaContainer, PostActions,
+	DownvoteIcon, SaveIcon, UpvoteIcon
 } from '../Components/Post'
 import Alert from '../Components/Alert'
 import {
@@ -24,7 +24,10 @@ import {
 } from '../Actions/postActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import genConfig from '../Utils/genConfig'
-import useMounted from '../Hooks/useMounted'
+import getHumanReadableDate from '../Utils/getHumanReadableDate'
+import {
+	useOnMount, useMounted, useEndScroll
+} from '../Hooks'
 import { StateType } from '../Store'
 import styled from 'styled-components'
 
@@ -67,7 +70,6 @@ const CommentSection = styled.div`
 
 export default function PostScreen() {
 	const [page, setPage] = useState(1)
-	const [oneShotForPost, setOneShotForPost] = useState(false)
 	const [oneShotForComments, setOneShotForComments] = useState(false)
 	const params:any = useParams()
 	const [postLoading, setPostLoading] = useState(true)
@@ -106,13 +108,7 @@ export default function PostScreen() {
 			})
 	}, [dispatch, params.id, isMounted])
 
-	// Fetch Post data on first run
-	useEffect(() => {
-		if (!oneShotForPost) {
-			fetchPost()
-			setOneShotForPost(false)
-		}
-	}, [fetchPost, oneShotForPost])
+	useOnMount(fetchPost)
 
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
@@ -404,22 +400,7 @@ export default function PostScreen() {
 		}
 	}, [oneShotForComments, updateCommentFeed, post])
 
-	useEffect(() => { // If Update function changes reapply the event listner
-		const onScrollCheck = () => {
-			// When on end of the page
-			if (
-				(window.innerHeight + window.scrollY) 
-				>= window.document.body.offsetHeight) {
-					updateCommentFeed()
-			}
-		}
-
-		window.addEventListener('scroll', onScrollCheck)
-
-		return () => {
-			window.removeEventListener('scroll', onScrollCheck)
-		}
-	}, [updateCommentFeed])
+	useEndScroll(updateCommentFeed)
 
 	return (
 		<Wrapper>
@@ -465,7 +446,11 @@ export default function PostScreen() {
 												</Typography>
 										</HeaderText>
 									}
-									subheader={getHumanReadableDate((post as PostType).createdAt)}
+									subheader={
+										<Typography variant="body2">
+											Posted At {getHumanReadableDate((post as PostType).createdAt)}
+										</Typography>
+									}
 								/>
 								<PostContent>
 									<PostTitle>

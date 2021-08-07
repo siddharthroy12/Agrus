@@ -29,6 +29,7 @@ const Banner = styled.div`
 `
 
 export default function DrawerContent() {
+	const loginState:any = useSelector((state:StateType) => state.login)
 	const joinedBoards:any[] = useSelector(
 		(state:StateType) => state.joinedBoards.data
 	)
@@ -66,7 +67,7 @@ export default function DrawerContent() {
 						Create Board
 					</ListItemText>
 				</ListItem>
-				<ListItem button>
+				<ListItem button component={Link} to={`/u/${loginState.info.username}`}>
 					<ListItemIcon>
 						<AccountBoxIcon />
 					</ListItemIcon>

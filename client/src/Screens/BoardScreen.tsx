@@ -3,19 +3,20 @@ import { useParams } from 'react-router'
 import axios from 'axios'
 import {
 	Typography, Card, CardHeader, CardContent,
-	Button, LinearProgress, Avatar
+	LinearProgress, Avatar
 } from '@material-ui/core'
 import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import { joinBoard } from '../Actions/boardActions'
 import genConfig from '../Utils/genConfig'
 import { Link } from 'react-router-dom'
-import Container from '../Components/Container'
-import SubContainerMain from '../Components/SubContainerMain'
-import SubContainerAside from '../Components/SubContainerAside'
-import CreatePost from '../Components/CreatePost'
-import Post from '../Components/Post'
-import useMounted from '../Hooks/useMounted'
+import {
+	Container, SubContainerMain, SubContainerAside,
+	CreatePost, Post, ButtonPrimary, ButtonSecondary
+} from '../Components'
+import {
+	useMounted, useOnMount, useEndScroll
+} from '../Hooks'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 
 type BoardType = {
@@ -36,7 +37,6 @@ export default function BoardScreen() {
 	const loginState:any = useSelector((state:StateType) => state.login)
 	const [feedLoading, setFeedLoading] = useState(false)
 	const [board, setBoard] = useState<BoardType | null>(null)
-	const [oneShot, setOneShot] = useState(false)
 	const [boardLoading, setBoardLoading] = useState(true)
 	const [isJoined, setIsJoined] = useState(false)
 	const [joinRequestPending, setJoinRequestPending] = useState(false)
@@ -117,30 +117,9 @@ export default function BoardScreen() {
 		dispatch, updateFeed
 	])
 
-	useEffect(() => {
-		if (!oneShot) {
-			setOneShot(true)
-			fetchBoard()
-		}
-	}, [fetchBoard, oneShot])
+	useOnMount(fetchBoard)
 
-	useEffect(() => { // If Update function changes reapply the event listner
-		const onScrollCheck = () => {
-			// When on end of the page
-			if (
-				(window.innerHeight + window.scrollY) 
-				>= window.document.body.offsetHeight) {
-				updateFeed()
-			}
-		}
-
-		window.addEventListener('scroll', onScrollCheck)
-
-		return () => {
-			window.removeEventListener('scroll', onScrollCheck)
-		}
-	}, [updateFeed])
-
+	useEndScroll(updateFeed)
 
 	const handleJoinButton = () => {
 		if (!joinRequestPending) {
@@ -164,7 +143,7 @@ export default function BoardScreen() {
 
 	return (
 		<Container>
-			{boardLoading ? <LinearProgress style={{width: '100%'}}/> : (<>
+			{boardLoading ? <LinearProgress style={{width: '100%'}}/> : board && (<>
 				<SubContainerMain>
 					<Card variant="outlined" style={{width: '100%'}}>
 						<CardHeader
@@ -216,18 +195,19 @@ export default function BoardScreen() {
 								</>}
 							/>
 							<CardContent>
-								<Button 
+								{/* @ts-ignore */}
+								<ButtonPrimary component={Link}
 									variant="contained"
 									disableElevation
-									component={Link}
+									color="primary"
 									style={{marginRight: '0.25rem'}}
 									to={`/submit?board=${params.boardname}`}
 								>
 									Create a Post
-								</Button>
+								</ButtonPrimary>
 								{loginState.loggedIn && (
-									<Button
-										variant="contained"
+									<ButtonSecondary
+										variant="outlined"
 										disableElevation
 										onClick={handleJoinButton}
 										style={{marginLeft: '0.25rem'}}
@@ -236,7 +216,7 @@ export default function BoardScreen() {
 											joinRequestPending ? 'Wait' :
 											isJoined ? 'Leave Board' : 'Join Board'
 										}
-									</Button>
+									</ButtonSecondary>
 								)}
 							</CardContent>
 					</Card>

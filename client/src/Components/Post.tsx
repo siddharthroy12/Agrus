@@ -23,6 +23,7 @@ import {
 	savePost
 } from '../Actions/postActions'
 import genConfig from '../Utils/genConfig'
+import getHumanReadableDate from '../Utils/getHumanReadableDate'
 
 export const HeaderText = styled.div`
 	display: flex;
@@ -128,11 +129,6 @@ export const PlainLink = styled(Link)`
 	text-decoration: none;
 	color: unset;
 `
-
-export const getHumanReadableDate = (rawdate: string) => {
-	const date = new Date(rawdate)
-	return `Posted on ${date.getDate()}, ${date.getMonth()}, ${date.getFullYear()}`
-}
 
 export type PostType = {
 	_id:string
@@ -438,7 +434,11 @@ export default function Post({ post: _post }: propsType) {
 								</PlainLink>
 							</HeaderText>
 						}
-        		subheader={getHumanReadableDate(post.createdAt)}
+        		subheader={
+							<Typography variant="body2">
+								Posted At {getHumanReadableDate(post.createdAt)}
+							</Typography>
+						}
 					/>
 					<PlainLink to={`/post/${post._id}`}>
 						<PostContent>

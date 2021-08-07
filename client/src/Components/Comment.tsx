@@ -8,8 +8,7 @@ import {
 } from '@material-ui/icons'
 import axios from 'axios'
 import { 
- 	HeaderText, getHumanReadableDate,
-	PostActions as CommentActions,
+ 	HeaderText, PostActions as CommentActions,
 	DownvoteIcon, UpvoteIcon,
 	PostContent as CommentContent,
 } from './Post'
@@ -26,6 +25,7 @@ import {
 import Alert from './Alert'
 import genConfig from '../Utils/genConfig'
 import useMounted from '../Hooks/useMounted'
+import getHumanReadableDate from '../Utils/getHumanReadableDate'
 
 export const TrashIcon = styled(DeleteIcon)`
 	color: ${(props) => props.theme.fontColor};
@@ -228,7 +228,11 @@ export default function Comment({ comment: _comment }: PropsType) {
 							</PlainLink>
 						</HeaderText>
 					}
-					subheader={getHumanReadableDate(comment.createdAt)}
+					subheader={
+						<Typography variant="body2">
+							Posted At {getHumanReadableDate(comment.createdAt)}
+						</Typography>
+					}
 				/>
 				<CommentContent>
 					<CommentBody>

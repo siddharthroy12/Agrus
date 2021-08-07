@@ -18,6 +18,7 @@ import {
 import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
 import { authenticate } from './Actions/loginActions'
+import GlobalStyle from './GlobalStyles'
 
 function App() {
   const [oneShotJoinedBoards, setOneShotJoinedBoards] = useState(false)
@@ -45,6 +46,7 @@ function App() {
   return (
     <Router>
       <ThemeProvider theme={lightTheme}>
+        <GlobalStyle />
         <AlertDisplay
           alert={alertState}
           closeAlert={() => dispatch(clearAlert())}
