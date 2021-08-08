@@ -4,6 +4,8 @@ const {
   loginUser,
 	authenticateUser,
 	getUser,
+	getUserPosts,
+	getUserComments,
 	getUserJoinedBoards,
 	getUserSavedPosts,
 	getAllUsers,
@@ -24,6 +26,9 @@ router.route('/:username')
 	.get(getUser)
 	.put(protect, admin, enableUser)
 	.delete(protect, admin, disableUser)
+
+router.get('/:username/posts', getUserPosts)
+router.get('/:username/comments', getUserComments)
 
 if (process.env.NODE_ENV === 'development') {
 	router.get('/', getAllUsers)

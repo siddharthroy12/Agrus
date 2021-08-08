@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/User')
+const Post = require('../models/Post')
+const Comment = require('../models/Comment')
 const generateToken = require('../utils/genToken')
 
 // @desc Register user & send token back
@@ -185,6 +187,42 @@ const getUserSavedPosts = asyncHandler(async (req, res) => {
   res.json(userPopulated.savedPosts)
 })
 
+// @desc Get Posts of user
+// @route GET /api/user/:username/posts?page=1&perpage=2
+// @access Public
+const getUserPosts = asyncHandler(async (req, res) => {
+  const { page, perpage } = req.query
+
+	if (page === undefined || perpage === undefined) {
+		res.status(400)
+		throw new Error('Provide page and perpage')
+	}
+
+  const posts = await Post.find({author: req.params.username})
+    .sort({ createdAt: -1 }).skip((page-1) * perpage).limit(perpage * 1)
+  
+  res.status(200)
+	res.json(posts)
+})
+
+// @desc Get Comments of user
+// @route GET /api/user/:username/comments?page=1&perpage=2
+// @access Public
+const getUserComments = asyncHandler(async (req, res) => {
+  const { page, perpage } = req.query
+
+	if (page === undefined || perpage === undefined) {
+		res.status(400)
+		throw new Error('Provide page and perpage')
+	}
+
+  const comments = await Comment.find({author: req.params.username})
+    .sort({ createdAt: -1 }).skip((page-1) * perpage).limit(perpage * 1)
+  
+  res.status(200)
+	res.json(comments)
+})
+
 // @desc Disable User
 // @route DELETE /api/user/:username
 // @access Private/Admin
@@ -264,6 +302,8 @@ module.exports = {
   loginUser,
   authenticateUser,
   getUser,
+  getUserPosts,
+  getUserComments,
   getUserJoinedBoards,
   getUserSavedPosts,
   getAllUsers,

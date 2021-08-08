@@ -92,6 +92,12 @@ export default function BoardScreen() {
 		dispatch
 	])
 
+	const updateFeedOnScroll = useCallback(() => {
+		if (board) {
+			updateFeed()
+		}
+	}, [board, updateFeed])
+
 	const fetchBoard = useCallback(() => {
 		setBoardLoading(true)
 		axios.get(`/api/board/${params.boardname}`)
@@ -118,8 +124,7 @@ export default function BoardScreen() {
 	])
 
 	useOnMount(fetchBoard)
-
-	useEndScroll(updateFeed)
+	useEndScroll(updateFeedOnScroll)
 
 	const handleJoinButton = () => {
 		if (!joinRequestPending) {

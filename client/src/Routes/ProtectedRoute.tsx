@@ -13,13 +13,15 @@ type CustomRoutePropsType = {
 export default function ProtectedRoute({component: Component, ...rest}: CustomRoutePropsType) {
 	const location = useLocation()
 	const loginState:any = useSelector((state: StateType) => state.login)
+	const redirect = queryString.parse(location.search).redirect
+		? queryString.parse(location.search).redirect : '/'
 
 	return (
 		<Route {...rest} render={props => {
 			return (
 				<>
 					{loginState.loggedIn ? (
-						<Redirect to={queryString.parse(location.search).redirect as string} />
+						<Redirect to={redirect as string} />
 					): (
 						<Component {...props} />
 					)}

@@ -9,7 +9,7 @@ import {
 import { 
 	PostType, HeaderText, PostContent, PostTitle,
 	BoardName, MediaContainer, PostActions,
-	DownvoteIcon, SaveIcon, UpvoteIcon
+	DownvoteIcon, SaveIcon, UpvoteIcon, PlainLink
 } from '../Components/Post'
 import Alert from '../Components/Alert'
 import {
@@ -430,20 +430,24 @@ export default function PostScreen() {
 										</IconButton>
 									}
 									title={
-										<HeaderText	>
-											{ (post as PostType).board !== '' ? (
+										<HeaderText>
+											{ post.board !== '' && (
 												<>
-													<BoardName>
-														{ (post as PostType).board }
-													</BoardName>
+													<PlainLink to={`/b/${post.board}`}>
+														<BoardName>
+															{ post.board }
+														</BoardName>
+													</PlainLink>
 													<Typography>
 														•
 													</Typography>
 												</>
-											): null}
+												)}
+											<PlainLink to={`/u/${post.author}`}>
 												<Typography>
-													{ (post as PostType).author }
+													{ post.author }
 												</Typography>
+											</PlainLink>
 										</HeaderText>
 									}
 									subheader={

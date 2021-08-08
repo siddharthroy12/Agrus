@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { 
   BrowserRouter as Router, 
@@ -21,7 +21,6 @@ import { authenticate } from './Actions/loginActions'
 import GlobalStyle from './GlobalStyles'
 
 function App() {
-  const [oneShotJoinedBoards, setOneShotJoinedBoards] = useState(false)
   const loginState:any = useSelector((state:StateType) => state.login)
   const alertState:any = useSelector((state:StateType) => state.alert)
   const dispatch = useDispatch()
@@ -37,11 +36,10 @@ function App() {
   }, [dispatch])
 
   useEffect(() => {
-    if (loginState.loggedIn && !oneShotJoinedBoards) {
-      setOneShotJoinedBoards(true)
+    if (loginState.loggedIn) {
       dispatch(fetchJoinedBoards())
     }
-  }, [loginState, dispatch, oneShotJoinedBoards])
+  }, [loginState.loggedIn, dispatch])
 
   return (
     <Router>
@@ -56,6 +54,9 @@ function App() {
           {/* Update Post Screen */}
           {/* Update Board Screen */}
           {/* Update User Screen */}
+          {/* Finishe user screen */}
+          {/* add redirect option to comment */}
+          {/* User avatar should redirect to user page */}
           <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />

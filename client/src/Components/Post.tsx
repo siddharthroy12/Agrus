@@ -415,7 +415,7 @@ export default function Post({ post: _post }: propsType) {
 						</>}
         		title={
 							<HeaderText	>
-								{ post.board !== '' ? (
+								{ post.board !== '' && (
 									<>
 										<PlainLink to={`/b/${post.board}`}>
 											<BoardName>
@@ -426,7 +426,7 @@ export default function Post({ post: _post }: propsType) {
 											•
 										</Typography>
 									</>
-								): null}
+								)}
 								<PlainLink to={`/u/${post.author}`}>
 									<Typography>
 										{ post.author }
