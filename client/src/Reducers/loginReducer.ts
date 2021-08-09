@@ -1,7 +1,8 @@
 import {
 	LOGIN_REQUEST, AUTHENTICATION_REQUEST, AUTHENTICATION_SUCCESS,
 	LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT, AUTHENTICATION_FAIL,
-	REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_FAIL
+	REGISTER_REQUEST, REGISTER_SUCCESS, REGISTER_FAIL,
+	UPDATE_PROFILE
 } from '../Constants/loginConstants'
 
 import {
@@ -64,6 +65,11 @@ const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType
 
 		case LOGOUT:
 			return { loggedin: false }
+		
+		case UPDATE_PROFILE:
+			info = state.info
+			info.avatar = action.payload.avatar
+			return {...state, info}
 
 		// Post actions
 		case UPVOTE_POST:

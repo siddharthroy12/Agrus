@@ -67,7 +67,7 @@ export default function CreateBoardScreen() {
 			}
 		}
 
-		axios.post('api/upload', formData, config)
+		axios.post('/api/upload', formData, config)
 			.then(res => {
 				if (isMounted()) {
 					setLogo(res.data.data.link)

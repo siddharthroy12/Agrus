@@ -8,6 +8,7 @@ import {
 	LOGIN_FAIL,
 	LOGIN_SUCCESS,
 	LOGOUT,
+  UPDATE_PROFILE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
   REGISTER_FAIL
@@ -77,6 +78,15 @@ export const authenticate = () => async (dispatch: DispatchType) => {
         payload: error
     })
 	}
+}
+
+export const updateProfile = (avatar:string) => async(dispatch:DispatchType) => {
+  dispatch({
+    type: UPDATE_PROFILE,
+    payload: {
+      avatar
+    }
+  })
 }
 
 export const logout = () => (dispatch: DispatchType) => {
