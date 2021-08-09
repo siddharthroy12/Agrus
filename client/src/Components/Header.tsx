@@ -262,7 +262,15 @@ export default function Header() {
 										</div>
 									</div>
 									<List className="subMenuList">
-										<ListItem className="subMenuListItem">
+										<ListItem
+											className="subMenuListItem"
+											button
+											component={Link}
+											to='/update/profile'
+										>
+											Update Profile
+										</ListItem>
+										<ListItem className="subMenuListItem" button disabled>
 											Switch Theme
 										</ListItem>
 									</List>

@@ -153,14 +153,20 @@ const getUser = asyncHandler(async (req, res) => {
 // @route PUT /api/user/update
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
-  const { avatar } = req.body
+  const { avatar, bio } = req.body
 
-  if (avatar === undefined) {
+  if (avatar === undefined && bio === undefined) {
     res.status(400)
-    throw new Error('Provide all feilds')
+    throw new Error('Nothing to update')
   }
 
-  req.user.avatar = avatar
+  if (avatar !== undefined) {
+    req.user.avatar = avatar
+  }
+  
+  if (bio !== undefined) {
+    req.user.bio = bio
+  }
 
   await req.user.save()
 

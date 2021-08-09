@@ -10,7 +10,8 @@ import { fetchJoinedBoards } from './Actions/boardActions'
 import { clearAlert } from './Actions/alertActions'
 import {
   HomeScreen, LoginScreen, RegisterScreen, CreateBoardScreen,
-  SubmitScreen, PostScreen, UserScreen, BoardScreen, SearchScreen
+  SubmitScreen, PostScreen, UserScreen, BoardScreen, SearchScreen,
+  UpdateProfileScreen
 } from './Screens'
 import {
   PublicRoute, ProtectedRoute, PrivateRoute
@@ -53,8 +54,7 @@ function App() {
           {/* TODO: */}
           {/* Update Post Screen */}
           {/* Update Board Screen */}
-          {/* Update User Screen */}
-          {/* Finishe user screen */}
+          <PrivateRoute exact path='/update/profile' component={UpdateProfileScreen} />
           <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />

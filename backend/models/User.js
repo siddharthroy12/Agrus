@@ -14,6 +14,10 @@ const userSchema = mongoose.Schema({
 		type: String,
 		default: ''
 	},
+	bio: {
+		type: String,
+		default: ''
+	},
 	joinedBoards: [{
 		type: mongoose.Schema.ObjectId,
 		ref: 'Board'
