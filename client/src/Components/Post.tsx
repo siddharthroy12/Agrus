@@ -7,6 +7,7 @@ import {
 	Avatar, IconButton, Typography, CardActions, Popover
 } from '@material-ui/core'
 import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router'
 import {
 	ArrowUpward as ArrowUpwardIcon,
 	ArrowDownward as ArrowDownwardIcon,
@@ -158,6 +159,7 @@ export default function Post({ post: _post }: propsType) {
 	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
+	const history = useHistory()
 
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
@@ -353,7 +355,10 @@ export default function Post({ post: _post }: propsType) {
 				) : (<>
 					<CardHeader
 						avatar={
-							<IconButton size="small">
+							<IconButton
+								size="small"
+								onClick={() => history.push(`/u/${post.author}`)}
+							>
 								<Avatar
 									style={{width: '40xp', height: '40px'}}>
 										{ post.author[0].toUpperCase() }

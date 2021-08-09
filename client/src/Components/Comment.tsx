@@ -19,6 +19,7 @@ import {
 	upvoteComment,
 	downvoteComment,
 } from '../Actions/commentActions'
+import { useHistory } from 'react-router'
 import {
 	PlainLink
 } from './Post'
@@ -56,6 +57,7 @@ export default function Comment({ comment: _comment }: PropsType) {
 	const [deleteRequestPending, setDeleteRequestPending] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
+	const history = useHistory()
 
 	const isUpvoted = () => {
 		if (loginState.loggedIn) {
@@ -212,7 +214,10 @@ export default function Comment({ comment: _comment }: PropsType) {
 			) : (<>
 				<CardHeader
 					avatar={
-						<IconButton size="small">
+						<IconButton
+							size="small"
+							onClick={() => history.push(`/u/${comment.author}`)}
+						>
 							<Avatar
 								style={{width: '40xp', height: '40px'}}>
 									{ comment.author[0].toUpperCase() }

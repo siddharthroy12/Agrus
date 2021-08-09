@@ -11,13 +11,12 @@ type CustomRoutePropsType = {
 
 // If user is not logged in redirect to login page
 export default function PrivateRoute({component: Component, ...rest}: CustomRoutePropsType) {
-	
 	const loginState:any = useSelector((state: StateType) => state.login)
 	const location = useLocation()
 	const redirect = encodeURIComponent(location.pathname + location.search)
 
 	return (
-		<Route {...rest} render={props => {
+		<Route {...rest} key={location.pathname} render={props => {
 			return (
 				<>
 					{loginState.loggedIn ? (

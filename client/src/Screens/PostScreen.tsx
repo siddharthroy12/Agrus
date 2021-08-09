@@ -17,6 +17,7 @@ import {
 } from '../Components/Comment'
 import Comment from '../Components/Comment'
 import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router'
 import { 
 	upvotePost,
 	downvotePost,
@@ -87,6 +88,7 @@ export default function PostScreen() {
 	const [deleted, setDeleted] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
+	const history = useHistory()
 
 	const fetchPost = useCallback(() => {
 		axios.get(`/api/post/${params.id}`)
@@ -422,7 +424,10 @@ export default function PostScreen() {
 							</>) : (<>
 								<CardHeader
 									avatar={
-										<IconButton size="small">
+										<IconButton
+											size="small"
+											onClick={() => history.push(`/u/${post.author}`)}
+										>
 											<Avatar
 												style={{width: '40xp', height: '40px'}}>
 													{ (post as PostType).author[0].toUpperCase() }

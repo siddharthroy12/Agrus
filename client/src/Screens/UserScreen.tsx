@@ -25,10 +25,6 @@ const List = styled.div`
 		margin-bottom: 1rem;
 	}
 `
-const Wrapper = styled(Container)`
-	display: flex;
-	flex-direction: column;
-`
 
 type UserType = {
 	username: string,
@@ -152,16 +148,16 @@ export default function UserScreen() {
 	])
 
 	const updatePostsOnScroll = useCallback(() => {
-		if (loginState.loggedIn) {
+		if (user) {
 			updatePosts()
 		}
-	}, [updatePosts, loginState.loggedIn])
+	}, [updatePosts, user])
 
 	const updateCommentsOnScroll = useCallback(() => {
-		if (loginState.loggedIn) {
+		if (user) {
 			updateComments()
 		}
-	}, [updateComments, loginState.loggedIn])
+	}, [updateComments, user])
 
 	const getUser = useCallback(() => {
 		if (!userLoading) {
@@ -208,9 +204,7 @@ export default function UserScreen() {
 	return (
 		<Container>
 			{userLoading && (<>
-				<Wrapper>
-					<LinearProgress />
-				</Wrapper>
+				<LinearProgress style={{width: '100%'}} />
 			</>)}
 			{!userLoading && user && (<>
 				<SubContainerMain>
@@ -273,6 +267,27 @@ export default function UserScreen() {
 					</List>
 				</SubContainerMain>
 				<SubContainerAside>
+					<Card variant="outlined" style={{width: '100%'}}>
+						<CardHeader
+							avatar={
+								<Avatar
+									src={(user as UserType).avatar}
+									style={{width: '40xp', height: '40px'}}>
+									{(user as UserType).username[0].toUpperCase()}
+								</Avatar>
+							}
+							title={
+								<Typography variant="subtitle2">
+									u/{ (user as UserType).username }
+								</Typography>
+							}
+							subheader={
+								<Typography variant="body2">
+									Joined At {getHumanReadableDate((user as UserType).createdAt)}
+								</Typography>
+							}
+						/>
+					</Card>
 				</SubContainerAside>
 			</>)}
 		</Container>

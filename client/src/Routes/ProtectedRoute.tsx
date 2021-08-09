@@ -17,7 +17,7 @@ export default function ProtectedRoute({component: Component, ...rest}: CustomRo
 		? queryString.parse(location.search).redirect : '/'
 
 	return (
-		<Route {...rest} render={props => {
+		<Route {...rest} key={location.pathname} render={props => {
 			return (
 				<>
 					{loginState.loggedIn ? (

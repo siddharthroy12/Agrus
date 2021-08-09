@@ -55,8 +55,6 @@ function App() {
           {/* Update Board Screen */}
           {/* Update User Screen */}
           {/* Finishe user screen */}
-          {/* add redirect option to comment */}
-          {/* User avatar should redirect to user page */}
           <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
           <PublicRoute exact path='/b/:boardname' component={BoardScreen} />
