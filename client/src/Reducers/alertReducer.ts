@@ -1,9 +1,5 @@
 import { SET_ALERT, CLEAR_ALERT } from '../Constants/alertConstants'
-
-type ActionType = {
-	type: string,
-	payload?: any
-}
+import ActionType from './actionType'
 
 export type StateType = {
 	active: boolean,

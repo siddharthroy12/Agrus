@@ -1,11 +1,7 @@
 import { 
 	FETCH_JOINED_BOARDS_START, FETCH_JOINED_BOARDS_FINISH, JOIN_BOARD 
 } from '../Constants/joinedBoardsConstants'
-
-type ActionType = {
-	type: string,
-	payload?: any
-}
+import ActionType from './actionType'
 
 type StateType = {
 	loading: boolean,

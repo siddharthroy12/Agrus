@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
 	Card, CardHeader,	Avatar,
 	IconButton, Typography,
@@ -16,10 +16,11 @@ import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import {
-	upvoteComment,
-	downvoteComment,
+	upvoteComment, downvoteComment,
 } from '../Actions/commentActions'
+import { getAndCacheUser } from '../Actions/usersCacheActions'
 import { useHistory } from 'react-router'
+import { useOnMount } from '../Hooks'
 import {
 	PlainLink
 } from './Post'
@@ -54,6 +55,7 @@ export default function Comment({ comment: _comment }: PropsType) {
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
 	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
+	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
 	const [deleteRequestPending, setDeleteRequestPending] = useState(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
@@ -198,6 +200,16 @@ export default function Comment({ comment: _comment }: PropsType) {
 		}
 	}
 
+	const getAuthorData = useCallback(() => {
+		if (!usersCacheState.users[comment.author]) {
+			dispatch(getAndCacheUser(comment.author))
+		}
+	}, [comment.author, usersCacheState, dispatch])
+	useOnMount(getAuthorData)
+
+	const avatarSrc = usersCacheState.users[comment.author] && 
+		!usersCacheState.users[comment.author].pending ?
+		usersCacheState.users[comment.author].avatar : ''
 
 	return (
 		<Card variant="outlined">
@@ -219,6 +231,7 @@ export default function Comment({ comment: _comment }: PropsType) {
 							onClick={() => history.push(`/u/${comment.author}`)}
 						>
 							<Avatar
+								src={avatarSrc}
 								style={{width: '40xp', height: '40px'}}>
 									{ comment.author[0].toUpperCase() }
 							</Avatar>

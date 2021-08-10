@@ -11,6 +11,7 @@ import {
 } from '../Components'
 import { useDispatch, useSelector } from 'react-redux'
 import { StateType } from '../Store'
+import { cacheUser } from '../Actions/usersCacheActions'
 import {
 	useMounted, useOnMount, useEndScroll
 } from '../Hooks'
@@ -30,7 +31,8 @@ type UserType = {
 	username: string,
 	avatar: string,
 	createdAt:string,
-	isAdmin: boolean
+	isAdmin: boolean,
+	bio:string,
 }
 
 export default function UserScreen() {
@@ -39,6 +41,7 @@ export default function UserScreen() {
 	const [user, setUser] = useState<UserType | null>(null)
 	const loginState:any = useSelector((state:StateType) => state.login)
 	const joinedBoardsState = useSelector((state:StateType) => state.joinedBoards)
+	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
 	const [tab, setTab] = useState(0)
 	const [posts, setPosts] = useState<any[]>([])
 	const [comments, setComments] = useState<any[]>([])
@@ -162,32 +165,52 @@ export default function UserScreen() {
 	const getUser = useCallback(() => {
 		if (!userLoading) {
 			setUserLoading(true)
-			axios.get(`/api/user/${params.username}`)
-				.then(res => {
-					if (isMounted()) {
-						setUser(res.data)
-						if (loginState.loggedIn) {
-							if (loginState.info.username === params.username) {
-								updateSavedPosts()
+			if (
+				usersCacheState.users[params.username] &&
+				!usersCacheState.users[params.username].pending
+			) {
+				setUser(usersCacheState.users[params.username])
+				if (loginState.loggedIn) {
+					if (loginState.info.username === params.username) {
+						updateSavedPosts()
+					}
+				}
+				updatePosts()
+				updateComments()
+				setUserLoading(false)
+			} else {
+				axios.get(`/api/user/${params.username}`)
+					.then(res => {
+						if (isMounted()) {
+							setUser(res.data)
+							dispatch(cacheUser(res.data))
+							if (loginState.loggedIn) {
+								if (loginState.info.username === params.username) {
+									updateSavedPosts()
+								}
 							}
+							updatePosts()
+							updateComments()
+							setUserLoading(false)
 						}
-						updatePosts()
-						updateComments()
-						setUserLoading(false)
-					}
-				})
-				.catch(error => {
-					if (isMounted()) {
-						reqErrorHandler(error, 'Failed to get user due to slow network', dispatch)
-						setUserLoading(false)
-					}
-				})
+					})
+					.catch(error => {
+						if (isMounted()) {
+							reqErrorHandler(
+								error,
+								'Failed to get user due to slow network',
+								dispatch
+							)
+							setUserLoading(false)
+						}
+					})
+			}
 		}
 	},[
 		params.username, dispatch,
 		userLoading, isMounted, updateSavedPosts,
 		updatePosts, loginState,
-		updateComments
+		updateComments, usersCacheState
 	])
 
 	useOnMount(getUser)
@@ -281,11 +304,14 @@ export default function UserScreen() {
 									u/{ (user as UserType).username }
 								</Typography>
 							}
-							subheader={
+							subheader={<>
 								<Typography variant="body2">
 									Joined At {getHumanReadableDate((user as UserType).createdAt)}
 								</Typography>
-							}
+								<Typography variant="body2">
+									{(user as UserType).bio}
+								</Typography>
+							</>}
 						/>
 					</Card>
 				</SubContainerAside>

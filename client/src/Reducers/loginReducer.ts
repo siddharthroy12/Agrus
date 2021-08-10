@@ -16,11 +16,7 @@ import {
 import {
 	JOIN_BOARD
 } from '../Constants/joinedBoardsConstants'
-
-type actionType = {
-	type: string,
-	payload?: any
-}
+import ActionType from './actionType'
 
 type LoginType = {
 	loading?: boolean,
@@ -28,7 +24,7 @@ type LoginType = {
 	loggedIn: boolean
 }
 
-const loginReducer = (state: LoginType = { loggedIn: false }, action: actionType) => {
+const loginReducer = (state: LoginType = { loggedIn: false }, action: ActionType) => {
 	let info:any = {}
 	let isUpvoted:boolean = false
 	let isDownvoted:boolean = false

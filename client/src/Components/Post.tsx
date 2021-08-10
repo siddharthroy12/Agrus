@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react'
+import { useState, SyntheticEvent, useCallback } from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
 import { useSelector, useDispatch } from 'react-redux'
@@ -19,10 +19,10 @@ import useMounted from '../Hooks/useMounted'
 import { StateType } from '../Store'
 import Alert from '../Components/Alert'
 import { 
-	upvotePost,
-	downvotePost,
-	savePost
+	upvotePost, downvotePost, savePost
 } from '../Actions/postActions'
+import { useOnMount } from '../Hooks'
+import { getAndCacheUser } from '../Actions/usersCacheActions'
 import genConfig from '../Utils/genConfig'
 import getHumanReadableDate from '../Utils/getHumanReadableDate'
 
@@ -156,6 +156,7 @@ export default function Post({ post: _post }: propsType) {
 	const [deletePending, setDeletePending] = useState(false)
 	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
+	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
 	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
@@ -339,6 +340,17 @@ export default function Post({ post: _post }: propsType) {
 		setMenuIsOpen(false)
 	}
 
+	const getAuthorData = useCallback(() => {
+		if (!usersCacheState.users[post.author]) {
+			dispatch(getAndCacheUser(post.author))
+		}
+	}, [post.author, usersCacheState, dispatch])
+	useOnMount(getAuthorData)
+
+	const avatarSrc = usersCacheState.users[post.author] && 
+		!usersCacheState.users[post.author].pending ?
+		usersCacheState.users[post.author].avatar : ''
+
 	return (
 		<Card variant="outlined">
 			{ deleted ? (
@@ -360,6 +372,7 @@ export default function Post({ post: _post }: propsType) {
 								onClick={() => history.push(`/u/${post.author}`)}
 							>
 								<Avatar
+									src={avatarSrc}
 									style={{width: '40xp', height: '40px'}}>
 										{ post.author[0].toUpperCase() }
 								</Avatar>

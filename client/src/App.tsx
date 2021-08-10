@@ -54,6 +54,7 @@ function App() {
           {/* TODO: */}
           {/* Update Post Screen */}
           {/* Update Board Screen */}
+          {/* Fix post and comment avatar */}
           <PrivateRoute exact path='/update/profile' component={UpdateProfileScreen} />
           <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />

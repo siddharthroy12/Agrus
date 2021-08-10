@@ -19,10 +19,9 @@ import Comment from '../Components/Comment'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 import { 
-	upvotePost,
-	downvotePost,
-	savePost
+	upvotePost, downvotePost, savePost
 } from '../Actions/postActions'
+import { getAndCacheUser } from '../Actions/usersCacheActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import genConfig from '../Utils/genConfig'
 import getHumanReadableDate from '../Utils/getHumanReadableDate'
@@ -75,6 +74,8 @@ export default function PostScreen() {
 	const params:any = useParams()
 	const [postLoading, setPostLoading] = useState(true)
 	const loginState:any = useSelector<StateType>(state => state.login)
+	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
+	const [cacheOneTime, setCacheOneTime] = useState(false)
 	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
 	const [commentPostRequestPending, setCommentPostRequestPending] = useState(false)
@@ -396,11 +397,28 @@ export default function PostScreen() {
 	])
 
 	useEffect(() => {
+		if (post && !cacheOneTime) {
+			if (!usersCacheState.users[post.author]) {
+				dispatch(getAndCacheUser(post.author))
+				setCacheOneTime(true)
+			}
+		}
+	}, [post, usersCacheState, dispatch, cacheOneTime])
+
+	useEffect(() => {
 		if (!oneShotForComments && post !== null) {
 			updateCommentFeed()
 			setOneShotForComments(true)
 		}
 	}, [oneShotForComments, updateCommentFeed, post])
+
+	let avatarSrc = ''
+	if (post) {
+		avatarSrc = usersCacheState.users[(post as any).author] && 
+			!usersCacheState.users[(post as any).author].pending ?
+			usersCacheState.users[(post as any).author].avatar : ''
+	}
+	
 
 	useEndScroll(updateCommentFeed)
 
@@ -429,6 +447,7 @@ export default function PostScreen() {
 											onClick={() => history.push(`/u/${post.author}`)}
 										>
 											<Avatar
+												src={avatarSrc}
 												style={{width: '40xp', height: '40px'}}>
 													{ (post as PostType).author[0].toUpperCase() }
 											</Avatar>

@@ -5,11 +5,13 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import loginReducer from './Reducers/loginReducer'
 import joinedBoardsReducer from './Reducers/joinedBoardsReducer'
 import alertReducer from './Reducers/alertReducer'
+import usersCacheReducer from './Reducers/usersCacheReducer'
 
 const reducers = combineReducers({
 	login: loginReducer,
 	joinedBoards: joinedBoardsReducer,
-	alert: alertReducer
+	alert: alertReducer,
+	usersCache: usersCacheReducer
 })
 
 const userInfoFromStorage = localStorage.getItem('loginInfo') ?
