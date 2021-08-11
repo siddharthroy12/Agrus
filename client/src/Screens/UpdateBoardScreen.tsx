@@ -15,8 +15,11 @@ import { useHistory, useParams } from 'react-router'
 import genConfig from '../Utils/genConfig'
 import useMounted from '../Hooks/useMounted'
 import { useOnMount } from '../Hooks'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateBoard as updateCachedBoard } from '../Actions/boardsCacheActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
+import { StateType } from '../Store'
+import { cacheBoard } from '../Actions/boardsCacheActions'
 import styled from 'styled-components'
 
 const FormWrapper = styled(Paper)`
@@ -48,6 +51,7 @@ export default function UpdateBoardScreen() {
 	const [boardDescription, setBoardDescription] = useState('')
 	const [boardExist, setBoardExist] = useState(false)
 	const [boardLoading, setBoardLoading] = useState(false)
+	const boardsCacheState:any = useSelector<StateType>(state => state.boardsCache)
 	const [updateBoardRequestPending, setUpdateBoardRequestPending] = useState(false)
 	const [uploading, setUploading] = useState(false)
 	const [logo, setLogo] = useState("")
@@ -100,10 +104,11 @@ export default function UpdateBoardScreen() {
 		}
 		axios.put(`/api/board/${boardname}`, reqBody, genConfig())
 			.then(res => {
-					if (isMounted()) {
-						setUpdateBoardRequestPending(false)
-						history.push(`/b/${boardname}`)
-					}
+				dispatch(updateCachedBoard(res.data))
+				if (isMounted()) {
+					setUpdateBoardRequestPending(false)
+					history.push(`/b/${boardname}`)
+				}
 			})
 			.catch(function (error) {
 				if (isMounted()) {
@@ -119,28 +124,39 @@ export default function UpdateBoardScreen() {
 
 	const fetchBoard = useCallback(() => {
 		setBoardLoading(true)
-		axios.get(`/api/board/${boardname}`)
-			.then(res => {
-				if (isMounted()) {
-					setBoardDescription(res.data.description)
-					setLogo(res.data.logo)
-					setBoardExist(true)
-					setBoardLoading(false)
-				}
-			})
-			.catch(error => {
-				if (isMounted()) {
-					setBoardLoading(false)
-					reqErrorHandler(
-						error,
-						'Failed to load board due to slow network',
-						dispatch
-					)
-				}
-			})
+		if (
+			boardsCacheState.boards[boardname] &&
+			!boardsCacheState.boards[boardname].pending
+		) {
+			setBoardDescription(boardsCacheState.boards[boardname].description)
+			setLogo(boardsCacheState.boards[boardname].logo)
+			setBoardExist(true)
+			setBoardLoading(false)
+		} else {
+			axios.get(`/api/board/${boardname}`)
+				.then(res => {
+					if (isMounted()) {
+						dispatch(cacheBoard(res.data))
+						setBoardDescription(res.data.description)
+						setLogo(res.data.logo)
+						setBoardExist(true)
+						setBoardLoading(false)
+					}
+				})
+				.catch(error => {
+					if (isMounted()) {
+						setBoardLoading(false)
+						reqErrorHandler(
+							error,
+							'Failed to load board due to slow network',
+							dispatch
+						)
+					}
+				})
+		}
 	}, [
 		isMounted, boardname,
-		dispatch,
+		dispatch, boardsCacheState
 	])
 
 	useOnMount(fetchBoard)

@@ -7,11 +7,11 @@ import {
 } from '../Constants/loginConstants'
 import ActionType from './actionType'
 
-type UserCacheStateType = {
+type UsersCacheStateType = {
 	users: any
 }
 
-const usersCacheReducer = (state:UserCacheStateType = {users:{}}, action:ActionType) => {
+const usersCacheReducer = (state:UsersCacheStateType = {users:{}}, action:ActionType) => {
 	let users:any = {}
 	switch(action.type) {
 		case GET_AND_CACHE_USER_START:
@@ -39,7 +39,7 @@ const usersCacheReducer = (state:UserCacheStateType = {users:{}}, action:ActionT
 				users[action.payload.username].avatar = action.payload.avatar
 			}
 			return {users}
-			
+
 		default:
 			return state
 	}

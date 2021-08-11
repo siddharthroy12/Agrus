@@ -23,6 +23,7 @@ import {
 } from '../Actions/postActions'
 import { useOnMount } from '../Hooks'
 import { getAndCacheUser } from '../Actions/usersCacheActions'
+import { getAndCacheBoard } from '../Actions/boardsCacheActions'
 import genConfig from '../Utils/genConfig'
 import getHumanReadableDate from '../Utils/getHumanReadableDate'
 
@@ -157,6 +158,7 @@ export default function Post({ post: _post }: propsType) {
 	const [deleted, setDeleted] = useState(false)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
+	const boardsCacheState:any = useSelector<StateType>(state => state.boardsCache)
 	const [menuIsOpen, setMenuIsOpen] = useState<Element | boolean>(false)
 	const isMounted = useMounted()
 	const dispatch = useDispatch()
@@ -345,6 +347,16 @@ export default function Post({ post: _post }: propsType) {
 			dispatch(getAndCacheUser(post.author))
 		}
 	}, [post.author, usersCacheState, dispatch])
+
+	const getBoardData = useCallback(() => {
+		if (post.board.trim() !== '') {
+			if (!boardsCacheState.boards[post.board]) {
+				dispatch(getAndCacheBoard(post.board))
+			}
+		}
+	}, [post.board, boardsCacheState, dispatch])
+
+	useOnMount(getBoardData)
 	useOnMount(getAuthorData)
 
 	const avatarSrc = usersCacheState.users[post.author] && 

@@ -19,6 +19,7 @@ import {
 } from '../Hooks'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
+import { cacheBoard } from '../Actions/boardsCacheActions'
 
 const BoardActionsContainer = styled.div`
 	display: flex;
@@ -45,6 +46,7 @@ export default function BoardScreen() {
 	const [page, setPage] = useState(1)
 	const [feedEnded, setFeedEnded] = useState(false)
 	const loginState:any = useSelector((state:StateType) => state.login)
+	const boardsCacheState:any = useSelector<StateType>(state => state.boardsCache)
 	const [feedLoading, setFeedLoading] = useState(false)
 	const [board, setBoard] = useState<BoardType | null>(null)
 	const [boardLoading, setBoardLoading] = useState(true)
@@ -68,20 +70,20 @@ export default function BoardScreen() {
 			axios.get(`/api/board/${params.boardname}/feed?page=${page}&perpage=5`)
 				.then(res => {
 					if (isMounted()) {
-							if (res.data.length === 0) {
-								setFeedEnded(true)
-							}
-								// @ts-ignore
-							setFeed((prevFeed:any) => {
-								if (prevFeed[0] && res.data[0]) {
-									if (prevFeed[0]._id === res.data[0]._id) {
-										return prevFeed
-									}
+						if (res.data.length === 0) {
+							setFeedEnded(true)
+						}
+							// @ts-ignore
+						setFeed((prevFeed:any) => {
+							if (prevFeed[0] && res.data[0]) {
+								if (prevFeed[0]._id === res.data[0]._id) {
+									return prevFeed
 								}
-								return [...prevFeed, ...res.data ]
-							})
-							setPage(page => page + 1)
-							setFeedLoading(false)
+							}
+							return [...prevFeed, ...res.data ]
+						})
+						setPage(page => page + 1)
+						setFeedLoading(false)
 					}
 				})
 				.catch(error => {
@@ -110,27 +112,37 @@ export default function BoardScreen() {
 
 	const fetchBoard = useCallback(() => {
 		setBoardLoading(true)
-		axios.get(`/api/board/${params.boardname}`)
-			.then(res => {
-				if (isMounted()) {
-					setBoard(res.data)
-					setBoardLoading(false)
-					updateFeed()
-				}
-			})
-			.catch(error => {
-				if (isMounted()) {
-					setBoardLoading(false)
-					reqErrorHandler(
-						error,
-						'Failed to load board due to slow network',
-						dispatch
-					)
-				}
-			})
+		if (
+			boardsCacheState.boards[params.boardname] &&
+			!boardsCacheState.boards[params.boardname].pending
+		) {
+			setBoard(boardsCacheState.boards[params.boardname])
+			updateFeed()
+			setBoardLoading(false)
+		} else {
+			axios.get(`/api/board/${params.boardname}`)
+				.then(res => {
+					if (isMounted()) {
+						setBoard(res.data)
+						dispatch(cacheBoard(res.data))
+						updateFeed()
+						setBoardLoading(false)
+					}
+				})
+				.catch(error => {
+					if (isMounted()) {
+						setBoardLoading(false)
+						reqErrorHandler(
+							error,
+							'Failed to load board due to slow network',
+							dispatch
+						)
+					}
+				})
+		}
 	}, [
 		isMounted, params.boardname,
-		dispatch, updateFeed
+		dispatch, updateFeed, boardsCacheState
 	])
 
 	useOnMount(fetchBoard)
@@ -234,7 +246,10 @@ export default function BoardScreen() {
 											}
 										</ButtonSecondary>
 									)}
-									{loginState.loggedIn && loginState.info._id === board.author && (<>
+									{loginState.loggedIn && (
+										loginState.info._id === board.author ||
+										loginState.info.isAdmin
+									) && (<>
 										{/* @ts-ignore */}
 										<ButtonPrimary component={Link}
 											variant="contained"

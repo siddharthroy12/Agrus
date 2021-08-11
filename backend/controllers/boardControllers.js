@@ -159,7 +159,7 @@ const deleteBoard = asyncHandler(async (req, res) => {
 })
 
 // @desc Get Board Details
-// @route POST /api/board/:boardName
+// @route GET /api/board/:boardName
 // @access Public
 const getBoard = asyncHandler(async (req, res) => {
 	const boardName = req.params.boardName

@@ -6,12 +6,14 @@ import loginReducer from './Reducers/loginReducer'
 import joinedBoardsReducer from './Reducers/joinedBoardsReducer'
 import alertReducer from './Reducers/alertReducer'
 import usersCacheReducer from './Reducers/usersCacheReducer'
+import boardsCacheReducer from './Reducers/boardsCacheReducer'
 
 const reducers = combineReducers({
 	login: loginReducer,
 	joinedBoards: joinedBoardsReducer,
 	alert: alertReducer,
-	usersCache: usersCacheReducer
+	usersCache: usersCacheReducer,
+	boardsCache: boardsCacheReducer
 })
 
 const userInfoFromStorage = localStorage.getItem('loginInfo') ?

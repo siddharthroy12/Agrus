@@ -22,6 +22,7 @@ import {
 	upvotePost, downvotePost, savePost
 } from '../Actions/postActions'
 import { getAndCacheUser } from '../Actions/usersCacheActions'
+import { getAndCacheBoard } from '../Actions/boardsCacheActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import genConfig from '../Utils/genConfig'
 import getHumanReadableDate from '../Utils/getHumanReadableDate'
@@ -75,7 +76,9 @@ export default function PostScreen() {
 	const [postLoading, setPostLoading] = useState(true)
 	const loginState:any = useSelector<StateType>(state => state.login)
 	const usersCacheState:any = useSelector<StateType>(state => state.usersCache)
-	const [cacheOneTime, setCacheOneTime] = useState(false)
+	const boardsCacheState:any = useSelector<StateType>(state => state.boardsCache)
+	const [cacheUserOneTime, setCacheUserOneTime] = useState(false)
+	const [cacheBoardOneTime, setCacheBoardOneTime] = useState(false)
 	const [saveRequestPending, setSaveRequestPending] = useState(false)
 	const [voteRequestPending, setVoteRequestPending] = useState(false)
 	const [commentPostRequestPending, setCommentPostRequestPending] = useState(false)
@@ -397,13 +400,22 @@ export default function PostScreen() {
 	])
 
 	useEffect(() => {
-		if (post && !cacheOneTime) {
+		if (post && !cacheUserOneTime) {
 			if (!usersCacheState.users[post.author]) {
 				dispatch(getAndCacheUser(post.author))
-				setCacheOneTime(true)
+				setCacheUserOneTime(true)
 			}
 		}
-	}, [post, usersCacheState, dispatch, cacheOneTime])
+	}, [post, usersCacheState, dispatch, cacheUserOneTime])
+
+	useEffect(() => {
+		if (post && !cacheBoardOneTime && post.board.trim() !== '') {
+			if (!boardsCacheState.boards[post.board]) {
+				dispatch(getAndCacheBoard(post.board))
+				setCacheBoardOneTime(true)
+			}
+		}
+	}, [post, boardsCacheState, dispatch, cacheBoardOneTime])
 
 	useEffect(() => {
 		if (!oneShotForComments && post !== null) {

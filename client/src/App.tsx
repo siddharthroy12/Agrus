@@ -54,7 +54,6 @@ function App() {
           {/* TODO: */}
           {/* Update Post Screen */}
           {/* Board owner should be able to delete post */}
-          {/* Board Caching */}
           <PrivateRoute exact path='/update/board/:boardname' component={UpdateBoardScreen} />
           <PrivateRoute exact path='/update/profile' component={UpdateProfileScreen} />
           <PublicRoute exact path='/search' component={SearchScreen} />
