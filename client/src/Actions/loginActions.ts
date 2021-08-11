@@ -1,19 +1,12 @@
 import axios from 'axios'
 import genConfig from '../Utils/genConfig'
 import {
-	LOGIN_REQUEST,
-  AUTHENTICATION_REQUEST,
-  AUTHENTICATION_SUCCESS,
-  AUTHENTICATION_FAIL,
-	LOGIN_FAIL,
-	LOGIN_SUCCESS,
-	LOGOUT,
-  UPDATE_PROFILE,
-  REGISTER_REQUEST,
-  REGISTER_SUCCESS,
+	LOGIN_REQUEST, AUTHENTICATION_REQUEST, AUTHENTICATION_SUCCESS,
+  AUTHENTICATION_FAIL, LOGIN_FAIL, LOGIN_SUCCESS,
+	LOGOUT, UPDATE_PROFILE, REGISTER_REQUEST, REGISTER_SUCCESS,
   REGISTER_FAIL
 } from '../Constants/loginConstants'
-import { DispatchType } from '../Store'
+import { DispatchType, GetStateType } from '../Store'
 
 export const login = (username: String, password: String) => async (dispatch: DispatchType) => {
 	try {
@@ -80,10 +73,13 @@ export const authenticate = () => async (dispatch: DispatchType) => {
 	}
 }
 
-export const updateProfile = (avatar:string) => async(dispatch:DispatchType) => {
+export const updateProfile = (avatar:string) => async(dispatch:DispatchType, getState:GetStateType) => {
+  const loginState:any = getState().login
+
   dispatch({
     type: UPDATE_PROFILE,
     payload: {
+      username: loginState.info.username,
       avatar
     }
   })

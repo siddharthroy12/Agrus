@@ -18,6 +18,16 @@ import {
 	useMounted, useOnMount, useEndScroll
 } from '../Hooks'
 import reqErrorHandler from '../Utils/reqErrorHandler'
+import styled from 'styled-components'
+
+const BoardActionsContainer = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+
+	> * {
+
+	}
+`
 
 type BoardType = {
 	_id: string,
@@ -200,29 +210,43 @@ export default function BoardScreen() {
 								</>}
 							/>
 							<CardContent>
-								{/* @ts-ignore */}
-								<ButtonPrimary component={Link}
-									variant="contained"
-									disableElevation
-									color="primary"
-									style={{marginRight: '0.25rem'}}
-									to={`/submit?board=${params.boardname}`}
-								>
-									Create a Post
-								</ButtonPrimary>
-								{loginState.loggedIn && (
-									<ButtonSecondary
-										variant="outlined"
+								<BoardActionsContainer>
+									{/* @ts-ignore */}
+									<ButtonPrimary component={Link}
+										variant="contained"
 										disableElevation
-										onClick={handleJoinButton}
-										style={{marginLeft: '0.25rem'}}
+										color="primary"
+										style={{marginRight: '0.25rem'}}
+										to={`/submit?board=${params.boardname}`}
 									>
-										{
-											joinRequestPending ? 'Wait' :
-											isJoined ? 'Leave Board' : 'Join Board'
-										}
-									</ButtonSecondary>
-								)}
+										Create a Post
+									</ButtonPrimary>
+									{loginState.loggedIn && (
+										<ButtonSecondary
+											variant="outlined"
+											disableElevation
+											onClick={handleJoinButton}
+											style={{marginLeft: '0.25rem'}}
+										>
+											{
+												joinRequestPending ? 'Wait' :
+												isJoined ? 'Leave Board' : 'Join Board'
+											}
+										</ButtonSecondary>
+									)}
+									{loginState.loggedIn && loginState.info._id === board.author && (<>
+										{/* @ts-ignore */}
+										<ButtonPrimary component={Link}
+											variant="contained"
+											disableElevation
+											color="primary"
+											style={{marginTop: '0.5rem'}}
+											to={`/update/board/${params.boardname}`}
+										>
+											Edit Board
+										</ButtonPrimary>
+									</>)}
+								</BoardActionsContainer>
 							</CardContent>
 					</Card>
 				</SubContainerAside>

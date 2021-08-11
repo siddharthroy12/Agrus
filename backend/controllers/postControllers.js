@@ -368,7 +368,19 @@ const deletePost = asyncHandler(async (req, res) => {
 		throw new Error('Post not found')
 	}
 
-	if (post.author.toString() !== req.user.username.toString() && req.user.isAdmin === false) {
+	let board
+
+	if (post.board.trim() !== '') {
+		board = await Board.findOne({boardName: post.board})
+	}
+	
+	let isPostBoardOwner = board && board.author.toString() === req.user.username.toString()
+
+	if (
+		post.author.toString() !== req.user.username.toString() &&
+		req.user.isAdmin === false &&
+		!isPostBoardOwner
+	) {
 		res.status(403)
 		throw new Error("It's not your post buddy")
 	}

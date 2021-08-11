@@ -418,7 +418,10 @@ export default function Post({ post: _post }: propsType) {
 											</ListItem>
 										): null}
 										{
-											loginState.loggedIn && loginState.info.username === post.author && (
+											loginState.loggedIn && (
+												loginState.info.username === post.author ||
+												loginState.info.isAdmin
+											) && (
 												<ListItem
 													className="menu-item"
 													button

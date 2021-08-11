@@ -11,7 +11,7 @@ import { clearAlert } from './Actions/alertActions'
 import {
   HomeScreen, LoginScreen, RegisterScreen, CreateBoardScreen,
   SubmitScreen, PostScreen, UserScreen, BoardScreen, SearchScreen,
-  UpdateProfileScreen
+  UpdateProfileScreen, UpdateBoardScreen
 } from './Screens'
 import {
   PublicRoute, ProtectedRoute, PrivateRoute
@@ -53,8 +53,9 @@ function App() {
         <Switch>
           {/* TODO: */}
           {/* Update Post Screen */}
-          {/* Update Board Screen */}
-          {/* Fix post and comment avatar */}
+          {/* Board owner should be able to delete post */}
+          {/* Board Caching */}
+          <PrivateRoute exact path='/update/board/:boardname' component={UpdateBoardScreen} />
           <PrivateRoute exact path='/update/profile' component={UpdateProfileScreen} />
           <PublicRoute exact path='/search' component={SearchScreen} />
           <PrivateRoute exact path='/createboard' component={CreateBoardScreen} />
