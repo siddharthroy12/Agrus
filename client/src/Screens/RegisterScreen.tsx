@@ -12,6 +12,7 @@ import reqErrorHandler from '../Utils/reqErrorHandler'
 import { setAlert, clearAlert } from '../Actions/alertActions'
 import { StateType } from '../Store'
 import { register } from '../Actions/loginActions'
+import { Helmet } from 'react-helmet'
 
 const Header = styled.div`
 	display: flex;
@@ -105,6 +106,13 @@ export default function RegisterScreen() {
 
 	return (
 		<Box elevation={3}>
+			<Helmet>
+				<title>Create an account</title>
+				<meta
+          name="description"
+          content="Create an account to post and interact with others on this site"
+        />
+			</Helmet>
 			<Header>
 				<Typography variant="h5" component="h1">Register</Typography>
 			</Header>

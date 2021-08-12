@@ -12,6 +12,7 @@ import { StateType } from '../Store'
 import { login } from '../Actions/loginActions'
 import { clearAlert } from '../Actions/alertActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
+import { Helmet } from 'react-helmet'
 
 const Header = styled.div`
 	display: flex;
@@ -94,6 +95,13 @@ export default function LoginScreen() {
 
 	return (
 		<Box elevation={3}>
+			<Helmet>
+				<title>Log In to Agrus</title>
+				<meta
+          name="description"
+          content="Log In to post and interact with others on this site"
+        />
+			</Helmet>
 			<Header>
 				<Typography variant="h5" component="h1">Login</Typography>
 			</Header>

@@ -12,6 +12,7 @@ import {
 import { useMounted, useOnMount } from '../Hooks'
 import { useDispatch } from 'react-redux'
 import { reqErrorHandler, genConfig } from '../Utils'
+import {Helmet} from 'react-helmet'
 
 export default function UpdatePostScreen() {
 	const params:{ id: string } = useParams()
@@ -73,6 +74,11 @@ export default function UpdatePostScreen() {
 
 	return (
 		<Container>
+			<Helmet>
+				<title>
+					Edit Post
+				</title>
+			</Helmet>
 			{postLoading && <LinearProgress style={{width: '100%'}}/>}
 			{!postLoading && post && (<>
 				<SubContainerMain>

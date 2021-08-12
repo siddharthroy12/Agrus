@@ -18,6 +18,7 @@ import {
 import { useDispatch } from 'react-redux'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
+import {Helmet} from "react-helmet"
 
 const PageDescriptionBox = styled(Paper)`
 	padding: 1rem;
@@ -79,6 +80,15 @@ export default function HomeScreen() {
 
 	return (
 		<Container>
+			<Helmet>
+				<title>Agrus | Home</title>
+				<meta
+					name="description"
+					content={`This is the front page of this site,
+					you can join boards, create posts,
+					interact with others and lot more, but behave properly`}
+				/>
+			</Helmet>
 			<SubContainerMain>
 				{loginState.loggedIn ? (
 					<CreatePost />

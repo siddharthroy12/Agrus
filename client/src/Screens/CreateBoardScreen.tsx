@@ -17,6 +17,7 @@ import useMounted from '../Hooks/useMounted'
 import { useDispatch } from 'react-redux'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
+import {Helmet} from 'react-helmet'
 
 const FormWrapper = styled(Paper)`
 	margin-top: 1rem;
@@ -118,6 +119,13 @@ export default function CreateBoardScreen() {
 
 	return (
 		<Container>
+			<Helmet>
+				<title>Create board</title>
+				<meta
+          name="description"
+          content="Create new board for your community"
+        />
+			</Helmet>
 			<SubContainerMain>
 				<Typography variant="h6" component="h2">
 					Create board

@@ -20,6 +20,7 @@ import {
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import styled from 'styled-components'
 import { cacheBoard } from '../Actions/boardsCacheActions'
+import {Helmet} from 'react-helmet'
 
 const BoardActionsContainer = styled.div`
 	display: flex;
@@ -170,6 +171,13 @@ export default function BoardScreen() {
 
 	return (
 		<Container>
+			{board && (<Helmet>
+				<title>{`${board.boardName}: ${board.description}`}</title>
+				<meta
+					name="description"
+					content={board.description}
+      	/>
+			</Helmet>)}
 			{boardLoading ? <LinearProgress style={{width: '100%'}}/> : board && (<>
 				<SubContainerMain>
 					<Card variant="outlined" style={{width: '100%'}}>

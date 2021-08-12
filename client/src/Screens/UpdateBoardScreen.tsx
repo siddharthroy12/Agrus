@@ -21,6 +21,7 @@ import reqErrorHandler from '../Utils/reqErrorHandler'
 import { StateType } from '../Store'
 import { cacheBoard } from '../Actions/boardsCacheActions'
 import styled from 'styled-components'
+import { Helmet } from 'react-helmet'
 
 const FormWrapper = styled(Paper)`
 	margin-top: 1rem;
@@ -163,6 +164,11 @@ export default function UpdateBoardScreen() {
 
 	return (
 		<Container>
+			<Helmet>
+				<title>
+					Update Board
+				</title>
+			</Helmet>
 			{boardLoading && <LinearProgress style={{width: '100%'}}/>}
 			{boardExist && (<>
 				<SubContainerMain>

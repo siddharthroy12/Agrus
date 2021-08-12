@@ -20,6 +20,7 @@ import { lightTheme } from './themes'
 import { ThemeProvider } from 'styled-components'
 import { authenticate } from './Actions/loginActions'
 import GlobalStyle from './GlobalStyles'
+import {Helmet} from 'react-helmet'
 
 function App() {
   const loginState:any = useSelector((state:StateType) => state.login)
@@ -44,6 +45,12 @@ function App() {
 
   return (
     <Router>
+      <Helmet>
+        <meta
+          name="description"
+          content="A reddit like social media mvp"
+        />
+      </Helmet>
       <ThemeProvider theme={lightTheme}>
         <GlobalStyle />
         <AlertDisplay

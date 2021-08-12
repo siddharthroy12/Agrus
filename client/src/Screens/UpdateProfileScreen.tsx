@@ -13,6 +13,7 @@ import { useMounted } from '../Hooks'
 import { genConfig, reqErrorHandler } from '../Utils'
 import { setAlert } from '../Actions/alertActions'
 import { updateProfile } from '../Actions/loginActions'
+import {Helmet} from 'react-helmet'
 
 const Wrapper = styled(Container)`
 	display: flex;
@@ -114,6 +115,11 @@ export default function UpdateProfileScreen() {
 
 	return (
 		<Wrapper>
+			<Helmet>
+				<title>
+					Edit Profile
+				</title>
+			</Helmet>
 			<input
 				accept="image/*"
 				onChange={fileInputHandle}

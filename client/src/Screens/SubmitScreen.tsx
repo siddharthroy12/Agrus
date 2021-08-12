@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux'
 import { setAlert } from '../Actions/alertActions'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import queryString from 'query-string'
+import { Helmet } from 'react-helmet'
 
 const TabContentContainer = styled.div`
 	padding: 1rem;
@@ -183,6 +184,15 @@ export default function SubmitScreen() {
 	return (
 		<>
 			<Container>
+				<Helmet>
+					<title>
+						Create a post
+					</title>
+					<meta
+						name="description"
+						content="Create a post"
+					/>
+				</Helmet>
 				<SubContainerMain>
 					<Typography variant="h6" component="h2">
 						Create post

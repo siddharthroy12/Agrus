@@ -12,6 +12,8 @@ import {
 } from '../Components'
 import { useDispatch } from 'react-redux'
 import styled from 'styled-components'
+import queryString from 'query-string'
+import { Helmet } from 'react-helmet'
 
 const Loading = styled(LinearProgress)`
 	width: 100%;
@@ -78,21 +80,30 @@ export default function SearchScreen() {
 	},[location.search, searchPosts, searchBoards])
 	return (
 		<Wrapper>
-				{loading && <Loading />}
-				{!loading && (<>
-					<SubHeader variant="h6">Posts</SubHeader>
-					<List>
-						{posts.map(post => <Post post={post} key={post._id}/>)}
-					</List>
-					{posts.length < 1  && <Typography>No Post Found</Typography>}
-				</>)}
-				{!loading && (<>
-					<SubHeader variant="h6">Boards</SubHeader>
-					<List>
-						{boards.map(board => <Board board={board} key={board._id}/>)}
-					</List>
-					{boards.length < 1  && <Typography>No Post Found</Typography>}
-				</>)}
+			<Helmet>
+				<title>
+					Search Result for {`"${queryString.parse((location.search)).search}"`}
+				</title>
+				<meta
+          name="description"
+          content={`Search Result for "${queryString.parse((location.search)).search}"`}
+        />
+			</Helmet>
+			{loading && <Loading />}
+			{!loading && (<>
+				<SubHeader variant="h6">Posts</SubHeader>
+				<List>
+					{posts.map(post => <Post post={post} key={post._id}/>)}
+				</List>
+				{posts.length < 1  && <Typography>No Post Found</Typography>}
+			</>)}
+			{!loading && (<>
+				<SubHeader variant="h6">Boards</SubHeader>
+				<List>
+					{boards.map(board => <Board board={board} key={board._id}/>)}
+				</List>
+				{boards.length < 1  && <Typography>No Post Found</Typography>}
+			</>)}
 		</Wrapper>
 	)
 }

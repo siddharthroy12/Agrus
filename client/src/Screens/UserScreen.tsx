@@ -20,6 +20,7 @@ import {
 	genConfig
 } from '../Utils'
 import styled from 'styled-components'
+import {Helmet} from 'react-helmet'
 
 const List = styled.div`
 	> * {
@@ -226,6 +227,13 @@ export default function UserScreen() {
 
 	return (
 		<Container>
+			{user && (<Helmet>
+				<title>{user.username}</title>
+				<meta
+					name="description"
+					content={`${user.username}'s Profile`}
+      	/>
+			</Helmet>)}
 			{userLoading && (<>
 				<LinearProgress style={{width: '100%'}} />
 			</>)}

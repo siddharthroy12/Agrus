@@ -31,6 +31,7 @@ import {
 } from '../Hooks'
 import { StateType } from '../Store'
 import styled from 'styled-components'
+import { Helmet } from 'react-helmet'
 
 const PostBody = styled(Typography)`
 	color: #505050;
@@ -448,6 +449,13 @@ export default function PostScreen() {
 
 	return (
 		<Wrapper>
+			{post && (<Helmet>
+				<title>{`${post.title}`}</title>
+				<meta
+					name="description"
+					content={post.title}
+      	/>
+			</Helmet>)}
 			{postLoading ? (
 				<LinearProgress />
 			) : post && (
