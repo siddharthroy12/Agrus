@@ -502,7 +502,7 @@ export default function Post({ post: _post }: propsType) {
 								<CardMedia
 									component="img"
 									alt="bruh"
-									style={{height: '25rem', width: 'auto'}}
+									style={{height: '25rem', objectFit: 'contain'}}
 									image={post.media}
 									title="image"
 								/>
