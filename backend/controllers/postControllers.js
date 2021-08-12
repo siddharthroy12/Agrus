@@ -147,13 +147,24 @@ const editPost = asyncHandler(async (req, res) => {
 	}
 
 	const post = await Post.findById(req.params.id)
-
 	if (!post) {
 		res.status(404)
 		throw new Error('Post not found')
 	}
 
-	if (post.author.toString() !== req.user._id.toString() && req.user.isAdmin === false) {
+	let board
+
+	if (post.board.trim() !== '') {
+		board = await Board.findOne({boardName: post.board})
+	}
+
+	let isPostBoardOwner = board && board.author.toString() === req.user.username.toString()
+	
+	if (
+		post.author.toString() !== req.user.username.toString() &&
+		req.user.isAdmin === false &&
+		!isPostBoardOwner
+	) {
 		res.status(403)
 		throw new Error("It's not your post buddy")
 	}
@@ -172,7 +183,7 @@ const editPost = asyncHandler(async (req, res) => {
 			if (body !== undefined) {
 				if (body.trim() === '') {
 					res.status(400)
-					throw new Error("Title can't be empty")
+					throw new Error("Body can't be empty")
 				}
 			}
 			break;

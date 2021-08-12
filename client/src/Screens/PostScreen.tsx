@@ -6,18 +6,18 @@ import {
 	Card, CardHeader, IconButton, CardMedia, Paper, Button,
 	Avatar, Typography, LinearProgress, TextField
 } from '@material-ui/core'
+import { Edit as EditIcon } from '@material-ui/icons'
 import { 
 	PostType, HeaderText, PostContent, PostTitle,
 	BoardName, MediaContainer, PostActions,
 	DownvoteIcon, SaveIcon, UpvoteIcon, PlainLink
 } from '../Components/Post'
 import Alert from '../Components/Alert'
-import {
-	TrashIcon
-} from '../Components/Comment'
+import {TrashIcon} from '../Components/Comment'
 import Comment from '../Components/Comment'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 import { 
 	upvotePost, downvotePost, savePost
 } from '../Actions/postActions'
@@ -51,6 +51,10 @@ const CommentBoxActions = styled.div`
 	display: flex;
 	padding-top: 1rem;
 	flex-direction: row-reverse;
+`
+
+export const EditPostIcon = styled(EditIcon)`
+	color: ${(props) => props.theme.fontColor};
 `
 
 const PostCommentButton = styled(Button)`
@@ -95,6 +99,7 @@ export default function PostScreen() {
 	const history = useHistory()
 
 	const fetchPost = useCallback(() => {
+		setPostLoading(true)
 		axios.get(`/api/post/${params.id}`)
 			.then(res => {
 				if (isMounted()) {
@@ -425,11 +430,18 @@ export default function PostScreen() {
 	}, [oneShotForComments, updateCommentFeed, post])
 
 	let avatarSrc = ''
+	let userIsBoardOwner = false
 	if (post) {
 		avatarSrc = usersCacheState.users[(post as any).author] && 
 			!usersCacheState.users[(post as any).author].pending ?
 			usersCacheState.users[(post as any).author].avatar : ''
+		
+		userIsBoardOwner = boardsCacheState.boards[post.board] &&
+		// because pending gets removed instead of set to false
+		!boardsCacheState.boards[post.board].pending ? true : false
 	}
+
+	
 	
 
 	useEndScroll(updateCommentFeed)
@@ -537,11 +549,17 @@ export default function PostScreen() {
 								<IconButton size="small" onClick={saveButtonHandler}>
 									<SaveIcon $saved={isSaved()} />
 								</IconButton>
-								{loginState.loggedIn && loginState.info.username === post.author && (
+								{loginState.loggedIn && (
+									loginState.info.username === post.author ||
+									loginState.info.isAdmin || userIsBoardOwner
+								) && (<>
 									<IconButton size="small" onClick={deleteButtonHandler}>
 										<TrashIcon />
 									</IconButton>
-								)}
+									<IconButton size="small" component={Link} to={`/update/post/${post._id}`}>
+										<EditPostIcon />
+									</IconButton>
+								</>)}
 							</PostActions>
 							</>)}
 					</Card>

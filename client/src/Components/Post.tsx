@@ -363,6 +363,10 @@ export default function Post({ post: _post }: propsType) {
 		!usersCacheState.users[post.author].pending ?
 		usersCacheState.users[post.author].avatar : ''
 
+	const userIsBoardOwner = boardsCacheState.boards[post.board] &&
+		// because pending gets removed instead of set to false
+		!boardsCacheState.boards[post.board].pending ? true : false
+
 	return (
 		<Card variant="outlined">
 			{ deleted ? (
@@ -432,15 +436,24 @@ export default function Post({ post: _post }: propsType) {
 										{
 											loginState.loggedIn && (
 												loginState.info.username === post.author ||
-												loginState.info.isAdmin
-											) && (
+												loginState.info.isAdmin || userIsBoardOwner
+											) && (<>
 												<ListItem
 													className="menu-item"
 													button
-													onClick={deleteButtonHandler}>
+													onClick={deleteButtonHandler}
+												>
 														Delete Post
 												</ListItem>
-											)
+												<ListItem
+													className="menu-item"
+													button
+													component={Link}
+													to={`/update/post/${post._id}`}
+												>
+													Edit Post
+												</ListItem>
+											</>)
 										}
 									</List>
 								</Menu>
