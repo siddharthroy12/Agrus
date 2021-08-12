@@ -527,7 +527,7 @@ export default function PostScreen() {
 									<CardMedia
 										component="img"
 										alt="bruh"
-										style={{height: '25rem', width: 'auto'}}
+										style={{height: '25rem', objectFit: 'contain'}}
 										image={(post as PostType).media}
 										title="image"
 									/>
