@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Paper, Typography } from '@material-ui/core'
+import { Paper, Typography, Link } from '@material-ui/core'
 import { ReactNode } from 'react'
 
 const Wrapper = styled.aside`
@@ -33,6 +33,7 @@ const MoreInfoRow = styled.div`
 
 	& > * {
 		width: 100%;
+		cursor: pointer;
 	}
 `
 
@@ -48,20 +49,40 @@ export default function SubContainerAside({ children }: propsType) {
 			<Divider variant="outlined"/>
 			<MoreInfoBox variant="outlined">
 				<MoreInfoRow>
-					<Typography>
+					<Link
+						color="inherit"
+						href="https://twitter.com/Siddharth_Roy12"
+						rel="noopener"
+						target="_blank"
+					>
 						Made By
-					</Typography>
-					<Typography>
+					</Link>
+					<Link
+						href="https://github.com/siddharthroy12/Agrus"
+						color="inherit"
+						rel="noopener"
+						target="_blank"
+					>
 						Source Code
-					</Typography>
+					</Link>
 				</MoreInfoRow>
 				<MoreInfoRow>
-					<Typography>
+					<Link
+						href="https://raw.githubusercontent.com/siddharthroy12/Agrus/main/LICENSE.txt"
+						color="inherit"
+						rel="noopener"
+						target="_blank"
+					>
 						License
-					</Typography>
-					<Typography>
+					</Link>
+					<Link
+						color="inherit"
+						rel="noopener"
+						href="https://github.com/siddharthroy12/Agrus/blob/main/README.md"
+						target="_blank"
+					>
 						About
-					</Typography>
+					</Link>
 				</MoreInfoRow>
 				</MoreInfoBox>
 			</Sticky>
