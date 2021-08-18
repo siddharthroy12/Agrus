@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent } from 'react'
+import { useState, SyntheticEvent, useEffect } from 'react'
 import {
 	AppBar, Toolbar, IconButton,
 	Typography, Button, InputBase,
@@ -16,7 +16,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { StateType } from '../Store'
 import { logout } from '../Actions/loginActions'
 import DrawerContent from './DrawerContent'
-import { useHistory } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
+import queryString from 'query-string'
 import styled from 'styled-components'
 
 const TopBar = styled(AppBar)`
@@ -129,9 +130,19 @@ const UserMenu = styled.div`
 export default function Header() {
 	const [userMenuIsOpen, setUserMenuIsOpen] = useState<Element | boolean>(false)
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+	const [searchText, setSearchText] = useState('')
 	const loginState:any = useSelector((state:StateType) => state.login)
 	const dispatch = useDispatch()
 	const history = useHistory()
+	const location = useLocation()
+
+	useEffect(() => {
+		setSearchText(queryString.parse(location.search).search as string)
+	}, [location.search])
+
+	const shouldAutoFocusSearchInput = () => {
+		return queryString.parse(location.search).search ? true : false
+	}
 
 	const handleUserMenuBtnClick = (e: SyntheticEvent) => {
 		setUserMenuIsOpen(e.currentTarget)
@@ -154,6 +165,7 @@ export default function Header() {
 	}
 
 	const handleSearchBoxChange = (event:any) => {
+		setSearchText(event.target.value)
 		if (event.target.value.trim().length > 2) {
 			history.push(
 				`/search?search=${encodeURIComponent(event.target.value.trim())}`
@@ -188,6 +200,8 @@ export default function Header() {
 						<SearchIcon />
 					</SearchBoxIcon>
 					<SearchBoxInput
+						autoFocus={shouldAutoFocusSearchInput()}
+						value={searchText}
 						placeholder="Search…"
 						inputProps={{ 'aria-label': 'search' }}
 						onChange={handleSearchBoxChange}
@@ -195,7 +209,11 @@ export default function Header() {
 				</SearchBox>
 			</CenterHorizontal>
 			<LeftOptions>
-				<SearchIconButton style={{color: 'white'}}>
+				{/* @ts-ignore */}
+				<SearchIconButton component={Link}
+					style={{color: 'white'}}
+					to='/search'
+				>
 					<SearchIcon />
 				</SearchIconButton>
 				{ loginState.loggedIn ? (

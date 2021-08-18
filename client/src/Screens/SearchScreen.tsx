@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { useState, useEffect, useCallback } from 'react'
-import { useLocation } from 'react-router'
+import { useLocation, useHistory } from 'react-router'
 import useMounted from '../Hooks/useMounted'
 import reqErrorHandler from '../Utils/reqErrorHandler'
 import {
-	LinearProgress, Typography
+	LinearProgress, Typography, TextField
 } from '@material-ui/core'
 import {
 	Container, Post,
@@ -26,18 +26,26 @@ const List = styled.div`
 		margin-bottom: 1rem;
 	}
 `
-
 const Wrapper = styled(Container)`
 	display: flex;
 	flex-direction: column;
+`
+const SearchBox = styled(TextField)`
+	margin-bottom: 3rem;
+
+	@media screen and (min-width: 451px) {
+		display: none !important;
+	}
 `
 
 export default function SearchScreen() {
 	const [loading, setLoading] = useState(false)
 	const [posts, setPosts] = useState<any[]>([])
 	const [boards, setBoards] = useState<any[]>([])
+	const [searchText, setSearchText] = useState('')
 	const isMounted = useMounted()
 	const location = useLocation()
+	const history = useHistory()
 	const dispatch = useDispatch()
 
 	const searchPosts = useCallback(() => {
@@ -73,11 +81,26 @@ export default function SearchScreen() {
 	}, [location.search, isMounted, dispatch])
 
 	useEffect(() => {
-		setLoading(true)
-		searchPosts()
-		searchBoards()
-		
+		if (queryString.parse(location.search).search) {
+			setLoading(true)
+			searchPosts()
+			searchBoards()
+		}
 	},[location.search, searchPosts, searchBoards])
+
+	useEffect(() => {
+		setSearchText(queryString.parse(location.search).search as string)
+	}, [location.search])
+	
+	const handleSearchBoxChange = (event:any) => {
+		setSearchText(event.target.value)
+		if (event.target.value.trim().length > 2) {
+			history.push(
+				`/search?search=${encodeURIComponent(event.target.value.trim())}`
+			)
+		}
+	}
+
 	return (
 		<Wrapper>
 			<Helmet>
@@ -89,6 +112,12 @@ export default function SearchScreen() {
           content={`Search Result for "${queryString.parse((location.search)).search}"`}
         />
 			</Helmet>
+			<SearchBox
+				variant="filled"
+				label="Search"
+				value={searchText}
+				onChange={handleSearchBoxChange}
+			/>
 			{loading && <Loading />}
 			{!loading && (<>
 				<SubHeader variant="h6">Posts</SubHeader>
