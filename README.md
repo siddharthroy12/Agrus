@@ -8,7 +8,7 @@
   <p align="center">
    	A Social Media MVP app based on reddit
     <br />
-    <a href="#">View Demo</a>
+    <a href="https://agrus.herokuapp.com/">View Demo</a>
     ·
     <a href="https://github.com/siddharthroy12/Agrus/issues">Report Bug</a>
     ·
