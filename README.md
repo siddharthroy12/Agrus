@@ -8,7 +8,7 @@
   <p align="center">
    	A Social Media MVP app based on reddit
     <br />
-    <a href="https://agrus.herokuapp.com/">View Demo</a>
+    <a href="https://agrus.onrender.com/">View Demo</a>
     ·
     <a href="https://github.com/siddharthroy12/Agrus/issues">Report Bug</a>
     ·
@@ -120,5 +120,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 
 Siddharth Roy - [@Siddharth_Roy12](https://twitter.com/Siddharth_Roy12)
-
-Project Link: [https://github.com/siddharthroy12/keepr](https://github.com/siddharthroy12/keepr)
